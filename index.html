@@ -1,1 +1,460 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Название проекта — Wiki</title>
+  <style>
+    :root{
+      --bg: #0a0a0a;
+      --panel: #000000;
+      --text: #ffffff;
+      --muted: rgba(255,255,255,.72);
+      --soft: rgba(255,255,255,.12);
+      --line: rgba(255,255,255,.18);
+      --line2: rgba(255,255,255,.10);
+      --focus: rgba(255,255,255,.35);
+      --radius: 14px;
+      --radius2: 10px;
+      --gap: 16px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+
+    *{ box-sizing: border-box; }
+    html, body{ height: 100%; }
+    body{
+      margin: 0;
+      background: radial-gradient(1200px 800px at 30% 10%, rgba(255,255,255,.06), transparent 60%),
+                  radial-gradient(900px 600px at 80% 30%, rgba(255,255,255,.04), transparent 55%),
+                  var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      line-height: 1.45;
+    }
+
+    /* “Форумная” сетка страницы */
+    .app{
+      min-height: 100%;
+      display: grid;
+      grid-template-columns: 280px 1fr;
+    }
+
+    /* Sidebar */
+    .sidebar{
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      padding: 18px 14px;
+      background: linear-gradient(180deg, rgba(255,255,255,.02), transparent 45%),
+                  var(--panel);
+      border-right: 1px solid var(--line);
+    }
+
+    .brand-mini{
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 10px 14px;
+      border-bottom: 1px solid var(--line2);
+      margin-bottom: 14px;
+    }
+    .sig{
+      width: 34px; height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      font-family: var(--mono);
+      letter-spacing: .06em;
+      user-select: none;
+    }
+    .brand-mini .t{
+      display: grid;
+      gap: 2px;
+    }
+    .brand-mini .t strong{
+      font-family: var(--mono);
+      font-size: 12.5px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .brand-mini .t span{
+      color: var(--muted);
+      font-size: 12px;
+      font-family: var(--mono);
+    }
+
+    .nav{
+      display: grid;
+      gap: 8px;
+      padding: 4px;
+    }
+    .nav a{
+      text-decoration: none;
+      color: var(--text);
+      border: 1px solid var(--line2);
+      border-radius: var(--radius2);
+      padding: 10px 10px;
+      font-family: var(--mono);
+      font-size: 12.5px;
+      letter-spacing: .04em;
+      background: rgba(255,255,255,.02);
+      transition: border-color .15s ease, background .15s ease, transform .06s ease;
+    }
+    .nav a:hover{
+      border-color: var(--focus);
+      background: rgba(255,255,255,.04);
+    }
+    .nav a:active{ transform: translateY(1px); }
+    .nav a[aria-current="page"]{
+      border-color: rgba(255,255,255,.45);
+      background: rgba(255,255,255,.06);
+    }
+
+    .sidebar .meta{
+      margin-top: 14px;
+      padding: 10px;
+      border-top: 1px solid var(--line2);
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 12px;
+      display: grid;
+      gap: 6px;
+    }
+
+    /* Main */
+    .main{
+      padding: 22px 22px 40px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .panel{
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(0,0,0,.35);
+      box-shadow: 0 0 0 1px rgba(255,255,255,.03) inset;
+      overflow: hidden;
+    }
+
+    .header{
+      padding: 18px 18px 14px;
+      border-bottom: 1px solid var(--line2);
+      display: flex;
+      gap: 14px;
+      align-items: center;
+    }
+    .logo{
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,.03);
+      font-family: var(--mono);
+      font-size: 14px;
+      letter-spacing: .12em;
+      user-select: none;
+    }
+    .titleblock{
+      display: grid;
+      gap: 4px;
+      min-width: 0;
+    }
+    .titleblock h1{
+      margin: 0;
+      font-family: var(--mono);
+      font-size: 18px;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .titleblock p{
+      margin: 0;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 12.5px;
+      letter-spacing: .03em;
+    }
+
+    .content{
+      padding: 16px 18px 18px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .intro{
+      display: grid;
+      gap: 10px;
+      border: 1px dashed var(--line2);
+      border-radius: 12px;
+      padding: 14px;
+      background: rgba(255,255,255,.02);
+    }
+    .intro .label{
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .intro .text{
+      margin: 0;
+      color: rgba(255,255,255,.9);
+      font-size: 14px;
+    }
+
+    /* Сетка статей 3x4 */
+    .articles{
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--gap);
+    }
+
+    .card{
+      display: grid;
+      gap: 8px;
+      padding: 14px;
+      border: 1px solid var(--line2);
+      border-radius: 14px;
+      background: rgba(255,255,255,.015);
+      text-decoration: none;
+      color: var(--text);
+      transition: border-color .15s ease, background .15s ease, transform .06s ease;
+      min-height: 112px;
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before{
+      content:"";
+      position:absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,.06), transparent 40%);
+      opacity: .35;
+      pointer-events:none;
+    }
+    .card:hover{
+      border-color: var(--focus);
+      background: rgba(255,255,255,.03);
+    }
+    .card:active{ transform: translateY(1px); }
+
+    .card .kicker{
+      font-family: var(--mono);
+      font-size: 11.5px;
+      color: var(--muted);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .card .name{
+      margin: 0;
+      font-family: var(--mono);
+      font-size: 13.5px;
+      letter-spacing: .05em;
+      position: relative;
+      z-index: 1;
+    }
+    .card .desc{
+      margin: 0;
+      font-size: 13px;
+      color: rgba(255,255,255,.78);
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Низ страницы — как “форумный” футер */
+    .footerline{
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 12px;
+      padding: 12px 2px 0;
+    }
+    .dot{
+      width: 6px; height: 6px;
+      border-radius: 99px;
+      background: rgba(255,255,255,.35);
+      display: inline-block;
+    }
+
+    /* Responsive */
+    @media (max-width: 980px){
+      .app{ grid-template-columns: 240px 1fr; }
+      .articles{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 760px){
+      .app{ grid-template-columns: 1fr; }
+      .sidebar{
+        height: auto;
+        position: relative;
+        border-right: none;
+        border-bottom: 1px solid var(--line);
+      }
+      .articles{ grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+
+    <!-- ЛЕВАЯ ПАНЕЛЬ -->
+    <aside class="sidebar">
+      <div class="brand-mini">
+        <div class="sig">XS</div>
+        <div class="t">
+          <strong>Project Wiki</strong>
+          <span>read-only • techno forum</span>
+        </div>
+      </div>
+
+      <nav class="nav" aria-label="Навигация">
+        <a href="#" aria-current="page"># Главная</a>
+        <a href="#articles"># Статьи</a>
+        <a href="#"># Глоссарий</a>
+        <a href="#"># Архитектура</a>
+        <a href="#"># Roadmap</a>
+        <a href="#"># Контакты</a>
+      </nav>
+
+      <div class="meta">
+        <div><span class="dot"></span> режим: только чтение</div>
+        <div><span class="dot"></span> стиль: ч/б, техно</div>
+        <div><span class="dot"></span> статус: прототип</div>
+      </div>
+    </aside>
+
+    <!-- ОСНОВНАЯ ОБЛАСТЬ -->
+    <main class="main">
+      <section class="panel">
+        <header class="header">
+          <div class="logo">LOGO</div>
+          <div class="titleblock">
+            <h1>Название проекта</h1>
+            <p>Вики-страница проекта • структура как у форума • без комментариев и правок</p>
+          </div>
+        </header>
+
+        <div class="content">
+          <div class="intro">
+            <div class="label">О проекте</div>
+            <p class="text">
+              Короткое описание: что это за проект, зачем он нужен и где его границы.
+              Здесь удобно держать “каноничную” информацию: термины, спецификации, решения и ссылки.
+              Никаких обсуждений — только чистая документация (как холодный космос).
+            </p>
+          </div>
+
+          <div class="intro" id="articles">
+            <div class="label">Статьи</div>
+
+            <div class="articles">
+              <!-- 12 карточек = 3x4 -->
+              <a class="card" href="#">
+                <div class="kicker">01 • старт</div>
+                <h3 class="name">Обзор системы</h3>
+                <p class="desc">Что это, из каких блоков состоит и как читать документацию.</p>
+              </a>
+
+              <a class="card" href="#">
+                <div class="kicker">02 • основа</div>
+                <h3 class="name">Термины и определения</h3>
+                <p class="desc">Мини-глоссарий: чтобы слова значили одно и то же.</p>
+              </a>
+
+              <a class="card" href="#">
+                <div class="kicker">03 • дизайн</div>
+                <h3 class="name">Архитектура</h3>
+                <p class="desc">Слои, модули, границы ответственности.</p>
+              </a>
+
+              <a class="card" href="#">
+                <div class="kicker">04 • протокол</div>
+                <h3 class="name">API / Контракты</h3>
+                <p class="desc">Форматы, статусы, ошибки, примеры запросов.</p>
+              </a>
+
+              <a class="card" href="#">
+                <div class="kicker">05 • процесс</div>
+                <h3 class="name">Roadmap</h3>
+                <p class="desc">Куда движемся, этапы, критерии готовности.</p>
+              </a>
+
+              <a class="card" href="#">
+                <div class="kicker">06 • правила</div>
+                <h3 class="name">Гайдлайны</h3>
+                <p class="desc">Стандарты, соглашения, стиль кода/доков.</p>
+              </a>
+
+              <a class="card" href="#">
+                <div class="kicker">07 • запуск</div>
+                <h3 class="name">Развёртывание</h3>
+                <p class="desc">Как поднять, где конфиги, какие зависимости.</p>
+              </a>
+
+              <a class="card" href="#">
+                <div class="kicker">08 • качество</div>
+                <h3 class="name">Тестирование</h3>
+                <p class="desc">Набор тестов, окружения, чек-листы.</p>
+              </a>
+
+              <a class="card" href="#">
+                <div class="kicker">09 • наблюдаемость</div>
+                <h3 class="name">Логи и метрики</h3>
+                <p class="desc">События, мониторинг, алерты, разбор инцидентов.</p>
+              </a>
+
+              <a class="card" href="#">
+                <div class="kicker">10 • безопасность</div>
+                <h3 class="name">Модель угроз</h3>
+                <p class="desc">Риски, ограничения, что защищаем и как.</p>
+              </a>
+
+              <a class="card" href="#">
+                <div class="kicker">11 • история</div>
+                <h3 class="name">Решения и ADR</h3>
+                <p class="desc">Почему приняли именно так (и где зарыты компромиссы).</p>
+              </a>
+
+              <a class="card" href="#">
+                <div class="kicker">12 • контакты</div>
+                <h3 class="name">Команда</h3>
+                <p class="desc">Ответственные, каналы связи, роли.</p>
+              </a>
+            </div>
+          </div>
+
+          <div class="footerline">
+            <span class="dot"></span>
+            <span>© <span id="year"></span> • Документация проекта • read-only</span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+  </div>
+
+  <script>
+    // маленькая техно-мелочь: год в футере
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // подсветка пункта “Статьи” при переходе по якорю
+    const links = document.querySelectorAll('.nav a');
+    function setCurrent(hash){
+      links.forEach(a => a.removeAttribute('aria-current'));
+      const active = Array.from(links).find(a => a.getAttribute('href') === hash) ||
+                     Array.from(links).find(a => a.getAttribute('href') === '#');
+      if(active) active.setAttribute('aria-current', 'page');
+    }
+    window.addEventListener('hashchange', () => setCurrent(location.hash));
+    setCurrent(location.hash || '#');
+  </script>
+</body>
+</html>
 
