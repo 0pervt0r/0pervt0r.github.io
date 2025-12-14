@@ -60,15 +60,21 @@
       margin-bottom: 14px;
     }
     .sig{
-      width: 34px; height: 34px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      display: grid;
-      place-items: center;
-      font-family: var(--mono);
-      letter-spacing: .06em;
-      user-select: none;
-    }
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  user-select: none;
+  overflow: hidden;
+}
+
+.sig-icon{
+  width: 70%;
+  height: 70%;
+  object-fit: contain;
+  display: block;
+}
+
     .brand-mini .t{
       display: grid;
       gap: 2px;
@@ -348,7 +354,7 @@
     
     <aside class="sidebar">
       <div class="brand-mini">
-        <div class="sig"> <img src="CINDER.png"></div>
+        <div class="sig"> <img class="sig-icon" src="CINDER.png"></div>
         <div class="t">
           <strong>CINDER</strong>
         </div>
