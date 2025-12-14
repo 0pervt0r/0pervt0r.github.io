@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Питомец-симулятор</title>
+  <title>кролекееее</title>
   <style>
     :root{
       --bg:#0f1220;
@@ -92,7 +92,7 @@
       display:grid;
       place-items:center;
       box-shadow: 0 10px 25px rgba(0,0,0,.25);
-      /* фон прогресса будет задаваться через style="background: conic-gradient(...)" */
+
     }
 
     .ring::after{
@@ -224,19 +224,18 @@
       <div class="card">
         <h3 class="title">
           Питомец
-          <span class="money">💰 <span id="money">30</span></span>
+          <span class="money">💰 <span id="money">3000</span></span>
         </h3>
         <div class="toast" id="toast"></div>
         <div style="font-size:12px; opacity:.85; line-height:1.35;">
-          Теперь питомец сам решает: стоять или идти. Игры повышают настроение, но пачкают.
         </div>
       </div>
 
       <div class="card">
         <h3 class="title">Играть</h3>
         <div class="btnRow">
-          <button id="petBtn">🤚 Погладить</button>
-          <button id="ballBtn">🎾 Бросить мячик</button>
+          <button id="petBtn">Погладить</button>
+          <button id="ballBtn"> Бросить мячик</button>
         </div>
       </div>
 
@@ -248,28 +247,28 @@
   </div>
 
   <script>
-    // ---------- Утилиты ----------
+    
     const clamp = (v, a=0, b=100) => Math.max(a, Math.min(b, v));
     const pct = v => `${Math.round(v)}%`;
 
-    // ---------- Состояние ----------
+    
     const state = {
-      money: 30,
+      money: 3000,
       stats: { hunger: 65, sleep: 70, mood: 60, clean: 75 },
 
-      // движение
+     
       petX: 80,
-      dir: 1,                 // 1 вправо, -1 влево
-      speed: 90,              // px/сек (когда идёт)
+      dir: 1,                
+      speed: 90,             
 
-      // поведение
-      mode: "idle",            // "idle" | "walk"
-      modeTimer: 0,            // сколько секунд осталось в текущем режиме
+     
+      mode: "idle",         
+      modeTimer: 0,  
 
       decay: { hunger: 1.2, sleep: 0.7, mood: 0.5, clean: 0.6 }
     };
 
-    // ---------- Еда (3 вида) ----------
+
     const foods = [
       { id:"kibble", name:"Сухой корм", price:6,  desc:"+18 голод, -3 настроение",
         effect:s => { s.hunger += 18; s.mood -= 3; } },
@@ -352,12 +351,12 @@
 
     function petAction(){
       applyEffects(s => { s.mood += 12; s.sleep += 3; s.clean -= 2; });
-      toast("Погладили ✨");
+      toast("Погладили");
     }
 
     function throwBall(){
       applyEffects(s => { s.mood += 18; s.sleep -= 5; s.clean -= 5; });
-      toast("Побегали! 🎾");
+      toast("Побегали!");
 
       // анимация мяча
       const rect = scene.getBoundingClientRect();
@@ -383,14 +382,14 @@
       }
       requestAnimationFrame(anim);
 
-      // чуть чаще начинаем идти после игры (как будто возбудился)
+     
       setMode("walk", 0.8 + Math.random()*1.2, 1);
     }
 
     petBtn.addEventListener("click", petAction);
     ballBtn.addEventListener("click", throwBall);
 
-    // ---------- Кружки прогресса ----------
+   
     function setRing(el, value01, color){
       const deg = Math.round(clamp(value01,0,100) * 3.6);
       el.style.background = `conic-gradient(${color} ${deg}deg, var(--ring-bg) 0deg)`;
@@ -435,15 +434,14 @@
       const { margin, maxX } = clampPetX();
 
       pet.style.left = state.petX + "px";
-      // разворот (без обводок)
       pet.style.transform = `scaleX(${state.dir})`;
 
-      // если вдруг зажали — переобрежем и поменяем направление
+
       if(state.petX <= margin) state.dir = 1;
       if(state.petX >= maxX) state.dir = -1;
     }
 
-    // ---------- Рандомное поведение ----------
+
     function setMode(mode, seconds, dir = state.dir){
       state.mode = mode;
       state.modeTimer = Math.max(0.2, seconds);
@@ -451,12 +449,12 @@
     }
 
     function decideNextMode(){
-      // чуть логики: если голод/сон плохие — меньше бегаем
+     
       const s = state.stats;
       const tired = (s.sleep < 25);
       const grumpy = (s.mood < 25);
 
-      // базовые вероятности
+     
       let pWalk = 0.55;
       let pIdle = 0.45;
 
@@ -474,7 +472,7 @@
       }
     }
 
-    // ---------- Игровой цикл ----------
+  
     let last = performance.now();
 
     function tick(now){
