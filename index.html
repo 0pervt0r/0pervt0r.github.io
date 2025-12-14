@@ -283,7 +283,7 @@
       z-index: 1;
     }
 
-    /* Низ страницы — как “форумный” футер */
+   
     .footerline{
       display: flex;
       gap: 10px;
@@ -300,7 +300,22 @@
       display: inline-block;
     }
 
-    /* Responsive */
+    @font-face {
+       font-family: "Palui SP"; 
+       src: url("PaluiSPDemo-Bold.otf") format("truetype"); 
+       font-style: normal; 
+       font-weight: normal; 
+} 
+
+    h1 {
+      font-family: "Palui SP";
+    }
+
+    h2 {
+
+    }
+
+    
     @media (max-width: 980px){
       .app{ grid-template-columns: 240px 1fr; }
       .articles{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -321,7 +336,7 @@
 <body>
   <div class="app">
 
-    <!-- ЛЕВАЯ ПАНЕЛЬ -->
+    
     <aside class="sidebar">
       <div class="brand-mini">
         <div class="sig">XS</div>
@@ -340,13 +355,7 @@
         <a href="#"># Контакты</a>
       </nav>
 
-      <div class="meta">
-        <div><span class="dot"></span> режим: только чтение</div>
-        <div><span class="dot"></span> стиль: ч/б, техно</div>
-        <div><span class="dot"></span> статус: прототип</div>
-      </div>
-    </aside>
-
+      
     <!-- ОСНОВНАЯ ОБЛАСТЬ -->
     <main class="main">
       <section class="panel">
@@ -357,7 +366,7 @@
 </div>
 
           <div class="titleblock">
-            <h1>Название проекта</h1>
+            <h1>URBANSHADE CHRONICLES</h1>
             <p>Вики-страница проекта • структура как у форума • без комментариев и правок</p>
           </div>
         </header>
