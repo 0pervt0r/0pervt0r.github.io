@@ -2,515 +2,551 @@
 <html lang="ru">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Питомец-симулятор</title>
   <style>
     :root{
-      --bg:#0f1220; --panel:#171a2b; --panel2:#1e2240; --text:#e9ecff;
-      --muted:#aab0d6; --border:#2a2f55;
-      --hunger:#ff9a3c; --sleep:#86b6ff; --mood:#ffe97a; --clean:#e9fbff;
-      --ok:#55e3a5; --warn:#ffcc66; --bad:#ff6b6b;
-    }
-    *{box-sizing:border-box; font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial;}
-    body{margin:0; background:radial-gradient(1200px 600px at 30% 20%, #1b1f3d 0%, var(--bg) 55%); color:var(--text);}
-    .wrap{display:grid; grid-template-columns: 1.3fr 0.7fr; gap:14px; padding:14px; max-width:1100px; margin:0 auto;}
-    .game{
-      background:linear-gradient(180deg, #14183a, #0d1022);
-      border:1px solid var(--border); border-radius:16px; overflow:hidden;
-      position:relative; height:420px; box-shadow:0 10px 30px rgba(0,0,0,.25);
-    }
-    .hud{
-      position:absolute; top:10px; left:10px; right:10px;
-      display:flex; gap:10px; align-items:flex-start; justify-content:space-between;
-      pointer-events:none;
-    }
-    .hud .left, .hud .right{display:flex; gap:10px; align-items:flex-start;}
-    .card{
-      pointer-events:auto;
-      background:rgba(23,26,43,.85);
-      border:1px solid rgba(42,47,85,.85);
-      border-radius:12px; padding:10px;
-      backdrop-filter: blur(6px);
-      min-width:240px;
-    }
-    .title{font-weight:700; letter-spacing:.2px;}
-    .sub{color:var(--muted); font-size:12px; margin-top:2px;}
-    .stats{display:grid; gap:8px; margin-top:10px;}
-    .stat{display:grid; gap:6px;}
-    .stat-row{display:flex; justify-content:space-between; align-items:center; font-size:12px; color:var(--muted);}
-    .bar{
-      height:10px; border-radius:999px; background:#0a0d1c; border:1px solid rgba(42,47,85,.7);
-      overflow:hidden;
-    }
-    .fill{height:100%; width:50%; border-radius:999px;}
-    .pill{font-size:12px; padding:4px 8px; border-radius:999px; border:1px solid rgba(255,255,255,.08);}
-    .money{font-weight:700;}
-    .toast{
-      position:absolute; left:50%; transform:translateX(-50%);
-      bottom:14px; background:rgba(23,26,43,.92); border:1px solid rgba(42,47,85,.9);
-      border-radius:999px; padding:8px 12px; color:var(--text);
-      font-size:13px; opacity:0; transition:.25s ease;
-      pointer-events:none;
-    }
-    .toast.show{opacity:1; transform:translateX(-50%) translateY(-4px);}
+      --bg:#0f1220;
+      --panel:#171a2b;
+      --panel2:#1e2238;
+      --text:#e9ecff;
 
-    /* Сцена */
+      --hunger:#ff9b2f;      /* оранжевый */
+      --sleep:#7ec8ff;       /* светло-синий */
+      --mood:#ffe28a;        /* нежно-жёлтый */
+      --clean:#eaf7ff;       /* голубовато-белый */
+      --danger:#ff4d6d;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(1200px 600px at 30% 10%, #20254a 0%, var(--bg) 55%);
+      color:var(--text);
+      display:flex;
+      min-height:100vh;
+    }
+
+    .wrap{
+      width:min(1100px, 96vw);
+      margin:auto;
+      display:grid;
+      grid-template-columns: 1fr 340px;
+      gap:14px;
+      padding:14px 0;
+    }
+
+    /* Игровая сцена */
+    .scene{
+      position:relative;
+      background: linear-gradient(180deg, #1a1f3a 0%, #12152a 100%);
+      border-radius:16px;
+      overflow:hidden;
+      min-height:520px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+
     .ground{
-      position:absolute; left:0; right:0; bottom:0; height:140px;
-      background:linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,.35)), linear-gradient(180deg, #1a2146, #0f1330);
-      border-top:1px solid rgba(255,255,255,.06);
-    }
-    .bed{
-      position:absolute; bottom:32px; left:50%; transform:translateX(-50%);
-      width:200px; height:64px; border-radius:18px;
-      border:1px solid rgba(255,255,255,.08);
-      box-shadow:0 10px 20px rgba(0,0,0,.25);
-    }
-    .bed.a{background:linear-gradient(180deg, #2c2f5f, #1a1d44);}
-    .bed.b{background:linear-gradient(180deg, #3a2c5f, #241544);}
-    .bed.c{background:linear-gradient(180deg, #2c5f56, #14443f);}
-    .bed::after{
-      content:""; position:absolute; inset:10px; border-radius:14px;
-      background:rgba(255,255,255,.06);
-      border:1px dashed rgba(255,255,255,.10);
+      position:absolute;
+      left:0; right:0; bottom:0;
+      height:120px;
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
     }
 
     /* Питомец */
     .pet{
-      position:absolute; bottom:86px; left:120px;
-      width:72px; height:72px; border-radius:20px;
-      background:linear-gradient(180deg, #ff8bd0, #c65bff);
-      border:1px solid rgba(255,255,255,.12);
-      box-shadow:0 12px 30px rgba(0,0,0,.35);
-      display:grid; place-items:center;
-      transform-origin: 50% 90%;
+      position:absolute;
+      bottom:90px;
+      width:120px;
+      height:120px;
+      image-rendering: pixelated;
+      user-select:none;
+      -webkit-user-drag:none;
+      transform: translateX(0) scaleX(1);
+      /* НИКАКИХ обводок/фильтров */
+      filter:none;
     }
-    .face{position:relative; width:46px; height:36px;}
-    .eye{position:absolute; top:8px; width:8px; height:8px; border-radius:999px; background:#0d0f1c;}
-    .eye.l{left:8px;} .eye.r{right:8px;}
-    .mouth{position:absolute; left:50%; bottom:6px; transform:translateX(-50%);
-      width:18px; height:10px; border-bottom:3px solid #0d0f1c; border-radius:0 0 18px 18px;
-      opacity:.9;
-    }
-    .pet.walk{animation:bob .45s ease-in-out infinite;}
-    .pet.sleeping{filter:saturate(.75) brightness(.9); }
-    .pet.sleeping .mouth{border-bottom-color:transparent; width:16px; height:6px; border-top:3px solid #0d0f1c; border-radius:18px;}
-    .pet.happy{box-shadow:0 0 0 6px rgba(85,227,165,.12), 0 12px 30px rgba(0,0,0,.35);}
-    .pet.dirty{box-shadow:0 0 0 6px rgba(255,204,102,.12), 0 12px 30px rgba(0,0,0,.35);}
-    @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
 
-    /* Панели справа */
-    .side{
-      background:rgba(23,26,43,.8);
-      border:1px solid var(--border);
+    /* Панель UI */
+    .ui{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .card{
+      background: linear-gradient(180deg, var(--panel) 0%, var(--panel2) 100%);
       border-radius:16px;
       padding:12px;
-      box-shadow:0 10px 30px rgba(0,0,0,.20);
-      height:420px;
-      overflow:auto;
+      box-shadow: 0 10px 30px rgba(0,0,0,.28);
     }
-    .section{border:1px solid rgba(42,47,85,.8); border-radius:14px; padding:10px; background:rgba(30,34,64,.45); margin-bottom:12px;}
-    .section h3{margin:0 0 8px; font-size:14px;}
-    .grid{display:grid; gap:8px;}
+
+    .title{
+      font-weight:700;
+      letter-spacing:.2px;
+      margin:0 0 8px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+    }
+
+    .money{
+      font-variant-numeric: tabular-nums;
+      opacity:.95;
+      background: rgba(255,255,255,.06);
+      padding:4px 8px;
+      border-radius:999px;
+    }
+
+    .bars{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .barRow{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+
+    .barTop{
+      display:flex;
+      justify-content:space-between;
+      font-size:12px;
+      opacity:.9;
+    }
+
+    .bar{
+      height:12px;
+      border-radius:999px;
+      background: rgba(255,255,255,.08);
+      overflow:hidden;
+    }
+
+    .fill{
+      height:100%;
+      width:50%;
+      border-radius:999px;
+      transition: width .18s linear;
+    }
+
+    .btnRow{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
     button{
-      width:100%; padding:9px 10px; border-radius:12px;
-      border:1px solid rgba(255,255,255,.10);
-      background:rgba(15,18,32,.7);
+      border:0;
+      border-radius:12px;
+      padding:10px 10px;
+      background: rgba(255,255,255,.08);
       color:var(--text);
       cursor:pointer;
-      transition:.15s ease;
-      text-align:left;
+      font-weight:600;
+      transition: transform .06s ease, background .12s ease, opacity .12s ease;
+      user-select:none;
     }
-    button:hover{transform:translateY(-1px); border-color:rgba(255,255,255,.18);}
-    button:active{transform:translateY(0px);}
-    button[disabled]{opacity:.5; cursor:not-allowed; transform:none;}
-    .row{display:flex; gap:8px;}
-    .row button{text-align:center;}
-    .hint{color:var(--muted); font-size:12px; line-height:1.35;}
-    .small{font-size:12px; color:var(--muted);}
+    button:hover{ background: rgba(255,255,255,.12); }
+    button:active{ transform: translateY(1px); }
+    button:disabled{ opacity:.45; cursor:not-allowed; }
+
+    .shop{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:8px;
+    }
+    .shopItem{
+      background: rgba(255,255,255,.06);
+      border-radius:14px;
+      padding:10px;
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap:10px;
+      align-items:center;
+    }
+    .shopItem small{opacity:.85; display:block; line-height:1.35}
+    .price{
+      font-variant-numeric: tabular-nums;
+      opacity:.95;
+    }
+
+    .toast{
+      margin-top:8px;
+      font-size:13px;
+      opacity:.92;
+      min-height:18px;
+    }
 
     /* Мячик */
     .ball{
-      position:absolute; bottom:98px; left:40px;
-      width:18px; height:18px; border-radius:999px;
-      background:linear-gradient(180deg,#ffe97a,#ffb84a);
-      border:1px solid rgba(255,255,255,.12);
-      box-shadow:0 8px 16px rgba(0,0,0,.25);
+      position:absolute;
+      width:20px;
+      height:20px;
+      border-radius:50%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.9), rgba(255,255,255,.25));
+      box-shadow: 0 6px 18px rgba(0,0,0,.35);
+      pointer-events:none;
       opacity:0;
-    }
-    .ball.throw{opacity:1; animation:throw 1.2s ease-in-out forwards;}
-    @keyframes throw{
-      0%{transform:translate(0,0) scale(1);}
-      50%{transform:translate(520px,-120px) scale(1.05);}
-      100%{transform:translate(820px,0) scale(1); opacity:0;}
+      transform: translate(-50%, -50%);
     }
 
-    .pet {
-  position: absolute;
-  bottom: 86px;
-  width: 96px;
-  height: 96px;
-  pointer-events: none;
-}
-
-.pet img {
-  width: 100%;
-}
-
+    /* Адаптив */
+    @media (max-width: 940px){
+      body{ align-items:flex-start; }
+      .wrap{
+        grid-template-columns: 1fr;
+        padding:14px 0 24px;
+      }
+      .scene{ min-height:420px; }
+    }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="game" id="game">
-      <div class="hud">
-        <div class="left">
-          <div class="card">
-            <div class="title">Питомец</div>
-            <div class="sub" id="statusText">Бодрствует и шляется по делам</div>
-            <div class="stats">
-              <div class="stat">
-                <div class="stat-row"><span>Голод</span><span id="hungerVal">80</span></div>
-                <div class="bar"><div class="fill" id="hungerFill" style="background:var(--hunger)"></div></div>
-              </div>
-              <div class="stat">
-                <div class="stat-row"><span>Сон</span><span id="sleepVal">80</span></div>
-                <div class="bar"><div class="fill" id="sleepFill" style="background:var(--sleep)"></div></div>
-              </div>
-              <div class="stat">
-                <div class="stat-row"><span>Настроение</span><span id="moodVal">80</span></div>
-                <div class="bar"><div class="fill" id="moodFill" style="background:var(--mood)"></div></div>
-              </div>
-              <div class="stat">
-                <div class="stat-row"><span>Чистота</span><span id="cleanVal">80</span></div>
-                <div class="bar"><div class="fill" id="cleanFill" style="background:var(--clean)"></div></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="pet">
-  <img id="petSprite" src="walk.png" />
-</div>
-
-
-          <div class="card" style="min-width:170px">
-            <div class="title">Монеты</div>
-            <div class="sub">Купить можно почти всё. Почти.</div>
-            <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:center;">
-              <span class="pill">Баланс</span>
-              <span class="money" id="moneyVal">40</span>
-            </div>
-            <div class="small" style="margin-top:8px;">+1 монета каждые 8 секунд</div>
-          </div>
-        </div>
-
-        <div class="right">
-          <div class="card" style="min-width:210px">
-            <div class="title">Управление</div>
-            <div class="sub">Можно и без мышки</div>
-            <div class="small" style="margin-top:10px; line-height:1.45">
-              Клик по сцене — погладить<br/>
-              <b>F</b> — еда • <b>P</b> — погладить • <b>B</b> — мячик
-            </div>
-          </div>
-        </div>
-      </div>
-
+    <div class="scene" id="scene">
+      <img class="pet" id="pet" src="walk.png" alt="pet" />
       <div class="ball" id="ball"></div>
-      <div class="pet" id="pet" aria-label="pet">
-        <div class="face">
-          <div class="eye l"></div><div class="eye r"></div>
-          <div class="mouth"></div>
-        </div>
-      </div>
-
       <div class="ground"></div>
-      <div class="bed a" id="bed"></div>
-
-      <div class="toast" id="toast"></div>
     </div>
 
-    <div class="side">
-      <div class="section">
-        <h3>Еда (магазин)</h3>
-        <div class="grid" id="foodShop"></div>
-        <div class="hint" style="margin-top:8px;">
-          Еда влияет на несколько статов сразу — баланс важнее морали, чем в реальной жизни.
+    <div class="ui">
+      <div class="card">
+        <h3 class="title">
+          Питомец
+          <span class="money">💰 <span id="money">30</span></span>
+        </h3>
+
+        <div class="bars">
+          <div class="barRow">
+            <div class="barTop"><span>Голод</span><span id="hungerTxt">—</span></div>
+            <div class="bar"><div class="fill" id="hungerFill" style="background:var(--hunger)"></div></div>
+          </div>
+
+          <div class="barRow">
+            <div class="barTop"><span>Сон</span><span id="sleepTxt">—</span></div>
+            <div class="bar"><div class="fill" id="sleepFill" style="background:var(--sleep)"></div></div>
+          </div>
+
+          <div class="barRow">
+            <div class="barTop"><span>Настроение</span><span id="moodTxt">—</span></div>
+            <div class="bar"><div class="fill" id="moodFill" style="background:var(--mood)"></div></div>
+          </div>
+
+          <div class="barRow">
+            <div class="barTop"><span>Чистота</span><span id="cleanTxt">—</span></div>
+            <div class="bar"><div class="fill" id="cleanFill" style="background:var(--clean)"></div></div>
+          </div>
         </div>
+
+        <div class="toast" id="toast"></div>
       </div>
 
-      <div class="section">
-        <h3>Игры</h3>
-        <div class="row">
+      <div class="card">
+        <h3 class="title">Играть</h3>
+        <div class="btnRow">
           <button id="petBtn">🤚 Погладить</button>
-          <button id="ballBtn">⚾ Мячик</button>
+          <button id="ballBtn">🎾 Бросить мячик</button>
         </div>
-        <div class="hint" style="margin-top:8px;">
-          Погладить — чуть настроение вверх. Мячик — больше настроение, но тратит сон и чистоту.
-        </div>
-      </div>
-
-      <div class="section">
-        <h3>Декор</h3>
-        <div class="grid" id="decorShop"></div>
-        <div class="hint" style="margin-top:8px;">
-          Пока только лежанка, но это уже “эндгейм” для настоящих ценителей интерьера.
+        <div style="margin-top:8px; font-size:12px; opacity:.85; line-height:1.35;">
+          Подсказка: статистики со временем падают. Игры повышают настроение, но пачкают питомца.
         </div>
       </div>
 
-      <div class="section">
-        <h3>Мини-логика (что уже есть)</h3>
-        <div class="hint">
-          Статы сами тикают вниз (голод/сон/настроение/чистота).<br/>
-          Если сон &lt; 20 — питомец засыпает и медленнее теряет сон, но всё ещё голодает.<br/>
-          Если чистота &lt; 25 — он “грязный” (визуальный эффект).
-        </div>
+      <div class="card">
+        <h3 class="title">Магазин еды</h3>
+        <div class="shop" id="shop"></div>
       </div>
     </div>
   </div>
 
-<script>
-(() => {
-  const clamp = (v, a=0, b=100) => Math.max(a, Math.min(b, v));
+  <script>
+    // ---------- Утилиты ----------
+    const clamp = (v, a=0, b=100) => Math.max(a, Math.min(b, v));
+    const fmt = v => `${Math.round(v)}%`;
 
-  // Состояние игры
-  const state = {
-    money: 40,
-    stats: { hunger: 80, sleep: 80, mood: 80, clean: 80 },
-    bed: "a",
-    pet: { x: 120, dir: 1, speed: 38, asleep: false } // px, -1/1
-  };
+    // ---------- Состояние игры ----------
+    const state = {
+      money: 30,
+      stats: {
+        hunger: 65,
+        sleep: 70,
+        mood: 60,
+        clean: 75,
+      },
+      // положение питомца (в пикселях внутри сцены)
+      petX: 80,
+      petV: 70,   // px/сек
+      dir: 1,     // 1 вправо, -1 влево
+      // скорость изменения статов (в единицах/сек)
+      decay: {
+        hunger: 1.2,   // голод падает быстрее
+        sleep: 0.7,
+        mood: 0.5,
+        clean: 0.6
+      }
+    };
 
-  // Товары
-  const foods = [
-    {
-      id:"kibble", name:"Сухой корм", price: 6,
-      desc:"+20 голод, +3 настроение, -2 чистота",
-      effect: s => { s.hunger+=20; s.mood+=3; s.clean-=2; }
-    },
-    {
-      id:"fish", name:"Рыбка", price: 10,
-      desc:"+28 голод, +8 настроение, -6 чистота",
-      effect: s => { s.hunger+=28; s.mood+=8; s.clean-=6; }
-    },
-    {
-      id:"soup", name:"Супчик", price: 8,
-      desc:"+18 голод, +10 сон, -3 настроение",
-      effect: s => { s.hunger+=18; s.sleep+=10; s.mood-=3; }
-    }
-  ];
+    // ---------- Еда (3 вида) ----------
+    const foods = [
+      {
+        id: "kibble",
+        name: "Сухой корм",
+        price: 6,
+        desc: "+18 голод, -3 настроение (скучновато)",
+        effect: s => { s.hunger += 18; s.mood -= 3; }
+      },
+      {
+        id: "fish",
+        name: "Рыбка",
+        price: 10,
+        desc: "+22 голод, +6 настроение, -4 чистота",
+        effect: s => { s.hunger += 22; s.mood += 6; s.clean -= 4; }
+      },
+      {
+        id: "treat",
+        name: "Лакомство",
+        price: 8,
+        desc: "+10 голод, +14 настроение",
+        effect: s => { s.hunger += 10; s.mood += 14; }
+      }
+    ];
 
-  const beds = [
-    { id:"a", name:"Лежанка: Ночь", price: 18, desc:"Стандартная, уютная" },
-    { id:"b", name:"Лежанка: Фиолетовый туман", price: 25, desc:"+стиль (в сердце)" },
-    { id:"c", name:"Лежанка: Морская", price: 25, desc:"Пахнет приключениями (почти)" }
-  ];
+    // ---------- DOM ----------
+    const scene = document.getElementById("scene");
+    const pet = document.getElementById("pet");
+    const ball = document.getElementById("ball");
 
-  // DOM
-  const game = document.getElementById("game");
-  const petEl = document.getElementById("pet");
-  const bedEl = document.getElementById("bed");
-  const ballEl = document.getElementById("ball");
+    const moneyEl = document.getElementById("money");
+    const toastEl = document.getElementById("toast");
 
-  const moneyVal = document.getElementById("moneyVal");
-  const statusText = document.getElementById("statusText");
-  const toastEl = document.getElementById("toast");
+    const hungerFill = document.getElementById("hungerFill");
+    const sleepFill  = document.getElementById("sleepFill");
+    const moodFill   = document.getElementById("moodFill");
+    const cleanFill  = document.getElementById("cleanFill");
 
-  const ui = {
-    hungerVal: document.getElementById("hungerVal"),
-    sleepVal: document.getElementById("sleepVal"),
-    moodVal: document.getElementById("moodVal"),
-    cleanVal: document.getElementById("cleanVal"),
-    hungerFill: document.getElementById("hungerFill"),
-    sleepFill: document.getElementById("sleepFill"),
-    moodFill: document.getElementById("moodFill"),
-    cleanFill: document.getElementById("cleanFill"),
-    foodShop: document.getElementById("foodShop"),
-    decorShop: document.getElementById("decorShop"),
-    petBtn: document.getElementById("petBtn"),
-    ballBtn: document.getElementById("ballBtn"),
-  };
+    const hungerTxt = document.getElementById("hungerTxt");
+    const sleepTxt  = document.getElementById("sleepTxt");
+    const moodTxt   = document.getElementById("moodTxt");
+    const cleanTxt  = document.getElementById("cleanTxt");
 
-  let toastTimer = null;
-  function toast(msg){
-    toastEl.textContent = msg;
-    toastEl.classList.add("show");
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => toastEl.classList.remove("show"), 1200);
-  }
+    const petBtn = document.getElementById("petBtn");
+    const ballBtn = document.getElementById("ballBtn");
+    const shopEl = document.getElementById("shop");
 
-  function renderShops(){
-    ui.foodShop.innerHTML = "";
-    foods.forEach(f => {
-      const b = document.createElement("button");
-      b.innerHTML = `🍽️ <b>${f.name}</b> — ${f.price}💰<div class="small">${f.desc}</div>`;
-      b.onclick = () => buyFood(f.id);
-      ui.foodShop.appendChild(b);
-    });
+    // ---------- UI: магазин ----------
+    function buildShop(){
+      shopEl.innerHTML = "";
+      for(const item of foods){
+        const row = document.createElement("div");
+        row.className = "shopItem";
+        row.innerHTML = `
+          <div>
+            <div style="font-weight:700">${item.name}</div>
+            <small>${item.desc}</small>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:6px; align-items:flex-end">
+            <div class="price">💰 ${item.price}</div>
+            <button data-buy="${item.id}">Купить</button>
+          </div>
+        `;
+        shopEl.appendChild(row);
+      }
 
-    ui.decorShop.innerHTML = "";
-    beds.forEach(d => {
-      const owned = (state.bed === d.id);
-      const b = document.createElement("button");
-      b.disabled = owned;
-      b.innerHTML = `🛏️ <b>${d.name}</b> — ${d.price}💰<div class="small">${owned ? "Уже установлено" : d.desc}</div>`;
-      b.onclick = () => buyBed(d.id);
-      ui.decorShop.appendChild(b);
-    });
-  }
-
-  function applyStatsDelta(deltaFn){
-    const s = state.stats;
-    deltaFn(s);
-    s.hunger = clamp(s.hunger);
-    s.sleep  = clamp(s.sleep);
-    s.mood   = clamp(s.mood);
-    s.clean  = clamp(s.clean);
-  }
-
-  function buyFood(id){
-    const item = foods.find(x => x.id === id);
-    if (!item) return;
-    if (state.money < item.price){ toast("Не хватает монет 😅"); return; }
-    state.money -= item.price;
-    applyStatsDelta(item.effect);
-    toast(`Съел: ${item.name}`);
-    render();
-  }
-
-  function buyBed(id){
-    const item = beds.find(x => x.id === id);
-    if (!item) return;
-    if (state.money < item.price){ toast("Кошелёк грустит"); return; }
-    state.money -= item.price;
-    state.bed = id;
-    toast(`Новая лежанка: ${item.name}`);
-    renderShops();
-    render();
-  }
-
-  function petting(){
-    applyStatsDelta(s => { s.mood += 7; s.sleep += 1; });
-    petEl.classList.add("happy");
-    setTimeout(() => petEl.classList.remove("happy"), 450);
-    toast("Поглажено ✨");
-    render();
-  }
-
-  function throwBall(){
-    // Анимация мячика + эффекты
-    applyStatsDelta(s => { s.mood += 14; s.sleep -= 6; s.clean -= 5; });
-    ballEl.classList.remove("throw"); void ballEl.offsetWidth; // перезапуск анимации
-    ballEl.classList.add("throw");
-    toast("Бросок! ⚾");
-    render();
-  }
-
-  // Клик по сцене — погладить
-  game.addEventListener("click", (e) => {
-    // Не ловим клики по кнопкам HUD (они сверху)
-    if (e.target.closest(".card")) return;
-    petting();
-  });
-
-  ui.petBtn.onclick = petting;
-  ui.ballBtn.onclick = throwBall;
-
-  // Хоткеи
-  window.addEventListener("keydown", (e) => {
-    const k = e.key.toLowerCase();
-    if (k === "p") petting();
-    if (k === "b") throwBall();
-    if (k === "f") buyFood(foods[0].id);
-  });
-
-  // Тики: экономика и деградация статов
-  setInterval(() => { state.money += 1; render(); }, 8000);
-
-  // Основной тик статов (каждую секунду)
-  setInterval(() => {
-    const s = state.stats;
-
-    // базовые потери
-    s.hunger -= 1.4;
-    s.mood   -= 0.7;
-    s.clean  -= 0.5;
-
-    // сон: если спит — сон растёт/падает медленнее (условно “отсыпается”)
-    if (state.pet.asleep) s.sleep += 0.6;
-    else s.sleep -= 1.0;
-
-    // Негативные синергии (чуть-чуть, но с характером)
-    if (s.hunger < 25) s.mood -= 0.6;
-    if (s.clean  < 25) s.mood -= 0.4;
-    if (s.sleep  < 20) s.mood -= 0.5;
-
-    s.hunger = clamp(s.hunger);
-    s.sleep  = clamp(s.sleep);
-    s.mood   = clamp(s.mood);
-    s.clean  = clamp(s.clean);
-
-    // Состояния
-    state.pet.asleep = (s.sleep < 20) ? true : (s.sleep > 45 ? false : state.pet.asleep);
-
-    render();
-  }, 1000);
-
-  // Движение питомца
-  let last = performance.now();
-  function loop(t){
-    const dt = (t - last) / 1000;
-    last = t;
-
-    const rect = game.getBoundingClientRect();
-    const leftBound = 24;
-    const rightBound = rect.width - 24 - 72;
-
-    // Если спит — не ходит
-    if (!state.pet.asleep){
-      state.pet.x += state.pet.dir * state.pet.speed * dt;
-      if (state.pet.x < leftBound){ state.pet.x = leftBound; state.pet.dir = 1; }
-      if (state.pet.x > rightBound){ state.pet.x = rightBound; state.pet.dir = -1; }
+      shopEl.addEventListener("click", (e) => {
+        const btn = e.target.closest("button[data-buy]");
+        if(!btn) return;
+        const id = btn.getAttribute("data-buy");
+        buyFood(id);
+      });
     }
 
-    petEl.style.left = `${state.pet.x}px`;
-    petEl.style.transform = `scaleX(${state.pet.dir})`;
-    petEl.classList.toggle("walk", !state.pet.asleep);
+    // ---------- Тост/сообщения ----------
+    let toastTimer = 0;
+    function toast(msg){
+      toastEl.textContent = msg;
+      toastTimer = 2.2; // сек
+    }
 
-    requestAnimationFrame(loop);
-  }
-  requestAnimationFrame(loop);
+    // ---------- Действия ----------
+    function applyEffects(fn){
+      fn(state.stats);
+      // нормализация
+      state.stats.hunger = clamp(state.stats.hunger);
+      state.stats.sleep  = clamp(state.stats.sleep);
+      state.stats.mood   = clamp(state.stats.mood);
+      state.stats.clean  = clamp(state.stats.clean);
+      renderUI();
+    }
 
-  function render(){
-    const s = state.stats;
+    function buyFood(id){
+      const item = foods.find(f => f.id === id);
+      if(!item) return;
+      if(state.money < item.price){
+        toast("Не хватает монет 🥲");
+        return;
+      }
+      state.money -= item.price;
+      applyEffects(item.effect);
+      toast(`${item.name}: вкусно!`);
+    }
 
-    moneyVal.textContent = state.money;
+    function petAction(){
+      // погладить: настроение ↑, сон слегка ↑, чистота чуть ↓ (руки же)
+      applyEffects(s => { s.mood += 12; s.sleep += 3; s.clean -= 2; });
+      toast("Питомец урчит (надеюсь) 😌");
+      // маленькая “радость” — ускорим на секунду
+      state.petV = 110;
+      setTimeout(()=> state.petV = 70, 650);
+    }
 
-    ui.hungerVal.textContent = Math.round(s.hunger);
-    ui.sleepVal.textContent  = Math.round(s.sleep);
-    ui.moodVal.textContent   = Math.round(s.mood);
-    ui.cleanVal.textContent  = Math.round(s.clean);
+    function throwBall(){
+      // мячик: настроение ↑↑, сон ↓, чистота ↓
+      applyEffects(s => { s.mood += 18; s.sleep -= 5; s.clean -= 5; });
+      toast("Побегали! 🎾");
 
-    ui.hungerFill.style.width = `${s.hunger}%`;
-    ui.sleepFill.style.width  = `${s.sleep}%`;
-    ui.moodFill.style.width   = `${s.mood}%`;
-    ui.cleanFill.style.width  = `${s.clean}%`;
+      // простая анимация полёта мяча по сцене
+      const rect = scene.getBoundingClientRect();
+      const startX = rect.width * 0.15;
+      const endX   = rect.width * 0.85;
+      const y      = rect.height * 0.35;
 
-    bedEl.className = `bed ${state.bed}`;
+      ball.style.opacity = "1";
+      const t0 = performance.now();
+      const duration = 650;
 
-    petEl.classList.toggle("sleeping", state.pet.asleep);
-    petEl.classList.toggle("dirty", s.clean < 25);
+      function anim(t){
+        const p = Math.min(1, (t - t0)/duration);
+        // парабола (подлетает и падает)
+        const x = startX + (endX - startX) * p;
+        const arc = Math.sin(Math.PI * p); // 0..1..0
+        const yy = y - arc * 90;
 
-    statusText.textContent =
-      state.pet.asleep ? "Спит. Трогать можно, но он осудит." :
-      (s.hunger < 25) ? "Голодный взгляд прожигает реальность" :
-      (s.mood < 25) ? "Настроение: мрачный философ" :
-      (s.clean < 25) ? "Нужно бы помыться... когда-нибудь" :
-      "Бодрствует и шляется по делам";
-  }
+        ball.style.left = x + "px";
+        ball.style.top  = yy + "px";
 
-  renderShops();
-  render();
-})();
-</script>
+        if(p < 1) requestAnimationFrame(anim);
+        else {
+          ball.style.opacity = "0";
+        }
+      }
+      requestAnimationFrame(anim);
+
+      // питомец “гонится” за мячом: меняем направление к правому краю ненадолго
+      state.dir = 1;
+      state.petV = 140;
+      setTimeout(()=> state.petV = 70, 750);
+    }
+
+    petBtn.addEventListener("click", petAction);
+    ballBtn.addEventListener("click", throwBall);
+
+    // ---------- Рендер ----------
+    function renderUI(){
+      moneyEl.textContent = state.money;
+
+      const s = state.stats;
+      hungerFill.style.width = s.hunger + "%";
+      sleepFill.style.width  = s.sleep  + "%";
+      moodFill.style.width   = s.mood   + "%";
+      cleanFill.style.width  = s.clean  + "%";
+
+      hungerTxt.textContent = fmt(s.hunger);
+      sleepTxt.textContent  = fmt(s.sleep);
+      moodTxt.textContent   = fmt(s.mood);
+      cleanTxt.textContent  = fmt(s.clean);
+
+      // кнопки недоступны, если питомец совсем “умирает” от голода/сна
+      const exhausted = (s.hunger <= 5 || s.sleep <= 5);
+      petBtn.disabled = exhausted;
+      ballBtn.disabled = exhausted;
+
+      // мягкий “красный флаг”
+      if(exhausted) toast("Питомцу срочно нужно поесть или поспать!");
+    }
+
+    function renderPet(){
+      // ограничиваем движение в пределах сцены
+      const rect = scene.getBoundingClientRect();
+      const margin = 20;
+      const maxX = rect.width - 120 - margin; // 120 = ширина pet
+      state.petX = clamp(state.petX, margin, maxX);
+
+      pet.style.left = state.petX + "px";
+
+      // разворот по направлению (scaleX)
+      pet.style.transform = `scaleX(${state.dir})`;
+    }
+
+    // ---------- Игровой цикл ----------
+    let last = performance.now();
+
+    function tick(now){
+      const dt = Math.min(0.05, (now - last)/1000); // сек, ограничим скачки
+      last = now;
+
+      // падение статов со временем
+      const s = state.stats;
+      s.hunger -= state.decay.hunger * dt;
+      s.sleep  -= state.decay.sleep  * dt;
+      s.mood   -= state.decay.mood   * dt;
+      s.clean  -= state.decay.clean  * dt;
+
+      // если грязный — настроение чуть быстрее падает
+      if(s.clean < 35) s.mood -= 0.35 * dt;
+
+      // если голодный — сон хуже восстанавливается (у нас пока нет сна как действия, но логика пригодится)
+      // clamp
+      s.hunger = clamp(s.hunger);
+      s.sleep  = clamp(s.sleep);
+      s.mood   = clamp(s.mood);
+      s.clean  = clamp(s.clean);
+
+      // ходьба туда-сюда
+      const rect = scene.getBoundingClientRect();
+      const margin = 20;
+      const maxX = rect.width - 120 - margin;
+      state.petX += state.petV * state.dir * dt;
+
+      if(state.petX >= maxX){
+        state.petX = maxX;
+        state.dir = -1;
+      } else if(state.petX <= margin){
+        state.petX = margin;
+        state.dir = 1;
+      }
+
+      // тост таймер
+      if(toastTimer > 0){
+        toastTimer -= dt;
+        if(toastTimer <= 0) toastEl.textContent = "";
+      }
+
+      renderPet();
+      renderUI();
+      requestAnimationFrame(tick);
+    }
+
+    // ---------- Старт ----------
+    buildShop();
+    renderUI();
+
+    // если картинка не загрузилась — покажем понятную ошибку
+    pet.addEventListener("error", () => {
+      toast("Не найден walk.png рядом с index.html");
+    });
+
+    // старт цикла
+    requestAnimationFrame(tick);
+
+    // на ресайз пересчитаем границы
+    window.addEventListener("resize", () => {
+      renderPet();
+    });
+  </script>
 </body>
 </html>
+
