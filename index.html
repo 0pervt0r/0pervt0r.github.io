@@ -145,19 +145,39 @@
       gap: 14px;
       align-items: center;
     }
-    .logo{
-      width: 56px;
-      height: 56px;
-      border-radius: 14px;
-      border: 1px solid var(--line);
-      display: grid;
-      place-items: center;
-      background: rgba(255,255,255,.03);
-      font-family: var(--mono);
-      font-size: 14px;
-      letter-spacing: .12em;
-      user-select: none;
-    }
+
+.logo-swap{
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,.03);
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+}
+
+.logo-img{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: opacity .15s ease;
+  user-select: none;
+  -webkit-user-drag: none;
+  image-rendering: auto;
+}
+
+
+.logo-1{ opacity: 1; }
+.logo-2{ opacity: 0; }
+
+.logo-swap:hover .logo-1{ opacity: 0; }
+.logo-swap:hover .logo-2{ opacity: 1; }
+    
+
     .titleblock{
       display: grid;
       gap: 4px;
@@ -334,7 +354,11 @@
     <main class="main">
       <section class="panel">
         <header class="header">
-          <div class="logo">LOGO</div>
+          <div class="logo-swap" aria-label="Логотип проекта">
+              <img class="logo-img logo-1" src="LOGOO1.png" alt="Логотип" />
+              <img class="logo-img logo-2" src="LOGOO2.png" alt="" aria-hidden="true" />
+</div>
+
           <div class="titleblock">
             <h1>Название проекта</h1>
             <p>Вики-страница проекта • структура как у форума • без комментариев и правок</p>
