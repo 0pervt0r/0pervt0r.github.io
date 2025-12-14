@@ -403,96 +403,25 @@
             <div class="label">Статьи</div>
 
             <div class="articles">
-              <!-- 12 карточек = 3x4 -->
               <a class="card" href="#">
-                <div class="kicker">01 • старт</div>
-                <h3 class="name">Обзор системы</h3>
-                <p class="desc">Что это, из каких блоков состоит и как читать документацию.</p>
+                <div class="kicker">Карта комплекса</div>
               </a>
 
               <a class="card" href="#">
-                <div class="kicker">02 • основа</div>
-                <h3 class="name">Термины и определения</h3>
-                <p class="desc">Мини-глоссарий: чтобы слова значили одно и то же.</p>
+                <div class="kicker">Документы оьъектов</div>
               </a>
 
               <a class="card" href="#">
-                <div class="kicker">03 • дизайн</div>
-                <h3 class="name">Архитектура</h3>
-                <p class="desc">Слои, модули, границы ответственности.</p>
-              </a>
-
-              <a class="card" href="#">
-                <div class="kicker">04 • протокол</div>
-                <h3 class="name">API / Контракты</h3>
-                <p class="desc">Форматы, статусы, ошибки, примеры запросов.</p>
-              </a>
-
-              <a class="card" href="#">
-                <div class="kicker">05 • процесс</div>
-                <h3 class="name">Roadmap</h3>
-                <p class="desc">Куда движемся, этапы, критерии готовности.</p>
-              </a>
-
-              <a class="card" href="#">
-                <div class="kicker">06 • правила</div>
-                <h3 class="name">Гайдлайны</h3>
-                <p class="desc">Стандарты, соглашения, стиль кода/доков.</p>
-              </a>
-
-              <a class="card" href="#">
-                <div class="kicker">07 • запуск</div>
-                <h3 class="name">Развёртывание</h3>
-                <p class="desc">Как поднять, где конфиги, какие зависимости.</p>
-              </a>
-
-              <a class="card" href="#">
-                <div class="kicker">08 • качество</div>
-                <h3 class="name">Тестирование</h3>
-                <p class="desc">Набор тестов, окружения, чек-листы.</p>
-              </a>
-
-              <a class="card" href="#">
-                <div class="kicker">09 • наблюдаемость</div>
-                <h3 class="name">Логи и метрики</h3>
-                <p class="desc">События, мониторинг, алерты, разбор инцидентов.</p>
-              </a>
-
-              <a class="card" href="#">
-                <div class="kicker">10 • безопасность</div>
-                <h3 class="name">Модель угроз</h3>
-                <p class="desc">Риски, ограничения, что защищаем и как.</p>
-              </a>
-
-              <a class="card" href="#">
-                <div class="kicker">11 • история</div>
-                <h3 class="name">Решения и ADR</h3>
-                <p class="desc">Почему приняли именно так (и где зарыты компромиссы).</p>
-              </a>
-
-              <a class="card" href="#">
-                <div class="kicker">12 • контакты</div>
-                <h3 class="name">Команда</h3>
-                <p class="desc">Ответственные, каналы связи, роли.</p>
+                <div class="kicker">Документы сотрудников</div>
               </a>
             </div>
-          </div>
-
-          <div class="footerline">
-            <span class="dot"></span>
-            <span>© <span id="year"></span> • Документация проекта • read-only</span>
-          </div>
         </div>
-      </section>
-    </main>
-
-  </div>
 
   <script>
-    // маленькая техно-мелочь: год в футере
+    
     document.getElementById('year').textContent = new Date().getFullYear();
 
-    // подсветка пункта “Статьи” при переходе по якорю
+    
     const links = document.querySelectorAll('.nav a');
     function setCurrent(hash){
       links.forEach(a => a.removeAttribute('aria-current'));
