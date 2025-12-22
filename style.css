@@ -23,23 +23,28 @@
       font-family: "Palui SP";
       text-align: center;
       text-size: 90px;
+      text-color: white;
     }
 
     h1 {
       text-align: center;
       text-size: 50px;
+      text-color: white;
     }
 
     p {
       font-family: "Gputeks";
+      text-color: white;
     }
 
     a {
       font-family: "Gputeks";
+      text-color: white;
     }
 
 .cinder {
     font-family: ApesTitle;
+      text-color: white;
 }
 
 
