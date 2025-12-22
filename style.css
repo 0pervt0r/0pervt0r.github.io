@@ -252,6 +252,12 @@
        font-style: normal; 
        font-weight: normal; 
 } 
+    @font-face {
+       font-family: "Gputeks"; 
+       src: url("Gputeks-Regular.ttf") format("truetype"); 
+       font-style: normal; 
+       font-weight: normal; 
+} 
 
     h2 {
       font-family: "Palui SP";
@@ -281,7 +287,6 @@
     
     @media (max-width: 980px){
       .app{ grid-template-columns: 240px 1fr; }
-      .articles{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     @media (max-width: 760px){
       .app{ grid-template-columns: 1fr; }
