@@ -44,8 +44,11 @@
     font-family: ApesTitle;
 }
 
-.header-bg {
+.container {
+    width: 1500px;
+    height: 200px;
     background-image: url ('cinderlogobanner.png');
+    background-size: cover;
 }
 
 .uc-header {
