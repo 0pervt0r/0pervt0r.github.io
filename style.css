@@ -78,7 +78,9 @@
 .logo-swap:hover .logo-1{ opacity: 0; }
 .logo-swap:hover .logo-2{ opacity: 1; }
 
-    .divider {
+    .top-bar {
+        position: absolute;
+        margin: 1.5em;
         background-color: #242324;
     }
 
