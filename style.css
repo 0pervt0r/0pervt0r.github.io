@@ -51,7 +51,7 @@
     aside {
            background-color: #030303;
            width: 10%;
-           padding: 1.5em;
+           padding: 2em;
            margin-top: 5em;
            margin-left: 2.5rem;
            margin-right: 2.5rem;
@@ -68,7 +68,7 @@
     .sidebar-logo {
         display: flex;
         align-items: center;
-        gap: 1em;
+        gap: 2em;
     }
     .main-content {
         background-color: #121212;
