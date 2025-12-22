@@ -291,21 +291,3 @@
         border-right: none;
         border-bottom: 1px solid var(--line);
       }
-      .articles{ grid-template-columns: 1fr; }
-    }
-
-    .card img{
-      width: 150px;
-      height: 150px;
-      object-fit: contain;
-      display:block;
-    }
-
-    .card:hover .icon{
-      transform: translateY(-8px);
-    }
-
-    .card:hover .icon{
-  transform: translateY(-8px) scale(1.06);
-}
-
