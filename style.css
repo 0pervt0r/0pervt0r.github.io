@@ -59,6 +59,7 @@
         margin-left: 2.5rem;
         float: left;
         border: 1px double #373737;
+        box-shadow: inset 5px 0 5px -5px #242324;
     }
 
     .main-content {
