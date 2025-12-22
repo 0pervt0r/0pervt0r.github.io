@@ -45,8 +45,9 @@
 
 .uc-header {
     display: flex;
+    align-items: center;
     gap: 5em;
-    margin-left: 7em;
+    margin-left: 15em;
 }
 .uc-head-logo {
     height: 200px;
