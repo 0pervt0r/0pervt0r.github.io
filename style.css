@@ -66,6 +66,10 @@
         float: left;
     }
 
+    .sidebar-logo {
+        display: flex;
+        gap: 0.5em;
+    }
     .main-content {
         background-color: #121212;
     }
