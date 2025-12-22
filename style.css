@@ -55,17 +55,6 @@
     width: 150px;
 }
 
-.uc-head-cinder {
-    display: flex;
-    align-items: center;
-    text-size: 15px;
-    align-items: center;
-}
-.uc-head-cinder-cinder {
-    width: 20px;
-    height: 20px;
-}
-
     body {
           background-color: black;
     }
