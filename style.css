@@ -43,6 +43,13 @@
     font-family: ApesTitle;
 }
 
+.uc-header {
+    display: flex;
+}
+.uc-head-logo {
+    height: 200px;
+    width: 200px;
+}
 
     body {
           background-color: black;
