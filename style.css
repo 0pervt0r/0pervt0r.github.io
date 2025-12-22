@@ -52,6 +52,10 @@
         background-color: #121212;
     }
 
-.side-bar {
+    aside {
         background-color: #030303;
+        width: 40%;
+        padding-left: 5em;
+        margin-left: 5rem;
+        float: left;
     }
