@@ -20,48 +20,44 @@
 } 
 
     h2 {
-      font-family: "Palui SP";
-      text-align: center;
-      text-size: 90px;
-      text-color: #ffffff;
+        color: #ffffff;
+        font-family: "Palui SP";
+        text-align: center;
+        text-size: 90px;
+      
     }
 
     h1 {
-      text-align: center;
-      text-size: 50px;
-      text-color: #ffffff;
+        color: #ffffff;
+        text-align: center;
+        text-size: 50px;
     }
 
     p {
-      font-family: "Gputeks";
-      text-color: #ffffff;
-    }
-
-    a {
-      font-family: "Gputeks";
-      text-color: #ffffff;
+        color: #ffffff;
+        font-family: "Gputeks";
     }
 
 .cinder {
+    color: #ffffff;
     font-family: ApesTitle;
-      text-color: #ffffff;
 }
 
 
     body {
-        background-color: black;
+          background-color: black;
     }
 
     aside {
-        background-color: #030303;
-        width: 10%;
-        padding: 1.5em;
-        margin-top: 5em;
-        margin-left: 2.5rem;
-        margin-right: 2.5rem;
-        float: left;
-        border: 1px double #242324;
-        box-shadow: inset 25px 0 25px -15px #242324;
+           background-color: #030303;
+           width: 10%;
+           padding: 1.5em;
+           margin-top: 5em;
+           margin-left: 2.5rem;
+           margin-right: 2.5rem;
+           float: left;
+           border: 1px double #242324;
+           box-shadow: inset 25px 0 25px -15px #242324;
     }
 
     .cinder-logo-small {
