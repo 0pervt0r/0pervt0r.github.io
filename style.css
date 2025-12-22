@@ -311,6 +311,10 @@
       text-size: 90px;
     }
 
+    p {
+      font-family: "Gputeks-Regular";
+    }
+
     h1 {
       text-align: center;
       text-size: 50px;
