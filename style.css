@@ -54,6 +54,13 @@
     width: 150px;
 }
 
+.uc-head-cinder {
+    display: flex;
+    align-items: center;
+}
+.uc-head-cinder-cinder {
+}
+
     body {
           background-color: black;
     }
