@@ -67,7 +67,8 @@
 
     .sidebar-logo {
         display: flex;
-        gap: 0.5em;
+        align-items: center;
+        gap: 1em;
     }
     .main-content {
         background-color: #121212;
