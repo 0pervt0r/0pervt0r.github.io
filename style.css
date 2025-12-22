@@ -346,22 +346,18 @@
       .articles{ grid-template-columns: 1fr; }
     }
 
-    .icon img{
+    .card img{
       width: 150px;
       height: 150px;
       object-fit: contain;
       display:block;
     }
 
-    .icon-link:hover .icon{
+    .card:hover .icon{
       transform: translateY(-8px);
     }
 
-    .icon-link:hover img{
-      filter: grayscale(0%);
-    }
-
-    .icon-link:hover .icon{
+    .card:hover .icon{
   transform: translateY(-8px) scale(1.06);
 }
 
