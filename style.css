@@ -50,13 +50,15 @@
     gap: 5em;
     margin-left: 22em;
 }
+
 .uc-head-logo {
+    display: inline-block;
     height: 150px;
     width: 150px;
+    background: url("LOGOO1.png") center/contain no-repeat;
 }
-.uc-head-logo:hover {
-    background-image: url('LOGOO2.png');
-
+.cinder-logo-small:hover{
+  background-image: url("LOGOO2.png");
 }
 
     body {
