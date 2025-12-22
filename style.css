@@ -345,3 +345,24 @@
       }
       .articles{ grid-template-columns: 1fr; }
     }
+
+    .icon img{
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display:block;
+      filter: grayscale(15%);
+    }
+
+    .icon-link:hover .icon{
+      transform: translateY(-8px);
+    }
+
+    .icon-link:hover img{
+      filter: grayscale(0%);
+    }
+
+    .icon-link:hover .icon{
+  transform: translateY(-8px) scale(1.06);
+}
+
