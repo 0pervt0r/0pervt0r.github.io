@@ -12,6 +12,12 @@
        font-style: normal; 
        font-weight: normal; 
 } 
+    @font-face {
+       font-family: "ApesTitle"; 
+       src: url("ApesTitle.ttf") format("truetype"); 
+       font-style: normal; 
+       font-weight: normal; 
+} 
 
     h2 {
       font-family: "Palui SP";
