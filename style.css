@@ -41,7 +41,6 @@
 .cinder {
     color: #ffffff;
     font-family: ApesTitle;
-    margin: 2.5em;
 }
 
 
@@ -63,7 +62,6 @@
 
     .cinder-logo-small {
         width: 35px;
-        float: left;
     }
 
     .sidebar-logo {
