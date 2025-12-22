@@ -277,6 +277,10 @@
     a {
       font-family: "Gputeks";
     }
+
+    .main-page {
+        text-size: 150px;
+    }
     
     .emoji-icon{
   height: 1em;
