@@ -54,6 +54,10 @@
     height: 150px;
     width: 150px;
 }
+.uc-head-logo:hover {
+    background-image: url('LOGOO2.png');
+
+}
 
     body {
           background-color: black;
