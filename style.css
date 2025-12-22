@@ -265,13 +265,17 @@
       text-size: 90px;
     }
 
+    h1 {
+      text-align: center;
+      text-size: 50px;
+    }
+
     p {
       font-family: "Gputeks";
     }
 
-    h1 {
-      text-align: center;
-      text-size: 50px;
+    a {
+      font-family: "Gputeks";
     }
     
     .emoji-icon{
