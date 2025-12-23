@@ -238,6 +238,217 @@
 }
 
 (! КНОПКА ЕБУЧАЯ)
+h2 {
+  color: #ffffff;
+  font-family: "Palui SP";
+  text-align: center;
+  font-size: 40px;
+}
+
+h1 {
+  color: #ffffff;
+  font-family: "Gputeks";
+  text-align: center;
+  font-size: 50px;
+}
+
+p {
+  color: #ffffff;
+  font-family: "Gputeks";
+}
+
+a {
+  color: white;
+  font-family: "Pobeda";
+}
+
+.cinder {
+  color: #ffffff;
+  font-family: ApesTitle;
+}
+
+.uc-header {
+  display: flex;
+  align-items: center;
+  gap: 8em;
+  margin-left: 22em;
+}
+
+.logo-swap{
+  width: 150px;
+  height: 150px;
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+}
+
+.logo-img{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: opacity .15s ease;
+  user-select: none;
+  -webkit-user-drag: none;
+  image-rendering: auto;
+}
+
+.logo-1{ opacity: 1; }
+.logo-2{ opacity: 0; }
+
+.logo-swap:hover .logo-1{ opacity: 0; }
+.logo-swap:hover .logo-2{ opacity: 1; }
+
+body {
+  background-color: black;
+}
+
+aside {
+  background-color: #030303;
+  width: 10%;
+  padding: 2em;
+  margin-top: 5em;
+  margin-left: 2.5rem;
+  margin-right: 2.5rem;
+  float: left;
+  border: 3px solid #242324;
+  border-radius: 17px;
+  box-shadow: inset 25px 0 25px -15px #242324;
+}
+
+.cinder-logo-small {
+  width: 55px;
+  height: 55px;
+}
+
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 2em;
+}
+
+.sidebar-nav{
+  display: flex;
+  flex-direction: column;
+  margin-top: 2em;
+  padding: 1em;
+  border: 1px solid #242324;
+  border-radius: 12px;
+}
+
+.sidebar-nav a{
+  display: block;
+  padding: 10px 12px;
+  text-decoration: none;
+  color: #fff;
+}
+
+.sidebar-nav a:not(:last-child){
+  border-bottom: 1px solid #666;
+}
+
+.top-bar {
+  background-color: #121212;
+  border: 3px solid #242324;
+  box-shadow: inset 25px 0 25px -15px #242324;
+  text-align: center;
+}
+
+.main-content-2 {
+  display: flow-root;
+  background-color: #030303;
+  border: 3px solid #242324;
+  border-radius: 17px;
+  box-shadow: inset 25px 0 25px -15px #242324;
+  padding: 2.5em;
+  margin: 2em;
+}
+
+.main-content {
+  display: flex;
+  gap: 5em;
+}
+
+.front-page-columns {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-around;
+  margin: 0.5em;
+}
+
+.front-button {
+  font-family: "Pobeda";
+  box-sizing: border-box;
+  min-height: 40px;
+  max-height: 40px;
+  min-width: 290px;
+  max-width: 290px;
+  background-color: #030303;
+  display: flex;
+  gap: 2em;
+  margin: 0.2em;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #242324;
+  border-radius: 14px;
+  box-shadow: inset 25px 0 25px -15px #242324;
+}
+
+.front-button-img {
+  height: 25px;
+  width: 25px;
+}
+
+.front-button:hover {
+  background-color: #c1394f;
+  border: 1px solid #690829;
+  box-shadow: inset 25px 0 25px -15px #690829;
+}
+
+.front-nav-cards {
+  padding: 3em;
+  border: 1px solid #242324;
+  border-radius: 12px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2em;
+}
+
+.card:not(:last-child)::after{
+  content: "";
+  position: absolute;
+  top: 10%;
+  right: -1em;
+  width: 1px;
+  height: 80%;
+  background: #666;
+}
+
+.card {
+  display: inline-block;
+  text-align: center;
+  position: relative;
+}
+
+.card img{
+  width: 200px;
+  display: block;
+  margin: 0 auto;
+  transition: transform .25s ease, box-shadow .25s ease;
+  border-radius: 12px;
+}
+
+.card:hover img{
+  transform: scale(1.05);
+}
+
+.card p{
+  margin-top: 1rem;
+  font-family: "Gputeks";
+}
 
 .modal{
   display: none;
@@ -254,27 +465,7 @@
   position: absolute;
   inset: 0;
   background: rgba(0,0,0,.7);
-}
-
-.modal-window{
-  position: relative;
-  width: 800px;
-  max-width: 90%;
-  margin: 10vh auto;
-  padding: 2em;
-  background: #030303;
-  border: 3px solid #242324;
-  border-radius: 16px;
-}
-
-.modal:target{
-  display: block;
-}
-
-.modal-overlay{
-  position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,.7);
+  cursor: default;
 }
 
 .modal-window{
@@ -285,9 +476,11 @@
   max-width: 90%;
   margin: 10vh auto;
   padding: 2em;
+  border: 3px solid #242324;
   border-radius: 16px;
   display: flex;
   gap: 2em;
+  z-index: 1001;
 }
 
 .modal-image{
@@ -300,19 +493,17 @@
   border-radius: 12px;
 }
 
-.modal-image .caption{
+.modal-caption{
   display: block;
   margin-top: .5em;
   font-size: .9em;
   opacity: .8;
 }
 
-
 .modal-divider{
   width: 1px;
   background: #666;
 }
-
 
 .modal-text{
   flex: 1;
@@ -323,7 +514,6 @@
   font-size: 1.5em;
 }
 
-
 .modal-close{
   position: absolute;
   top: .5em;
@@ -332,3 +522,4 @@
   font-size: 2em;
   color: #fff;
 }
+
