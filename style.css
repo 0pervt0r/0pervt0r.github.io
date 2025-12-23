@@ -135,9 +135,10 @@
 
 .front-button {
     background-color: #030303;
-    padding: 1em;
+    height:  70px;
+    padding: 0.4em;
     display: flex;
-    align-items: left;
+    align-items: center center;
     gap: 4em;
     border: 1px solid #242324;
     border-radius: 20px;
