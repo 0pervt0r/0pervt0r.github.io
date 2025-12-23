@@ -124,3 +124,23 @@
         display: flex;
         justify-content: center;
     }
+
+.front-page-columns {
+    display: flex;
+    flex-direction: column;
+    align-items: right;
+    justify-content: space-around; 
+    margin: 0.5em;
+}
+
+.front-button {
+    background-color: #030303;
+    display: flex;
+    align-items: center;
+    gap: 4em;
+    border: 1px solid #242324;
+    box-shadow: inset 25px 0 25px -15px #242324;
+}
+.front-button:hover {
+    background-color: #c1394f;
+}
