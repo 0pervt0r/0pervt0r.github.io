@@ -200,8 +200,14 @@
     gap: 2em;
 }
 
-.front-nav-cards article :not(:last-child){
-  border-left: 1px solid #666;
+.card:not(:last-child)::after{
+  content: "";
+  position: absolute;
+  top: 10%;
+  right: -1em;
+  width: 1px;
+  height: 80%;
+  background: #666;
 }
 
 .card {
