@@ -122,6 +122,7 @@
         padding: 2em;
         margin: 2em;
         display: flex;
+        gap: 5em;
     }
 
 .front-page-columns {
