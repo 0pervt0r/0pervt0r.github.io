@@ -196,6 +196,7 @@
 }
 
 .front-nav-cards {
+    padding: 3em;
     border: 1px solid #242324;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
