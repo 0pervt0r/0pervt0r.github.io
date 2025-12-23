@@ -153,5 +153,6 @@
 }
 .front-button:hover {
     background-color: #c1394f;
+    border: 3px double #690829;
     box-shadow: inset 25px 0 25px -15px #690829;
 }
