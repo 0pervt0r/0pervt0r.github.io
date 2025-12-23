@@ -148,7 +148,8 @@
     max-width: 290px;
     background-color: #030303;
     display: flex;
-    gap: 1em;
+    gap: 2em;
+    margin: 1em;
     align-items: center;
     justify-content:center;
     border: 1px solid #242324;
