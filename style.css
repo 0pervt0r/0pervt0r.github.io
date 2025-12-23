@@ -237,3 +237,10 @@
   font-family: "Gputeks";
 }
 
+
+.card-swap-1 .user-doc-1{ opacity: 1; }
+.card-swap-1 .user-doc-2{ opacity: 0; }
+
+.card-swap-1:hover .user-doc-1{ opacity: 0; }
+.card-swap-1:hover .user-doc-2{ opacity: 1; }
+
