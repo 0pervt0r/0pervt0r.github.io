@@ -240,10 +240,31 @@
 (! КНОПКА ЕБУЧАЯ)
 
 .modal{
+  display: none;
   position: fixed;
   inset: 0;
-  display: none;
   z-index: 1000;
+}
+
+.modal:target{
+  display: block;
+}
+
+.modal-overlay{
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,.7);
+}
+
+.modal-window{
+  position: relative;
+  width: 800px;
+  max-width: 90%;
+  margin: 10vh auto;
+  padding: 2em;
+  background: #030303;
+  border: 3px solid #242324;
+  border-radius: 16px;
 }
 
 .modal:target{
