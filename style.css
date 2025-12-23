@@ -135,10 +135,12 @@
 
 .front-button {
     background-color: #030303;
+    padding: 1em;
     display: flex;
     align-items: center;
     gap: 4em;
     border: 1px solid #242324;
+    border-radius: 20px;
     box-shadow: inset 25px 0 25px -15px #242324;
 }
 .front-button-img {
