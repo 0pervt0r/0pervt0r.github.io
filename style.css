@@ -119,7 +119,7 @@
         background-color: #030303;
         border: 2px solid #242324;
         box-shadow: inset 25px 0 25px -15px #242324;
-        padding: 2em;
+        padding: 5em;
         margin: 2em;
         display: flex;
         gap: 5em;
@@ -135,7 +135,8 @@
 
 .front-button {
     background-color: #030303;
-    height:  70px;
+    height:  50px;
+    width: 120px;
     padding: 1.4em;
     display: flex;
     align-items: center center;
