@@ -144,6 +144,7 @@
     }
 
     .main-content-2 {
+        display: flow-root;
         background-color: #030303;
         border: 3px solid #242324;
         box-shadow: inset 25px 0 25px -15px #242324;
@@ -209,8 +210,6 @@
   height: 80%;
   background: #666;
 }
-
-  
 
 .card {
     display: inline-block;
