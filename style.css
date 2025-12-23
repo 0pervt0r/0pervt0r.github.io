@@ -134,10 +134,12 @@
 }
 
 .front-button {
+    min-height: 50px;
     max-height: 50px;
     min-width: 290px;
+    max-width: 290px;
     background-color: #030303;
-    padding: 1em;
+    padding: 1.5em;
     display: flex;
     align-items: center center;
     gap: 3em;
