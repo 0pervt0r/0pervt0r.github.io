@@ -131,7 +131,6 @@
   color: #fff;
 }
 
-
 .sidebar-nav a:not(:last-child){
   border-bottom: 1px solid #666;
 }
@@ -156,8 +155,6 @@
         display: flex;
         gap: 5em;
     }
-
-
 
 .front-page-columns {
     display: flex;
@@ -201,6 +198,10 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 2em;
+}
+
+.front-nav-cards article :not(:last-child){
+  border-left: 1px solid #666;
 }
 
 .card {
