@@ -134,8 +134,8 @@
 }
 
 .front-button {
-    min-height: 50px;
-    max-height: 50px;
+    min-height: 40px;
+    max-height: 40px;
     min-width: 290px;
     max-width: 290px;
     background-color: #030303;
@@ -148,8 +148,8 @@
     box-shadow: inset 25px 0 25px -15px #242324;
 }
 .front-button-img {
-    height: 25px;
-    width: 25px;
+    height: 15px;
+    width: 15px;
 }
 .front-button:hover {
     background-color: #c1394f;
