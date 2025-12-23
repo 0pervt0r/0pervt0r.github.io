@@ -136,12 +136,12 @@
 .front-button {
     background-color: #030303;
     height:  70px;
-    padding: 0.4em;
+    padding: 1.4em;
     display: flex;
     align-items: center center;
-    gap: 4em;
+    gap: 3em;
     border: 1px solid #242324;
-    border-radius: 20px;
+    border-radius: 30px;
     box-shadow: inset 25px 0 25px -15px #242324;
 }
 .front-button-img {
