@@ -210,8 +210,12 @@
   background: #666;
 }
 
+  
+
 .card {
+    display: inline-block;
     text-align: center;
+    position: relative;
 }
 
 .card img{
