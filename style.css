@@ -147,7 +147,6 @@
     min-width: 290px;
     max-width: 290px;
     background-color: #030303;
-    padding: 23px;
     display: flex;
     gap: 1em;
     align-items: center;
@@ -157,8 +156,8 @@
     box-shadow: inset 25px 0 25px -15px #242324;
 }
 .front-button-img {
-    height: 15px;
-    width: 15px;
+    height: 25px;
+    width: 25px;
 }
 .front-button:hover {
     background-color: #c1394f;
