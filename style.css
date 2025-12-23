@@ -18,6 +18,12 @@
        font-style: normal; 
        font-weight: normal; 
 } 
+    @font-face {
+       font-family: "Pobeda"; 
+       src: url("pobeda-bold.ttf") format("truetype"); 
+       font-style: normal; 
+       font-weight: normal; 
+} 
 
     h2 {
         color: #ffffff;
@@ -134,6 +140,7 @@
 }
 
 .front-button {
+    font-family: "Pobeda";
     box-sizing: border-box;
     min-height: 40px;
     max-height: 40px;
