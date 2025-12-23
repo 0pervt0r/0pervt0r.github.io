@@ -236,3 +236,78 @@
   margin-top: 1rem;
   font-family: "Gputeks";
 }
+
+(! КНОПКА ЕБУЧАЯ)
+
+.modal{
+  position: fixed;
+  inset: 0;
+  display: none;
+  z-index: 1000;
+}
+
+.modal:target{
+  display: block;
+}
+
+.modal-overlay{
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,.7);
+}
+
+.modal-window{
+  position: relative;
+  background: #030303;
+  color: #fff;
+  width: 800px;
+  max-width: 90%;
+  margin: 10vh auto;
+  padding: 2em;
+  border-radius: 16px;
+  display: flex;
+  gap: 2em;
+}
+
+.modal-image{
+  width: 250px;
+  text-align: center;
+}
+
+.modal-image img{
+  width: 100%;
+  border-radius: 12px;
+}
+
+.modal-image .caption{
+  display: block;
+  margin-top: .5em;
+  font-size: .9em;
+  opacity: .8;
+}
+
+
+.modal-divider{
+  width: 1px;
+  background: #666;
+}
+
+
+.modal-text{
+  flex: 1;
+}
+
+.modal-text h3{
+  margin-top: 0;
+  font-size: 1.5em;
+}
+
+
+.modal-close{
+  position: absolute;
+  top: .5em;
+  right: .7em;
+  text-decoration: none;
+  font-size: 2em;
+  color: #fff;
+}
