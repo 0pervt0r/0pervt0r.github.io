@@ -140,6 +140,8 @@
     gap: 4em;
     border: 1px solid #242324;
     box-shadow: inset 25px 0 25px -15px #242324;
+    img-height: 25px;
+    img-width: 25px;
 }
 .front-button:hover {
     background-color: #c1394f;
