@@ -158,6 +158,8 @@
         gap: 5em;
     }
 
+
+
 .front-page-columns {
     display: flex;
     flex-direction: column;
@@ -193,7 +195,7 @@
     box-shadow: inset 25px 0 25px -15px #690829;
 }
 
-.front-articles {
+.front-nav-cards {
     border: 1px solid #242324;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
