@@ -137,7 +137,7 @@
     background-color: #030303;
     padding: 1em;
     display: flex;
-    align-items: center;
+    align-items: left;
     gap: 4em;
     border: 1px solid #242324;
     border-radius: 20px;
@@ -149,4 +149,5 @@
 }
 .front-button:hover {
     background-color: #c1394f;
+    box-shadow: inset 25px 0 25px -15px #690829;
 }
