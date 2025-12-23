@@ -146,14 +146,14 @@
 
     .main-content-2 {
         item-align: anchor-center;
-    }
-
-    .main-content {
         background-color: #030303;
         border: 3px solid #242324;
         box-shadow: inset 25px 0 25px -15px #242324;
         padding: 2.5em;
         margin: 2em;
+    }
+
+    .main-content {
         display: flex;
         gap: 5em;
     }
