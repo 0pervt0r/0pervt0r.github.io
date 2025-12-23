@@ -39,6 +39,10 @@
         font-family: "Gputeks";
     }
 
+    a {
+        color: white;
+    }
+
 .cinder {
     color: #ffffff;
     font-family: ApesTitle;
