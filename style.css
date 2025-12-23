@@ -46,6 +46,10 @@ p{
     text-align: justify;
 }
 
+.p-center {
+  text-align: center;
+}
+
 a{
   color:white;
   font-family:"Pobeda";
