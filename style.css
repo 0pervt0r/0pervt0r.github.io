@@ -247,6 +247,7 @@
 .card-swap-1-img {
       position: absolute;
       inset: 0;
+       width: 200px;
       object-fit: contain;
       transition: opacity .15s ease;
       user-select: none;
