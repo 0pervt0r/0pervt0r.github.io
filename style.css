@@ -128,12 +128,13 @@
 .front-page-columns {
     display: flex;
     flex-direction: column;
-    align-items: right;
+    align-items: flex-end;
     justify-content: space-around; 
     margin: 0.5em;
 }
 
 .front-button {
+    box-sizing: border-box;
     min-height: 40px;
     max-height: 40px;
     min-width: 290px;
@@ -141,8 +142,8 @@
     background-color: #030303;
     padding: 23px;
     display: flex;
-    align-items: center center;
-    gap: 3em;
+    align-items: center;
+    justify-content:center;
     border: 1px solid #242324;
     border-radius: 24px;
     box-shadow: inset 25px 0 25px -15px #242324;
@@ -150,6 +151,7 @@
 .front-button-img {
     height: 15px;
     width: 15px;
+    float: right;
 }
 .front-button:hover {
     background-color: #c1394f;
