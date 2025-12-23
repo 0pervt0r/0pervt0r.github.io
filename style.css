@@ -155,6 +155,7 @@ aside{
 }
 
 .main-content{
+  text-align: justify;
   display:flex;
   gap:5em;
 }
