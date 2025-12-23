@@ -236,29 +236,3 @@
   margin-top: 1rem;
   font-family: "Gputeks";
 }
-
-.card-swap-1 {
-    position: relative;
-    overflow: hidden;
-    display: grid;
-    place-items: center;
-}
-
-.card-swap-1-img {
-      position: absolute;
-      inset: 0;
-      width: 200px;
-      height: 200px;
-      object-fit: contain;
-      transition: opacity .15s ease;
-      user-select: none;
-      -webkit-user-drag: none;
-      image-rendering: auto;
-}
-
-.card-swap-1 .user-doc-1{ opacity: 1; }
-.card-swap-1 .user-doc-2{ opacity: 0; }
-
-.card-swap-1:hover .user-doc-1{ opacity: 0; }
-.card-swap-1:hover .user-doc-2{ opacity: 1; }
-
