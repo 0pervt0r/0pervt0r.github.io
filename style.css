@@ -145,7 +145,6 @@
     }
 
     .main-content-2 {
-        item-align: anchor-center;
         background-color: #030303;
         border: 3px solid #242324;
         box-shadow: inset 25px 0 25px -15px #242324;
@@ -198,6 +197,7 @@
 .front-nav-cards {
     padding: 3em;
     border: 1px solid #242324;
+    border-radius: 12px;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 2em;
