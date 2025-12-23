@@ -188,3 +188,33 @@
     border: 1px solid #690829;
     box-shadow: inset 25px 0 25px -15px #690829;
 }
+
+.front-articles {
+    border: 1px solid #242324;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2em;
+}
+
+.card {
+    text-align: center;
+}
+
+.card img{
+  width: 200px;
+  display: block;
+  margin: 0 auto;
+  transition: transform .25s ease, box-shadow .25s ease;
+  border-radius: 12px;
+}
+
+.card:hover img{
+  transform: scale(1.05);
+  box-shadow: 0 0 0 2px #fff;
+}
+
+.card p{
+  margin-top: 1rem;
+  font-family: "Gputeks";
+}
+
