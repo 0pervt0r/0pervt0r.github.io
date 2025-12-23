@@ -147,6 +147,7 @@
         display: flow-root;
         background-color: #030303;
         border: 3px solid #242324;
+        border-radius: 17px;
         box-shadow: inset 25px 0 25px -15px #242324;
         padding: 2.5em;
         margin: 2em;
