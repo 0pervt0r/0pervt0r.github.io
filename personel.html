@@ -1,0 +1,89 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Urbanshade Chronicles 🦢</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="sidebar-overlay" aria-hidden="true"></div>
+  <div class="header">
+    <div class="uc-header">
+      <div class="logo-swap">
+        <img class="logo-img logo-1" src="LOGOO1.png"/>
+        <img class="logo-img logo-2" src="LOGOO2.png" aria-hidden="true" />
+      </div>
+      <h2>URBANSHADE CHRONICLES</h2>
+    </div>
+  </div>
+
+  <main>
+    <div class="main-container">
+      <aside>
+        <div class="side-bar">
+          <div class="sidebar-logo">
+            <img src="CINDER.png" class="cinder-logo-small">
+            <a class="cinder" href="index.html">CINDER</a>
+          </div>
+
+          <div class="sidebar-nav">
+            <a href="">Карта комплекса</a>
+            <a href="">Классификация</a>
+            <a href="">Сотрудники</a>
+            <a href="">Объекты на содержании</a>
+          </div>
+        </div>
+      </aside>
+
+      <div class="top-bar">
+        <button class="sidebar-toggle" type="button" aria-label="Открыть меню" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+
+        <a href="https://t.me/UrbanshadeChronicles"><p><span class="cinder">CINDER</span> DATABASE</p></a>
+      </div>
+
+
+      <div class="main-content-2">
+      </div>
+
+    </main>
+
+  <div class="footer"></div>
+
+    <script>
+  (function () {
+    const btn = document.querySelector('.sidebar-toggle');
+    const overlay = document.querySelector('.sidebar-overlay');
+    const links = document.querySelectorAll('aside a');
+
+    if (!btn || !overlay) return;
+
+    function openMenu() {
+      document.body.classList.add('sidebar-open');
+      btn.setAttribute('aria-expanded', 'true');
+    }
+
+    function closeMenu() {
+      document.body.classList.remove('sidebar-open');
+      btn.setAttribute('aria-expanded', 'false');
+    }
+
+    btn.addEventListener('click', () => {
+      document.body.classList.contains('sidebar-open') ? closeMenu() : openMenu();
+    });
+
+    overlay.addEventListener('click', closeMenu);
+
+    links.forEach(a => a.addEventListener('click', closeMenu));
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeMenu();
+    });
+  })();
+</script>
+
+</body>
+</html>
