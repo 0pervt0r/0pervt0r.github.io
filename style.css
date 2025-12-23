@@ -40,14 +40,13 @@ h1{
   font-size:50px;
 }
 
-p{
+p {
   color:#ffffff;
   font-family:"Gputeks";
-    text-align: justify;
 }
 
-.p-center {
-  text-align: center;  !important
+.p-text {
+  text-align: justify;
 }
 
 a{
