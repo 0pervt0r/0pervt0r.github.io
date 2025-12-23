@@ -116,8 +116,7 @@
     }
 
 .sidebar-nav {
-    display:flex;
-    align-items:center;
+    padding: 1em;
     border: 1px solid #242324;
 }
 
