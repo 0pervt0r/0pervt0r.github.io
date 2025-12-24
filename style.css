@@ -43,12 +43,12 @@ h1{
 p {
   color:#ffffff;
   font-family:"Gputeks";
+  text-align: center;
 }
 
 a{
   color:white;
   font-family:"Pobeda";
-  text-align: justify;
 }
 
 .cinder{
