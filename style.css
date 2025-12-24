@@ -430,6 +430,10 @@ aside{
   border-radius: 20px;
 }
 
+.actual-personel-doc-align {
+  display: flex;
+}
+
 .actual-personel-doc img {
   width: 150px;
   height: 200px;
