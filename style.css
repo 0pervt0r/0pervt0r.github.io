@@ -464,7 +464,7 @@ aside{
 }
 
 .doc-img{
-  width: 170px;
+  width: 200px;
   aspect-ratio: 3 / 4;
   object-fit: cover;
   border-radius: 10px;
@@ -477,6 +477,7 @@ aside{
   border-left: 2px solid rgba(255,255,255,0.18);
   line-height: 1.25;
   font-size: 14px;
+  text-align: justify;
 }
 
 .info-row{
