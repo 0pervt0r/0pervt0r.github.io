@@ -421,6 +421,8 @@ aside{
 .personel-docs {
   border: 1px solid #242324;
   border-radius: 20px;
+  margin: 3em;
+  padding: 2em;
 }
 
 .actual-personel-doc {
