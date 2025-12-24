@@ -417,3 +417,95 @@ aside{
   .sidebar-toggle{display:none;}
   .sidebar-overlay{display:none;}
 }
+
+.persona-card{
+  background:#030303;
+  border:3px solid #242324;
+  border-radius:17px;
+  box-shadow:inset 25px 0 25px -15px #242324;
+  padding:1.25rem;
+}
+
+.persona-top{
+  display:flex;
+  align-items:flex-start;
+  gap:1.25rem;
+}
+
+/* Фото 3×4 */
+.persona-photo{
+  width:150px;              /* меняй размер тут */
+  aspect-ratio:3/4;         /* фиксирует 3×4 */
+  position:relative;
+  overflow:hidden;
+  border-radius:12px;
+  border:1px solid #242324;
+  flex:0 0 auto;
+}
+
+.persona-photo .photo{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  transition:opacity .2s ease;
+  user-select:none;
+  -webkit-user-drag:none;
+}
+
+.persona-photo .photo-1{ opacity:1; }
+.persona-photo .photo-2{ opacity:0; }
+
+.persona-photo:hover .photo-1{ opacity:0; }
+.persona-photo:hover .photo-2{ opacity:1; }
+
+/* Инфа справа + вертикальная черта */
+.persona-info{
+  color:#fff;
+  font-family:"Gputeks";
+  padding-left:1.25rem;
+  border-left:1px solid #666;
+  min-width:0;              /* чтобы текст нормально переносился */
+  flex:1;
+}
+
+.persona-info p{
+  margin:0 0 .5rem 0;
+  text-align:left;          /* намеренно */
+  line-height:1.35;
+}
+
+.persona-info p:last-child{ margin-bottom:0; }
+
+/* Имя снизу по центру */
+.persona-name{
+  margin:1rem 0 0;
+  text-align:center;
+  color:#fff;
+  font-family:"Gputeks";
+  font-size:1.1rem;
+  letter-spacing:.03em;
+}
+
+/* Адаптив */
+@media (max-width:768px){
+  .persona-top{
+    flex-direction:column;
+    align-items:center;
+    gap:1rem;
+  }
+
+  .persona-info{
+    border-left:none;
+    border-top:1px solid #666;
+    padding-left:0;
+    padding-top:1rem;
+    width:100%;
+  }
+
+  .persona-info p{
+    text-align:left;
+  }
+}
+
