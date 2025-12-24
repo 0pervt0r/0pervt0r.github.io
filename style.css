@@ -449,8 +449,9 @@ aside{
   width: 150px;
   flex: 1 1 auto;  
   display: flex;
-  align-items: flex-start;
-  justify-content: flex-start;
+  align-items: center;
+  border-radius: 10px;
+  margin: 1em;
 }
 
 .doc-img{
@@ -458,13 +459,6 @@ aside{
   height: 100%;
   object-fit: cover; 
   display: block;
-}
-
-.name-separator{
-  border: none;
-  height: 2px;
-  background: #fff;  
-  margin: 0;
 }
 
 .person-name{
