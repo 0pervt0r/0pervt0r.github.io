@@ -464,7 +464,7 @@ aside{
 }
 
 .doc-img{
-  width: 200px;
+  width: 150px;
   aspect-ratio: 3 / 4;
   object-fit: cover;
   border-radius: 10px;
