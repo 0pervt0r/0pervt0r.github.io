@@ -2,3 +2,12 @@
     font-family: Kurland; 
     src: url(Kurland-Regular.otf);
    }
+@font-face {
+    font-family: Rocket Doodle Cyr (sherbackoffa; 
+    src: url(Rocket Doodle Cyr (sherbackoffalex).otf);
+   }
+
+
+.p-center {
+    text-align: justify;
+}
