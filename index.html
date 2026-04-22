@@ -1,50 +1,155 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Urbanshade Chronicles ᆞ Official Wiki</title>
 
-  
-  <head>
-    <title>Архив Воли!</title>
-    <link rel="stylesheet" href="styles.css">
+<style>
+:root {
+    --bg: #00060f;
+    --text: #fffff2;
+    --accent1: #c3e63f;
+    --accent2: #2c7503;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+}
+
+header {
+    background: linear-gradient(90deg, var(--accent2), var(--bg));
+    padding: 15px 25px;
+    border-bottom: 2px solid var(--accent1);
+}
+
+header h1 {
+    color: var(--accent1);
+    font-size: 24px;
+}
+
+.container {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 250px;
+    background-color: #010a18;
+    border-right: 1px solid var(--accent2);
+    padding: 20px;
+}
+
+.sidebar h2 {
+    color: var(--accent1);
+    margin-bottom: 10px;
+    font-size: 18px;
+}
+
+.sidebar ul {
+    list-style: none;
+}
+
+.sidebar li {
+    margin: 10px 0;
+}
+
+.sidebar a {
+    color: var(--text);
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.sidebar a:hover {
+    color: var(--accent1);
+}
+
+.content {
+    flex: 1;
+    padding: 30px;
+}
+
+.content h2 {
+    color: var(--accent1);
+    margin-bottom: 15px;
+}
+
+.content p {
+    margin-bottom: 15px;
+}
+
+.card {
+    background-color: #020d1f;
+    border: 1px solid var(--accent2);
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+}
+
+a {
+    color: var(--accent1);
+}
+
+a:hover {
+    color: var(--accent2);
+}
+
+footer {
+    text-align: center;
+    padding: 15px;
+    border-top: 1px solid var(--accent2);
+    font-size: 14px;
+    opacity: 0.7;
+}
+</style>
+
+</head>
+
+<body>
+
+<header>
+    <h1>Wiki Project</h1>
+</header>
+
+<div class="container">
     
-  </head>
+    <aside class="sidebar">
+        <h2>Навигация</h2>
+        <ul>
+            <li><a href="#">Главная</a></li>
+            <li><a href="#">Персонажи</a></li>
+            <li><a href="#">Лор</a></li>
+            <li><a href="#">Локации</a></li>
+        </ul>
+    </aside>
 
-  
-  <style>
-    body {
-      background-color: #e6e6e6;
-    }
-
-    ocxc-list {
-      background-color: #637863;
-    }
-
-    h1 {
-      font-family: Jolly Lodger Cyrillic;
-      text-color: black;
-      text-align: center;
-      text-size: 100px;
-    }
-    p {
-      font-family: Kurland;
-      text-color: black;
-      text-align: justify;
-    }
-  </style>
-
-  
-  <body>
-          <h1>Архив воли оператора</h1>
-          <p>Тут будет текст</p>
-
-    <main>
-
-        <div class="ocxc-list">
-          <p>тут будет список моих активных ос\канон пейрингов</p>
+    <main class="content">
+        <div class="card">
+            <h2>Заголовок статьи</h2>
+            <p>Это пример текста для вашей вики. Здесь можно описывать персонажей, события или мир.</p>
+            <p>Вы можете добавлять больше блоков, разделов и ссылок.</p>
         </div>
-      
-    </main>
-    
-  </body>
 
-  
+        <div class="card">
+            <h2>Дополнительный раздел</h2>
+            <p>Этот блок можно использовать для заметок, фактов или вторичной информации.</p>
+        </div>
+    </main>
+
+</div>
+
+<footer>
+    © 2026 Urbanshade Chronicles
+</footer>
+
+</body>
 </html>
