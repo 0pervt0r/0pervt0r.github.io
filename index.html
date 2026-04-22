@@ -1,154 +1,148 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Urbanshade Chronicles ᆞ Official Wiki</title>
+    <meta charset="UTF-8">
+    <title>Urbanshade Chronicles</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #000000;
+            color: #fffff2;
+        }
 
-<style>
-:root {
-    --bg: #00060f;
-    --text: #fffff2;
-    --accent1: #c3e63f;
-    --accent2: #2c7503;
-}
+        a {
+            color: #c3e63f;
+            text-decoration: none;
+        }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+        a:hover {
+            color: #2c7503;
+        }
 
-body {
-    background-color: var(--bg);
-    color: var(--text);
-    font-family: Arial, sans-serif;
-    line-height: 1.6;
-}
+        header {
+            background-color: #111;
+            padding: 20px;
+            border-bottom: 2px solid #2c7503;
+        }
 
-header {
-    background: linear-gradient(90deg, var(--accent2), var(--bg));
-    padding: 15px 25px;
-    border-bottom: 2px solid var(--accent1);
-}
+        header h1 {
+            margin: 0;
+            color: #ffffff;
+            font-size: 28px;
+        }
 
-header h1 {
-    color: var(--accent1);
-    font-size: 24px;
-}
+        .container {
+            display: flex;
+        }
 
-.container {
-    display: flex;
-    min-height: 100vh;
-}
+        nav {
+            width: 250px;
+            background-color: #0a0a0a;
+            padding: 20px;
+            border-right: 1px solid #2c7503;
+        }
 
-.sidebar {
-    width: 250px;
-    background-color: #010a18;
-    border-right: 1px solid var(--accent2);
-    padding: 20px;
-}
+        nav h2 {
+            color: #ffffff;
+            font-size: 16px;
+            margin-top: 20px;
+            border-bottom: 1px solid #2c7503;
+            padding-bottom: 5px;
+        }
 
-.sidebar h2 {
-    color: var(--accent1);
-    margin-bottom: 10px;
-    font-size: 18px;
-}
+        nav ul {
+            list-style: none;
+            padding: 0;
+        }
 
-.sidebar ul {
-    list-style: none;
-}
+        nav li {
+            margin: 8px 0;
+        }
 
-.sidebar li {
-    margin: 10px 0;
-}
+        main {
+            flex: 1;
+            padding: 30px;
+        }
 
-.sidebar a {
-    color: var(--text);
-    text-decoration: none;
-    transition: 0.2s;
-}
+        main h2 {
+            color: #ffffff;
+            border-bottom: 1px solid #2c7503;
+            padding-bottom: 5px;
+        }
 
-.sidebar a:hover {
-    color: var(--accent1);
-}
+        .article-box {
+            border: 1px solid #2c7503;
+            padding: 15px;
+            margin-top: 20px;
+            background-color: #050505;
+        }
 
-.content {
-    flex: 1;
-    padding: 30px;
-}
+        footer {
+            text-align: center;
+            padding: 15px;
+            border-top: 1px solid #2c7503;
+            background-color: #111;
+            font-size: 12px;
+        }
 
-.content h2 {
-    color: var(--accent1);
-    margin-bottom: 15px;
-}
-
-.content p {
-    margin-bottom: 15px;
-}
-
-.card {
-    background-color: #020d1f;
-    border: 1px solid var(--accent2);
-    padding: 20px;
-    margin-bottom: 20px;
-    border-radius: 8px;
-}
-
-a {
-    color: var(--accent1);
-}
-
-a:hover {
-    color: var(--accent2);
-}
-
-footer {
-    text-align: center;
-    padding: 15px;
-    border-top: 1px solid var(--accent2);
-    font-size: 14px;
-    opacity: 0.7;
-}
-</style>
-
+    </style>
 </head>
-
 <body>
 
 <header>
-    <h1>Wiki Project</h1>
+    <h1>Urbanshade Chronicles</h1>
 </header>
 
 <div class="container">
-    
-    <aside class="sidebar">
+
+    <nav>
         <h2>Навигация</h2>
         <ul>
             <li><a href="#">Главная</a></li>
+            <li><a href="#">Объекты</a></li>
             <li><a href="#">Персонажи</a></li>
-            <li><a href="#">Лор</a></li>
             <li><a href="#">Локации</a></li>
+            <li><a href="#">Архив</a></li>
         </ul>
-    </aside>
 
-    <main class="content">
-        <div class="card">
-            <h2>Заголовок статьи</h2>
-            <p>Это пример текста для вашей вики. Здесь можно описывать персонажей, события или мир.</p>
-            <p>Вы можете добавлять больше блоков, разделов и ссылок.</p>
+        <h2>Служебное</h2>
+        <ul>
+            <li><a href="#">Правила</a></li>
+            <li><a href="#">Форум</a></li>
+            <li><a href="#">Контакты</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <h2>Добро пожаловать</h2>
+        <p> </p>
+
+        <div class="article-box">
+            <h3>Файл: US-001</h3>
+            <p><strong>Класс:</strong> Неопределён</p>
+            <p>
+                Объект проявляет себя в виде искажений городской инфраструктуры.
+                Зафиксированы случаи изменения топологии зданий без физического вмешательства.
+            </p>
+            <p><a href="#">Читать далее →</a></p>
         </div>
 
-        <div class="card">
-            <h2>Дополнительный раздел</h2>
-            <p>Этот блок можно использовать для заметок, фактов или вторичной информации.</p>
+        <div class="article-box">
+            <h3>Файл: US-014</h3>
+            <p><strong>Класс:</strong> Контролируемый</p>
+            <p>
+                Сущность, обитающая в системах метро. Контакт приводит к дезориентации
+                и частичной потере памяти.
+            </p>
+            <p><a href="#">Читать далее →</a></p>
         </div>
+
     </main>
 
 </div>
 
 <footer>
-    © 2026 Urbanshade Chronicles
 </footer>
 
 </body>
