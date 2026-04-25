@@ -2,240 +2,223 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Slot Machine</title>
+<title>Slot Game</title>
 
 <style>
 body {
-    background: radial-gradient(circle at center, #021e00 0%, #000300 80%);
+    background: #000300;
     color: #c3e63e;
-    font-family: Arial;
+    font-family: Arial, sans-serif;
     text-align: center;
 }
 
-.machine {
-    display: inline-block;
-    padding: 20px;
-    border-radius: 20px;
-    background: #021e00;
-    box-shadow: 0 0 20px #83b625;
+h1 {
+    color: #ffffff;
 }
 
-.reels {
-    display: flex;
+#balance {
+    margin: 10px;
+}
+
+.slot {
+    display: grid;
+    grid-template-columns: repeat(3, 80px);
     gap: 10px;
+    justify-content: center;
+    margin: 20px;
 }
 
-.reel {
-    width: 110px;
-    height: 330px;
-    overflow: hidden;
-    background: #000;
-    border-radius: 10px;
-}
-
-.reel-track {
-    transition: transform 0.3s;
-}
-
-.symbol {
-    height: 110px;
+.cell {
+    width: 80px;
+    height: 80px;
+    background: #021e00;
+    border: 2px solid #83b625;
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
+    position: relative;
 }
 
-.symbol img {
-    width: 80px;
+.cell img {
+    width: 60px;
+    height: 60px;
 }
 
-.win {
-    box-shadow:
-        inset 0 0 0 3px #83b625,
-        0 0 10px #83b625,
-        0 0 25px #83b625;
-    animation: glow 0.6s infinite alternate;
+.spin {
+    animation: spin 0.6s ease-out;
 }
 
-@keyframes glow {
-    from { transform: scale(1); }
-    to { transform: scale(1.05); }
+@keyframes spin {
+    0% { transform: translateY(-100px); }
+    100% { transform: translateY(0); }
+}
+
+.highlight {
+    border: 3px solid #c3e63e;
 }
 
 button {
-    margin-top: 15px;
-    padding: 12px 25px;
     background: #83b625;
+    color: #000;
+    padding: 10px 20px;
     border: none;
-    font-size: 18px;
     cursor: pointer;
+}
+
+#resultIcon img {
+    width: 120px;
+    margin-top: 10px;
 }
 </style>
 </head>
 
 <body>
 
-<h1>Сдохни или умри</h1>
-<div>Баланс: <span id="money">250</span></div>
+<h1>Slots</h1>
 
-<div class="machine">
-    <div class="reels" id="reels"></div>
+<div id="balance">
+    <img src="Croners.png" width="20"> <span id="money"></span>
 </div>
 
-<button onclick="spin()">Крутить (-25)</button>
+<button onclick="spin()">SPIN (25)</button>
 
-<audio id="tickSound" src="tick.mp3"></audio>
+<div class="slot" id="slot"></div>
+
+<div id="resultIcon"></div>
 
 <script>
-const symbols = [
-    "symbol1.png",
-    "symbol2.png",
-    "symbol3.png",
-    "symbol4.png",
-    "symbol5.png",
-    "symbol6.png"
-];
+const icons = ["symbol1.png","symbol2.png","symbol3.png","symbol4.png","symbol5.png","symbol6.png"];
+const cost = 25;
+const reward = 100;
 
-let balance = 2500;
-let reels = [];
-let result = [[],[],[]];
+let grid = [];
+let balance = loadBalance();
 
-const reelsEl = document.getElementById("reels");
-const tick = document.getElementById("tickSound");
+function loadBalance() {
+    let data = JSON.parse(localStorage.getItem("slotData"));
+    let today = new Date().toDateString();
 
-function init() {
-    for (let r = 0; r < 3; r++) {
-        let reel = document.createElement("div");
-        reel.className = "reel";
+    if (!data) {
+        data = { money: 250, lastLogin: today };
+    }
 
-        let track = document.createElement("div");
-        track.className = "reel-track";
+    if (data.lastLogin !== today) {
+        data.money += 250;
+        data.lastLogin = today;
+    }
 
-        for (let i = 0; i < 3; i++) {
-            let sym = document.createElement("div");
-            sym.className = "symbol";
+    localStorage.setItem("slotData", JSON.stringify(data));
+    return data.money;
+}
 
-            let img = document.createElement("img");
-            img.src = symbols[Math.floor(Math.random()*symbols.length)];
+function saveBalance() {
+    let data = JSON.parse(localStorage.getItem("slotData"));
+    data.money = balance;
+    localStorage.setItem("slotData", JSON.stringify(data));
+}
 
-            sym.appendChild(img);
-            track.appendChild(sym);
-        }
+function updateUI() {
+    document.getElementById("money").innerText = balance;
+}
 
-        reel.appendChild(track);
-        reelsEl.appendChild(reel);
-        reels.push(track);
+function createGrid() {
+    const slot = document.getElementById("slot");
+    slot.innerHTML = "";
+    grid = [];
+
+    for (let i = 0; i < 9; i++) {
+        let cell = document.createElement("div");
+        cell.className = "cell";
+
+        let img = document.createElement("img");
+        img.src = icons[Math.floor(Math.random() * icons.length)];
+
+        cell.appendChild(img);
+        slot.appendChild(cell);
+
+        grid.push({ cell, img });
     }
 }
 
 function spin() {
-    if (balance < 25) return;
+    if (balance < cost) return;
 
-    balance -= 25;
-    update();
+    balance -= cost;
+    updateUI();
+    saveBalance();
 
-    clearWins();
+    document.getElementById("resultIcon").innerHTML = "";
 
-    reels.forEach((track, i) => {
-        let duration = 600 + i * 300;
-
-        playTick(duration);
-
-        let interval = setInterval(() => {
-            for (let j = 0; j < 3; j++) {
-                track.children[j].querySelector("img").src =
-                    symbols[Math.floor(Math.random()*symbols.length)];
-            }
-        }, 80);
+    grid.forEach((g, i) => {
+        g.cell.classList.remove("highlight");
+        g.img.classList.add("spin");
 
         setTimeout(() => {
-            clearInterval(interval);
+            g.img.src = icons[Math.floor(Math.random() * icons.length)];
+            g.img.classList.remove("spin");
 
-            let col = [];
-            for (let j = 0; j < 3; j++) {
-                let s = symbols[Math.floor(Math.random()*symbols.length)];
-                track.children[j].querySelector("img").src = s;
-                col.push(s);
-            }
-
-            result[i] = col;
-
-            if (i === 2) checkWin();
-
-        }, duration);
+            if (i === 8) checkWin();
+        }, 200 + i * 100);
     });
 }
 
-/* МАТРИЦА */
-function getM() {
-    let m = [];
-    for (let r = 0; r < 3; r++) {
-        for (let c = 0; c < 3; c++) {
-            m[r*3+c] = result[c][r];
-        }
-    }
-    return m;
-}
-
-function eq(a,b,c){ return a===b && b===c }
-
-/* ПОДСВЕТКА */
-function mark(indices) {
-    indices.forEach(i=>{
-        let r = Math.floor(i/3);
-        let c = i%3;
-        reels[c].children[r].classList.add("win");
-    });
-}
-
-function clearWins() {
-    document.querySelectorAll(".symbol").forEach(el=>{
-        el.classList.remove("win");
-    });
-}
-
-/* ПРОВЕРКА */
 function checkWin() {
-    let m = getM();
-
-    const lines = [
+    let lines = [
         [0,1,2],[3,4,5],[6,7,8],
         [0,3,6],[1,4,7],[2,5,8],
         [0,4,8],[2,4,6]
     ];
 
-    lines.forEach(line=>{
-        if (eq(m[line[0]],m[line[1]],m[line[2]])) {
-            mark(line);
-            balance += 50;
+    let winCells = [];
+
+    lines.forEach(line => {
+        let [a,b,c] = line;
+        if (grid[a].img.src === grid[b].img.src &&
+            grid[b].img.src === grid[c].img.src) {
+            winCells.push(...line);
+            balance += reward;
         }
     });
 
-    // крест
-    if (eq(m[0],m[4],m[8]) && eq(m[2],m[4],m[6])) {
-        mark([0,2,4,6,8]);
-        balance += 150;
+    // PLUS
+    if (same([1,3,4,5,7])) {
+        showIcon("Plus.png");
+        balance += reward * 2;
     }
 
-    // плюс
-    if (eq(m[1],m[4],m[7]) && eq(m[3],m[4],m[5])) {
-        mark([1,3,4,5,7]);
-        balance += 150;
+    // CROSS
+    if (same([0,2,4,6,8])) {
+        showIcon("Cross.png");
+        balance += reward * 2;
     }
 
-    // бинго
-    if (m.every(v=>v===m[0])) {
-        mark([0,1,2,3,4,5,6,7,8]);
-        balance += 500;
+    // BINGO
+    if (same([0,1,2,3,4,5,6,7,8])) {
+        showIcon("Bingo.png");
+        balance += reward * 5;
     }
 
-    update();
+    winCells.forEach(i => {
+        grid[i].cell.classList.add("highlight");
+    });
+
+    updateUI();
+    saveBalance();
 }
 
-function update() {
-    document.getElementById("money").innerText = balance;
+function same(indexes) {
+    let first = grid[indexes[0]].img.src;
+    return indexes.every(i => grid[i].img.src === first);
 }
 
-init();
+function showIcon(src) {
+    document.getElementById("resultIcon").innerHTML =
+        `<img src="${src}">`;
+}
+
+createGrid();
+updateUI();
 </script>
 
 </body>
