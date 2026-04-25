@@ -87,7 +87,7 @@ const icons = [
     "symbol5.png"
 ];
 
-const cost = 20;
+const cost = 10;
 const reward = 100;
 
 let balance = 0;
@@ -103,7 +103,7 @@ const reels = [
 const btn = document.getElementById("spinBtn");
 const moneyEl = document.getElementById("money");
 
-// ---------- Сохранение / загрузка ----------
+
 function loadGame() {
     const savedBalance = localStorage.getItem("slot_balance");
     const savedTime = localStorage.getItem("slot_last_bonus");
@@ -119,7 +119,7 @@ function saveGame() {
     localStorage.setItem("slot_last_bonus", lastBonusTime);
 }
 
-// ---------- Бонус каждые 24 часа ----------
+
 function applyDailyBonus() {
     const now = Date.now();
     const day = 24 * 60 * 60 * 1000;
@@ -134,13 +134,13 @@ function applyDailyBonus() {
     }
 }
 
-// ---------- UI ----------
+
 function updateUI() {
     moneyEl.innerText = balance;
     saveGame();
 }
 
-// ---------- Генерация барабана ----------
+
 function createStrip() {
     let arr = [];
     for (let i = 0; i < 30; i++) {
@@ -159,7 +159,7 @@ function render(reel, strip) {
     });
 }
 
-// ---------- Спин ----------
+
 function spin() {
     if (spinning || balance < cost) return;
 
@@ -195,7 +195,7 @@ function spin() {
     }, 1400);
 }
 
-// ---------- Проверка выигрыша ----------
+
 function checkWin(gridCols) {
     let g = [
         [gridCols[0][0], gridCols[1][0], gridCols[2][0]],
@@ -226,7 +226,6 @@ function checkWin(gridCols) {
     updateUI();
 }
 
-// ---------- Запуск ----------
 btn.onclick = spin;
 
 loadGame();
