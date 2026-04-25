@@ -6,14 +6,36 @@
 
 <style>
 body {
-    background: #000300;
+    background: radial-gradient(circle at center, #021e00 0%, #000300 80%);
     color: #c3e63e;
     font-family: Arial;
     text-align: center;
+    overflow: hidden;
+}
+
+/* затемнение краёв */
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    box-shadow: inset 0 0 150px #000;
+    pointer-events: none;
 }
 
 h1 {
     color: #ffffff;
+    text-shadow: 0 0 10px #83b625, 0 0 25px #83b625;
+}
+
+/* рамка автомата */
+.machine {
+    display: inline-block;
+    padding: 20px;
+    border-radius: 20px;
+    background: linear-gradient(145deg, #021e00, #000300);
+    box-shadow:
+        0 0 20px #83b625,
+        inset 0 0 15px #83b625;
 }
 
 #balance {
@@ -21,57 +43,99 @@ h1 {
     font-size: 20px;
 }
 
+/* сетка */
 .grid {
     display: grid;
-    grid-template-columns: repeat(3, 100px);
-    gap: 5px;
+    grid-template-columns: repeat(3, 110px);
+    gap: 8px;
     justify-content: center;
     margin: 20px auto;
 }
 
+/* ячейки */
 .cell {
-    width: 100px;
-    height: 100px;
+    width: 110px;
+    height: 110px;
     background: #021e00;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
+
+    box-shadow:
+        inset 0 0 10px #000,
+        0 0 10px #000;
 }
 
 .cell img {
     width: 80px;
+    transition: transform 0.2s;
 }
 
+/* лёгкий "прыжок" символа */
+.cell img.spin {
+    transform: translateY(-10px);
+}
+
+/* подсветка выигрыша */
 .highlight {
     animation: pulse 0.6s infinite alternate;
     border: 2px solid #83b625;
+    box-shadow: 0 0 15px #83b625;
 }
 
 @keyframes pulse {
     from { transform: scale(1); }
-    to { transform: scale(1.1); }
+    to { transform: scale(1.12); }
 }
 
+/* кнопка */
 button {
-    background: #83b625;
+    background: linear-gradient(145deg, #83b625, #5c8d1a);
     color: #000;
     border: none;
-    padding: 10px 20px;
+    padding: 12px 25px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 18px;
+    border-radius: 10px;
+
+    box-shadow: 0 0 10px #83b625;
+    transition: 0.2s;
+}
+
+button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px #83b625;
+}
+
+button:active {
+    transform: scale(0.95);
 }
 
 #bigWin {
     position: absolute;
-    top: 20%;
+    top: 30%;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translateX(-50%) scale(0.5);
     display: none;
+    opacity: 0;
+}
+
+#bigWin.show {
+    display: block;
+    animation: bigWinAnim 1s forwards;
+}
+
+@keyframes bigWinAnim {
+    0% { opacity: 0; transform: translateX(-50%) scale(0.5); }
+    50% { opacity: 1; transform: translateX(-50%) scale(1.2); }
+    100% { opacity: 1; transform: translateX(-50%) scale(1); }
 }
 
 #bigWin img {
-    width: 200px;
+    width: 220px;
+    filter: drop-shadow(0 0 20px #83b625);
 }
 </style>
 </head>
@@ -85,9 +149,11 @@ button {
     <img src="Croners.png" width="20">
 </div>
 
-<div class="grid" id="grid"></div>
+<div class="machine">
+    <div class="grid" id="grid"></div>
+</div>
 
-<button onclick="spin()">Крутить (-25)</button>
+<button onclick="spin()">Крутить!</button>
 
 <div id="bigWin">
     <img id="bigWinImg" src="">
@@ -103,7 +169,7 @@ const symbols = [
     "symbol6.png"
 ];
 
-let balance = 250;
+let balance = 25000;
 let grid = [];
 const gridEl = document.getElementById("grid");
 
@@ -131,7 +197,13 @@ function spin() {
     let interval = setInterval(() => {
         grid.forEach(cell => {
             let img = cell.querySelector("img");
-            img.src = symbols[Math.floor(Math.random()*symbols.length)];
+
+            img.classList.add("spin");
+
+            setTimeout(() => {
+                img.src = symbols[Math.floor(Math.random()*symbols.length)];
+                img.classList.remove("spin");
+            }, 50);
         });
 
         spins--;
@@ -159,9 +231,12 @@ function showBig(icon) {
     const img = document.getElementById("bigWinImg");
 
     img.src = icon;
-    el.style.display = "block";
+    el.classList.add("show");
 
-    setTimeout(() => el.style.display = "none", 2000);
+    setTimeout(() => {
+        el.classList.remove("show");
+        el.style.display = "none";
+    }, 2000);
 }
 
 function checkWin() {
@@ -182,21 +257,18 @@ function checkWin() {
         }
     });
 
-    // крест (X)
     if (checkLine(m[0],m[4],m[8]) && checkLine(m[2],m[4],m[6])) {
         showBig("Cross.png");
         balance += 150;
         highlight([0,2,4,6,8]);
     }
 
-    // плюс (+)
     if (checkLine(m[1],m[4],m[7]) && checkLine(m[3],m[4],m[5])) {
         showBig("Plus.png");
         balance += 150;
         highlight([1,3,4,5,7]);
     }
 
-    // бинго
     if (m.every(v => v === m[0])) {
         showBig("Bingo.png");
         balance += 500;
