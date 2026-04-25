@@ -79,33 +79,7 @@ button {
     <div id="board"></div>
 </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import {
-  getDatabase,
-  ref,
-  set,
-  query,
-  orderByChild,
-  limitToLast,
-  onValue
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
-// ---------- FIREBASE ----------
-const firebaseConfig = {
-  apiKey: "AIzaSyBHu6nNgmxC_Ll7eOMLSDryjx8pIdG4OQ8",
-  authDomain: "chronicles-990c0.firebaseapp.com",
-  databaseURL: "https://chronicles-990c0-default-rtdb.firebaseio.com",
-  projectId: "chronicles-990c0",
-  storageBucket: "chronicles-990c0.appspot.com",
-  messagingSenderId: "1028854285177",
-  appId: "1:1028854285177:web:0fa5158ad78a49f53b25a8"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-
-// ---------- GAME ----------
+<script>
 const icons = ["symbol1.png","symbol2.png","symbol3.png","symbol4.png","symbol5.png"];
 const cost = 20;
 const reward = 100;
@@ -113,7 +87,7 @@ const reward = 100;
 let balance = 200;
 let spinning = false;
 
-// ---------- DOM ----------
+
 const moneyEl = document.getElementById("money");
 const nameEl = document.getElementById("name");
 const btn = document.getElementById("spinBtn");
@@ -125,7 +99,7 @@ const reels = [
   document.getElementById("r3")
 ];
 
-// ---------- НИК (ИСПРАВЛЕНО) ----------
+
 let playerName = localStorage.getItem("slot_name");
 
 function askNameIfNeeded() {
@@ -140,18 +114,6 @@ function askNameIfNeeded() {
   nameEl.innerText = playerName;
 }
 
-    function saveFirebase() {
-    console.log("SAVE FIREBASE:", playerName, balance);
-
-    set(ref(db, "leaderboard/" + playerName), {
-        balance: balance,
-        updated: Date.now()
-    }).catch(err => {
-        console.error("FIREBASE ERROR:", err);
-    });
-}
-
-// ---------- СМЕНА НИКА (ИСПРАВЛЕНО) ----------
 function changeName() {
   const n = prompt("Новый ник:", playerName);
   if (!n || !n.trim()) return;
@@ -159,11 +121,9 @@ function changeName() {
   playerName = n.trim();
   localStorage.setItem("slot_name", playerName);
   nameEl.innerText = playerName;
-
-  saveFirebase();
 }
 
-// ---------- SLOT ----------
+
 function createStrip() {
   let arr = [];
   for (let i = 0; i < 30; i++) {
@@ -182,7 +142,7 @@ function render(reel, strip) {
   });
 }
 
-// ---------- SPIN ----------
+
 function spin() {
   if (spinning || balance < cost) return;
 
@@ -218,7 +178,7 @@ function spin() {
   }, 1400);
 }
 
-// ---------- WIN ----------
+
 function checkWin(g) {
   let m = [
     [g[0][0], g[1][0], g[2][0]],
@@ -247,50 +207,18 @@ function checkWin(g) {
   updateUI();
 }
 
-// ---------- FIREBASE ----------
-function saveFirebase() {
-  if (!playerName) return;
-
-  set(ref(db, "leaderboard/" + playerName), {
-    balance: balance,
-    updated: Date.now()
-  });
-}
-
-function loadLeaderboard() {
-  const q = query(ref(db, "leaderboard"), orderByChild("balance"), limitToLast(10));
-
-  onValue(q, snap => {
-    const data = snap.val() || {};
-
-    let arr = Object.entries(data)
-      .map(([name,v]) => ({name, balance:v.balance}))
-      .sort((a,b)=>b.balance-a.balance);
-
-    const board = document.getElementById("board");
-    board.innerHTML = "";
-
-    arr.forEach((p,i)=>{
-      const div = document.createElement("div");
-      div.textContent = `${i+1}. ${p.name} — ${p.balance}`;
-      board.appendChild(div);
-    });
-  });
-}
-
-// ---------- LOCAL ----------
 function loadLocal() {
   balance = parseInt(localStorage.getItem("slot_balance")) || 200;
 }
 
-// ---------- UI ----------
+
 function updateUI() {
   moneyEl.innerText = balance;
   localStorage.setItem("slot_balance", balance);
   saveFirebase();
 }
 
-// ---------- INIT ----------
+
 btn.onclick = spin;
 nameBtn.onclick = changeName;
 
