@@ -75,8 +75,9 @@ button {
     cursor: pointer;
 }
 
-.highlight {
-    outline: 2px solid #c3e63e;
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 #balance {
@@ -101,22 +102,27 @@ button {
         <div class="reel"><div class="strip" id="r3"></div></div>
     </div>
 
-    <button onclick="spin()">SPIN (25)</button>
+    <button id="spinBtn" onclick="spin()">SPIN (25)</button>
 </div>
 
 <div id="resultIcon"></div>
 
 <script>
-const icons = ["symbol1.png","symbol2.png","symbol3.png","symbol4.png","symbol5.png","symbol6.png",];
+const icons = ["symbol1.png","symbol2.png","symbol3.png","symbol4.png","symbol5.png","symbol6.png"];
 const cost = 25;
 const reward = 100;
 
 let balance = loadBalance();
+let isSpinning = false;
+let finished = 0;
+
 let reels = [
     document.getElementById("r1"),
     document.getElementById("r2"),
     document.getElementById("r3")
 ];
+
+const button = document.getElementById("spinBtn");
 
 function loadBalance() {
     let data = JSON.parse(localStorage.getItem("slotData"));
@@ -164,7 +170,12 @@ function generateStrip(reel) {
 let resultGrid = [];
 
 function spin() {
+    if (isSpinning) return;
     if (balance < cost) return;
+
+    isSpinning = true;
+    button.disabled = true;
+    finished = 0;
 
     balance -= cost;
     updateUI();
@@ -181,11 +192,12 @@ function spin() {
         setTimeout(() => {
             reel.classList.remove("spin");
 
-            // берём 3 центральных символа
             let visible = strip.slice(3, 6);
-            resultGrid.push(visible);
+            resultGrid[index] = visible;
 
-            if (index === 2) {
+            finished++;
+
+            if (finished === 3) {
                 setTimeout(checkWin, 100);
             }
         }, 400 + index * 300);
@@ -205,12 +217,9 @@ function checkWin() {
         [0,4,8],[2,4,6]
     ];
 
-    let win = false;
-
     lines.forEach(line => {
         let [a,b,c] = line;
         if (grid[a] === grid[b] && grid[b] === grid[c]) {
-            win = true;
             balance += reward;
         }
     });
@@ -232,6 +241,9 @@ function checkWin() {
 
     updateUI();
     saveBalance();
+
+    isSpinning = false;
+    button.disabled = false;
 }
 
 function same(grid, indexes) {
