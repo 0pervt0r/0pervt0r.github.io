@@ -26,7 +26,7 @@ h1 {
     box-shadow: 0 0 25px #83b625, inset 0 0 15px #83b625;
 }
 
-/* БАРАБАНЫ */
+/* барабаны */
 .reels {
     display: flex;
     gap: 10px;
@@ -45,6 +45,7 @@ h1 {
     position: absolute;
     width: 100%;
     top: 0;
+    transition: transform 0.2s;
 }
 
 .symbol {
@@ -58,34 +59,31 @@ h1 {
     width: 80px;
 }
 
-/* подсветка */
-.highlight img {
-    animation: pulse 0.6s infinite alternate;
-    filter: drop-shadow(0 0 10px #83b625)
-            drop-shadow(0 0 25px #83b625);
+/* blur при прокрутке */
+.spinning .symbol img {
+    filter: blur(3px);
 }
 
-@keyframes pulse {
-    from { transform: scale(1); }
-    to { transform: scale(1.15); }
-}
-
-/* линии */
-#winLines {
+/* рамка выигрыша */
+#winFrames {
     position: absolute;
     inset: 0;
     pointer-events: none;
 }
 
-.line {
+.win-frame {
     position: absolute;
-    background: #83b625;
-    height: 6px;
-    box-shadow: 0 0 10px #83b625, 0 0 30px #83b625;
-    border-radius: 10px;
+    border: 4px solid #83b625;
+    border-radius: 12px;
+    box-shadow: 0 0 15px #83b625, 0 0 30px #83b625;
+    animation: frameAppear 0.3s ease;
 }
 
-/* кнопка */
+@keyframes frameAppear {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
 button {
     margin-top: 15px;
     padding: 12px 25px;
@@ -103,11 +101,14 @@ button {
 <div>Баланс: <span id="money">250</span></div>
 
 <div class="machine">
-    <div id="winLines"></div>
+    <div id="winFrames"></div>
     <div class="reels" id="reels"></div>
 </div>
 
 <button onclick="spin()">Крутить (-25)</button>
+
+<!-- звук -->
+<audio id="tickSound" src="tick.mp3" preload="auto"></audio>
 
 <script>
 const symbols = [
@@ -122,10 +123,10 @@ const symbols = [
 let balance = 250;
 let reels = [];
 let resultGrid = [[],[],[]];
-
 const reelsEl = document.getElementById("reels");
+const tick = document.getElementById("tickSound");
 
-/* СОЗДАНИЕ БАРАБАНОВ */
+/* создание барабанов */
 function init() {
     for (let r = 0; r < 3; r++) {
         let reel = document.createElement("div");
@@ -134,7 +135,6 @@ function init() {
         let track = document.createElement("div");
         track.classList.add("reel-track");
 
-        // много символов для прокрутки
         for (let i = 0; i < 20; i++) {
             let sym = document.createElement("div");
             sym.classList.add("symbol");
@@ -148,22 +148,32 @@ function init() {
 
         reel.appendChild(track);
         reelsEl.appendChild(reel);
-
         reels.push(track);
     }
 }
 
-/* СПИН */
+/* звук щелчков */
+function playTickLoop(duration) {
+    let interval = setInterval(() => {
+        tick.currentTime = 0;
+        tick.play();
+    }, 80);
+
+    setTimeout(() => clearInterval(interval), duration);
+}
+
+/* спин */
 function spin() {
     if (balance < 25) return alert("Нет денег");
 
     balance -= 25;
     document.getElementById("money").innerText = balance;
 
-    document.getElementById("winLines").innerHTML = "";
+    document.getElementById("winFrames").innerHTML = "";
+    reelsEl.classList.add("spinning");
 
     reels.forEach((track, i) => {
-        let duration = 1000 + i * 500;
+        let duration = 1000 + i * 400;
         let distance = 110 * (10 + Math.floor(Math.random()*10));
 
         track.style.transition = "none";
@@ -174,14 +184,14 @@ function spin() {
             track.style.transform = `translateY(-${distance}px)`;
         }, 50);
 
-        // остановка
+        playTickLoop(duration);
+
         setTimeout(() => {
             let finalSymbols = [];
 
             for (let j = 0; j < 3; j++) {
                 let sym = symbols[Math.floor(Math.random()*symbols.length)];
                 finalSymbols.push(sym);
-
                 track.children[j].querySelector("img").src = sym;
             }
 
@@ -190,13 +200,16 @@ function spin() {
 
             resultGrid[i] = finalSymbols;
 
-            if (i === 2) checkWin();
+            if (i === 2) {
+                reelsEl.classList.remove("spinning");
+                checkWin();
+            }
 
         }, duration + 100);
     });
 }
 
-/* ПОЛУЧЕНИЕ СЕТКИ */
+/* матрица */
 function getMatrix() {
     let m = [];
     for (let r = 0; r < 3; r++) {
@@ -207,9 +220,31 @@ function getMatrix() {
     return m;
 }
 
-/* ПРОВЕРКА */
+/* проверка */
 function checkLine(a,b,c){ return a===b && b===c }
 
+/* рамка */
+function drawFrame(indices) {
+    const container = document.getElementById("winFrames");
+    const cells = document.querySelectorAll(".symbol");
+
+    let first = cells[indices[0]].getBoundingClientRect();
+    let last = cells[indices[2]].getBoundingClientRect();
+    let parent = reelsEl.getBoundingClientRect();
+
+    let frame = document.createElement("div");
+    frame.classList.add("win-frame");
+
+    frame.style.left = (first.left - parent.left) + "px";
+    frame.style.top = (first.top - parent.top) + "px";
+    frame.style.width = (last.right - first.left) + "px";
+    frame.style.height = (last.bottom - first.top) + "px";
+
+    container.appendChild(frame);
+    setTimeout(()=>frame.remove(),1500);
+}
+
+/* выигрыш */
 function checkWin() {
     let m = getMatrix();
 
@@ -221,34 +256,12 @@ function checkWin() {
 
     lines.forEach(line => {
         if (checkLine(m[line[0]], m[line[1]], m[line[2]])) {
-            drawLine(line);
+            drawFrame(line);
             balance += 50;
         }
     });
 
     document.getElementById("money").innerText = balance;
-}
-
-/* РИСОВАНИЕ ЛИНИИ */
-function drawLine(indices) {
-    const container = document.getElementById("winLines");
-
-    let line = document.createElement("div");
-    line.classList.add("line");
-
-    if (indices[0] === 0 && indices[1] === 1) {
-        line.style.top = "55px";
-        line.style.width = "100%";
-    } else if (indices[0] === 3) {
-        line.style.top = "165px";
-        line.style.width = "100%";
-    } else if (indices[0] === 6) {
-        line.style.top = "275px";
-        line.style.width = "100%";
-    }
-
-    container.appendChild(line);
-    setTimeout(()=>line.remove(),1500);
 }
 
 init();
