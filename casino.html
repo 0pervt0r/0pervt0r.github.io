@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Slot Game</title>
+
+<style>
+body {
+    background: #000300;
+    color: #c3e63e;
+    font-family: Arial;
+    text-align: center;
+}
+
+h1 {
+    color: #ffffff;
+}
+
+#balance {
+    margin: 10px;
+    font-size: 20px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 100px);
+    gap: 5px;
+    justify-content: center;
+    margin: 20px auto;
+}
+
+.cell {
+    width: 100px;
+    height: 100px;
+    background: #021e00;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.cell img {
+    width: 80px;
+}
+
+.highlight {
+    animation: pulse 0.6s infinite alternate;
+    border: 2px solid #83b625;
+}
+
+@keyframes pulse {
+    from { transform: scale(1); }
+    to { transform: scale(1.1); }
+}
+
+button {
+    background: #83b625;
+    color: #000;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+#bigWin {
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+}
+
+#bigWin img {
+    width: 200px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Slot Machine</h1>
+
+<div id="balance">
+    Баланс: <span id="money">250</span>
+    <img src="Croners.png" width="20">
+</div>
+
+<div class="grid" id="grid"></div>
+
+<button onclick="spin()">Крутить (-25)</button>
+
+<div id="bigWin">
+    <img id="bigWinImg" src="">
+</div>
+
+<script>
+const symbols = [
+    "symbol1.png",
+    "symbol2.png",
+    "symbol3.png",
+    "symbol4.png",
+    "symbol5.png",
+    "symbol6.png"
+];
+
+let balance = 250;
+let grid = [];
+const gridEl = document.getElementById("grid");
+
+function init() {
+    for (let i = 0; i < 9; i++) {
+        let div = document.createElement("div");
+        div.classList.add("cell");
+        let img = document.createElement("img");
+        img.src = symbols[Math.floor(Math.random()*symbols.length)];
+        div.appendChild(img);
+        gridEl.appendChild(div);
+        grid.push(div);
+    }
+}
+
+function spin() {
+    if (balance < 25) return alert("Недостаточно средств");
+
+    balance -= 25;
+    updateBalance();
+    clearHighlights();
+
+    let spins = 15;
+
+    let interval = setInterval(() => {
+        grid.forEach(cell => {
+            let img = cell.querySelector("img");
+            img.src = symbols[Math.floor(Math.random()*symbols.length)];
+        });
+
+        spins--;
+        if (spins <= 0) {
+            clearInterval(interval);
+            checkWin();
+        }
+    }, 100);
+}
+
+function getMatrix() {
+    return grid.map(cell => cell.querySelector("img").src);
+}
+
+function checkLine(a,b,c) {
+    return a === b && b === c;
+}
+
+function highlight(indices) {
+    indices.forEach(i => grid[i].classList.add("highlight"));
+}
+
+function showBig(icon) {
+    const el = document.getElementById("bigWin");
+    const img = document.getElementById("bigWinImg");
+
+    img.src = icon;
+    el.style.display = "block";
+
+    setTimeout(() => el.style.display = "none", 2000);
+}
+
+function checkWin() {
+    let m = getMatrix();
+    let win = false;
+
+    const lines = [
+        [0,1,2],[3,4,5],[6,7,8],
+        [0,3,6],[1,4,7],[2,5,8],
+        [0,4,8],[2,4,6]
+    ];
+
+    lines.forEach(line => {
+        if (checkLine(m[line[0]], m[line[1]], m[line[2]])) {
+            highlight(line);
+            balance += 50;
+            win = true;
+        }
+    });
+
+    // крест (X)
+    if (checkLine(m[0],m[4],m[8]) && checkLine(m[2],m[4],m[6])) {
+        showBig("Cross.png");
+        balance += 150;
+        highlight([0,2,4,6,8]);
+    }
+
+    // плюс (+)
+    if (checkLine(m[1],m[4],m[7]) && checkLine(m[3],m[4],m[5])) {
+        showBig("Plus.png");
+        balance += 150;
+        highlight([1,3,4,5,7]);
+    }
+
+    // бинго
+    if (m.every(v => v === m[0])) {
+        showBig("Bingo.png");
+        balance += 500;
+        highlight([0,1,2,3,4,5,6,7,8]);
+    }
+
+    updateBalance();
+}
+
+function clearHighlights() {
+    grid.forEach(cell => cell.classList.remove("highlight"));
+}
+
+function updateBalance() {
+    document.getElementById("money").innerText = balance;
+}
+
+init();
+</script>
+
+</body>
+</html>
