@@ -20,7 +20,6 @@ body {
     box-shadow: 0 0 20px #83b625;
 }
 
-/* БАРАБАНЫ */
 .reels {
     display: flex;
     gap: 10px;
@@ -49,7 +48,6 @@ body {
     width: 80px;
 }
 
-/* ПОДСВЕТКА (рамки по ячейкам, но выглядят цельно) */
 .win {
     box-shadow:
         inset 0 0 0 3px #83b625,
@@ -76,7 +74,7 @@ button {
 
 <body>
 
-<h1>Slot Machine</h1>
+<h1>Сдохни или умри</h1>
 <div>Баланс: <span id="money">250</span></div>
 
 <div class="machine">
@@ -97,14 +95,13 @@ const symbols = [
     "symbol6.png"
 ];
 
-let balance = 250;
+let balance = 2500;
 let reels = [];
 let result = [[],[],[]];
 
 const reelsEl = document.getElementById("reels");
 const tick = document.getElementById("tickSound");
 
-/* СОЗДАНИЕ */
 function init() {
     for (let r = 0; r < 3; r++) {
         let reel = document.createElement("div");
@@ -113,7 +110,6 @@ function init() {
         let track = document.createElement("div");
         track.className = "reel-track";
 
-        // создаём ровно 3 символа (фикс)
         for (let i = 0; i < 3; i++) {
             let sym = document.createElement("div");
             sym.className = "symbol";
@@ -131,17 +127,6 @@ function init() {
     }
 }
 
-/* ЗВУК */
-function playTick(duration) {
-    let i = setInterval(()=>{
-        tick.currentTime = 0;
-        tick.play();
-    }, 100);
-
-    setTimeout(()=>clearInterval(i), duration);
-}
-
-/* СПИН */
 function spin() {
     if (balance < 25) return;
 
