@@ -27,7 +27,6 @@ h1 {
     text-shadow: 0 0 10px #83b625, 0 0 25px #83b625;
 }
 
-/* рамка автомата */
 .machine {
     display: inline-block;
     padding: 20px;
@@ -43,7 +42,6 @@ h1 {
     font-size: 20px;
 }
 
-/* сетка */
 .grid {
     display: grid;
     grid-template-columns: repeat(3, 110px);
@@ -52,7 +50,6 @@ h1 {
     margin: 20px auto;
 }
 
-/* ячейки */
 .cell {
     width: 110px;
     height: 110px;
@@ -73,24 +70,24 @@ h1 {
     transition: transform 0.2s;
 }
 
-/* лёгкий "прыжок" символа */
 .cell img.spin {
     transform: translateY(-10px);
 }
 
-/* подсветка выигрыша */
 .highlight {
-    animation: pulse 0.6s infinite alternate;
-    border: 2px solid #83b625;
-    box-shadow: 0 0 15px #83b625;
+    animation: iconPulse 0.6s infinite alternate;
 }
 
-@keyframes pulse {
+.highlight img {
+    filter: drop-shadow(0 0 10px #83b625)
+            drop-shadow(0 0 20px #83b625);
+}
+
+@keyframes iconPulse {
     from { transform: scale(1); }
-    to { transform: scale(1.12); }
+    to { transform: scale(1.15); }
 }
 
-/* кнопка */
 button {
     background: linear-gradient(145deg, #83b625, #5c8d1a);
     color: #000;
@@ -150,6 +147,7 @@ button:active {
 </div>
 
 <div class="machine">
+    <div id="winLines"></div>
     <div class="grid" id="grid"></div>
 </div>
 
@@ -212,6 +210,7 @@ function spin() {
             checkWin();
         }
     }, 100);
+    document.getElementById("winLines").innerHTML = "";
 }
 
 function getMatrix() {
@@ -252,6 +251,7 @@ function checkWin() {
     lines.forEach(line => {
         if (checkLine(m[line[0]], m[line[1]], m[line[2]])) {
             highlight(line);
+            drawLine(line);
             balance += 50;
             win = true;
         }
@@ -287,6 +287,79 @@ function updateBalance() {
 }
 
 init();
+
+    #winLines {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.line {
+    position: absolute;
+    background: #83b625;
+    box-shadow:
+        0 0 10px #83b625,
+        0 0 25px #83b625,
+        0 0 50px #83b625;
+    border-radius: 10px;
+    animation: lineFade 0.5s ease;
+}
+
+@keyframes lineFade {
+    from { opacity: 0; transform: scaleX(0.5); }
+    to { opacity: 1; transform: scaleX(1); }
+}
+
+    function drawLine(indices) {
+    const container = document.getElementById("winLines");
+
+    const cells = indices.map(i => grid[i].getBoundingClientRect());
+    const parent = gridEl.getBoundingClientRect();
+
+    let line = document.createElement("div");
+    line.classList.add("line");
+
+    // горизонталь
+    if (indices[0] + 1 === indices[1]) {
+        let top = cells[0].top - parent.top + cells[0].height/2;
+        line.style.height = "6px";
+        line.style.width = (cells[2].right - cells[0].left) + "px";
+        line.style.left = (cells[0].left - parent.left) + "px";
+        line.style.top = top + "px";
+    }
+
+    // вертикаль
+    else if (indices[0] + 3 === indices[1]) {
+        let left = cells[0].left - parent.left + cells[0].width/2;
+        line.style.width = "6px";
+        line.style.height = (cells[2].bottom - cells[0].top) + "px";
+        line.style.top = (cells[0].top - parent.top) + "px";
+        line.style.left = left + "px";
+    }
+
+    // диагональ \
+    else if (indices[0] === 0 && indices[2] === 8) {
+        line.style.height = "6px";
+        line.style.width = "150%";
+        line.style.top = "50%";
+        line.style.left = "-25%";
+        line.style.transform = "rotate(45deg)";
+    }
+
+    // диагональ /
+    else {
+        line.style.height = "6px";
+        line.style.width = "150%";
+        line.style.top = "50%";
+        line.style.left = "-25%";
+        line.style.transform = "rotate(-45deg)";
+    }
+
+    container.appendChild(line);
+
+    setTimeout(() => line.remove(), 1500);
+}
 </script>
 
 </body>
