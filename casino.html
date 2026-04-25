@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>КАЗИК!!!</title>
+<title>Slot Machine</title>
 
 <style>
 body {
@@ -12,21 +12,15 @@ body {
     text-align: center;
 }
 
-h1 {
-    color: #fff;
-    text-shadow: 0 0 15px #83b625;
-}
-
 .machine {
-    position: relative;
     display: inline-block;
     padding: 20px;
     border-radius: 20px;
-    background: linear-gradient(145deg, #021e00, #000300);
-    box-shadow: 0 0 25px #83b625, inset 0 0 15px #83b625;
+    background: #021e00;
+    box-shadow: 0 0 20px #83b625;
 }
 
-/* барабаны */
+/* БАРАБАНЫ */
 .reels {
     display: flex;
     gap: 10px;
@@ -36,16 +30,12 @@ h1 {
     width: 110px;
     height: 330px;
     overflow: hidden;
-    background: #021e00;
+    background: #000;
     border-radius: 10px;
-    position: relative;
 }
 
 .reel-track {
-    position: absolute;
-    width: 100%;
-    top: 0;
-    transition: transform 0.2s;
+    transition: transform 0.3s;
 }
 
 .symbol {
@@ -59,29 +49,18 @@ h1 {
     width: 80px;
 }
 
-/* blur при прокрутке */
-.spinning .symbol img {
-    filter: blur(3px);
+/* ПОДСВЕТКА (рамки по ячейкам, но выглядят цельно) */
+.win {
+    box-shadow:
+        inset 0 0 0 3px #83b625,
+        0 0 10px #83b625,
+        0 0 25px #83b625;
+    animation: glow 0.6s infinite alternate;
 }
 
-/* рамка выигрыша */
-#winFrames {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-}
-
-.win-frame {
-    position: absolute;
-    border: 4px solid #83b625;
-    border-radius: 12px;
-    box-shadow: 0 0 15px #83b625, 0 0 30px #83b625;
-    animation: frameAppear 0.3s ease;
-}
-
-@keyframes frameAppear {
-    from { transform: scale(0.8); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
+@keyframes glow {
+    from { transform: scale(1); }
+    to { transform: scale(1.05); }
 }
 
 button {
@@ -97,18 +76,16 @@ button {
 
 <body>
 
-<h1>СДОХНИ ИЛИ УМРИ</h1>
+<h1>Slot Machine</h1>
 <div>Баланс: <span id="money">250</span></div>
 
 <div class="machine">
-    <div id="winFrames"></div>
     <div class="reels" id="reels"></div>
 </div>
 
 <button onclick="spin()">Крутить (-25)</button>
 
-<!-- звук -->
-<audio id="tickSound" src="tick.mp3" preload="auto"></audio>
+<audio id="tickSound" src="tick.mp3"></audio>
 
 <script>
 const symbols = [
@@ -120,24 +97,26 @@ const symbols = [
     "symbol6.png"
 ];
 
-let balance = 25000;
+let balance = 250;
 let reels = [];
-let resultGrid = [[],[],[]];
+let result = [[],[],[]];
+
 const reelsEl = document.getElementById("reels");
 const tick = document.getElementById("tickSound");
 
-/* создание барабанов */
+/* СОЗДАНИЕ */
 function init() {
     for (let r = 0; r < 3; r++) {
         let reel = document.createElement("div");
-        reel.classList.add("reel");
+        reel.className = "reel";
 
         let track = document.createElement("div");
-        track.classList.add("reel-track");
+        track.className = "reel-track";
 
-        for (let i = 0; i < 20; i++) {
+        // создаём ровно 3 символа (фикс)
+        for (let i = 0; i < 3; i++) {
             let sym = document.createElement("div");
-            sym.classList.add("symbol");
+            sym.className = "symbol";
 
             let img = document.createElement("img");
             img.src = symbols[Math.floor(Math.random()*symbols.length)];
@@ -152,101 +131,86 @@ function init() {
     }
 }
 
-/* звук щелчков */
-function playTickLoop(duration) {
-    let interval = setInterval(() => {
+/* ЗВУК */
+function playTick(duration) {
+    let i = setInterval(()=>{
         tick.currentTime = 0;
         tick.play();
-    }, 80);
+    }, 100);
 
-    setTimeout(() => clearInterval(interval), duration);
+    setTimeout(()=>clearInterval(i), duration);
 }
 
-/* спин */
+/* СПИН */
 function spin() {
-    if (balance < 25) return alert("Нет денег");
+    if (balance < 25) return;
 
     balance -= 25;
-    document.getElementById("money").innerText = balance;
+    update();
 
-    document.getElementById("winFrames").innerHTML = "";
-    reelsEl.classList.add("spinning");
+    clearWins();
 
     reels.forEach((track, i) => {
-        let duration = 1000 + i * 400;
-        let distance = 110 * (10 + Math.floor(Math.random()*10));
+        let duration = 600 + i * 300;
 
-        track.style.transition = "none";
-        track.style.transform = "translateY(0px)";
+        playTick(duration);
 
-        setTimeout(() => {
-            track.style.transition = `transform ${duration}ms cubic-bezier(.1,.7,.2,1)`;
-            track.style.transform = `translateY(-${distance}px)`;
-        }, 50);
-
-        playTickLoop(duration);
-
-        setTimeout(() => {
-            let finalSymbols = [];
-
+        let interval = setInterval(() => {
             for (let j = 0; j < 3; j++) {
-                let sym = symbols[Math.floor(Math.random()*symbols.length)];
-                finalSymbols.push(sym);
-                track.children[j].querySelector("img").src = sym;
+                track.children[j].querySelector("img").src =
+                    symbols[Math.floor(Math.random()*symbols.length)];
+            }
+        }, 80);
+
+        setTimeout(() => {
+            clearInterval(interval);
+
+            let col = [];
+            for (let j = 0; j < 3; j++) {
+                let s = symbols[Math.floor(Math.random()*symbols.length)];
+                track.children[j].querySelector("img").src = s;
+                col.push(s);
             }
 
-            track.style.transition = "none";
-            track.style.transform = "translateY(0px)";
+            result[i] = col;
 
-            resultGrid[i] = finalSymbols;
+            if (i === 2) checkWin();
 
-            if (i === 2) {
-                reelsEl.classList.remove("spinning");
-                checkWin();
-            }
-
-        }, duration + 100);
+        }, duration);
     });
 }
 
-/* матрица */
-function getMatrix() {
+/* МАТРИЦА */
+function getM() {
     let m = [];
     for (let r = 0; r < 3; r++) {
         for (let c = 0; c < 3; c++) {
-            m[r*3 + c] = resultGrid[c][r];
+            m[r*3+c] = result[c][r];
         }
     }
     return m;
 }
 
-/* проверка */
-function checkLine(a,b,c){ return a===b && b===c }
+function eq(a,b,c){ return a===b && b===c }
 
-/* рамка */
-function drawFrame(indices) {
-    const container = document.getElementById("winFrames");
-    const cells = document.querySelectorAll(".symbol");
-
-    let first = cells[indices[0]].getBoundingClientRect();
-    let last = cells[indices[2]].getBoundingClientRect();
-    let parent = reelsEl.getBoundingClientRect();
-
-    let frame = document.createElement("div");
-    frame.classList.add("win-frame");
-
-    frame.style.left = (first.left - parent.left) + "px";
-    frame.style.top = (first.top - parent.top) + "px";
-    frame.style.width = (last.right - first.left) + "px";
-    frame.style.height = (last.bottom - first.top) + "px";
-
-    container.appendChild(frame);
-    setTimeout(()=>frame.remove(),1500);
+/* ПОДСВЕТКА */
+function mark(indices) {
+    indices.forEach(i=>{
+        let r = Math.floor(i/3);
+        let c = i%3;
+        reels[c].children[r].classList.add("win");
+    });
 }
 
-/* выигрыш */
+function clearWins() {
+    document.querySelectorAll(".symbol").forEach(el=>{
+        el.classList.remove("win");
+    });
+}
+
+/* ПРОВЕРКА */
 function checkWin() {
-    let m = getMatrix();
+    let m = getM();
 
     const lines = [
         [0,1,2],[3,4,5],[6,7,8],
@@ -254,13 +218,35 @@ function checkWin() {
         [0,4,8],[2,4,6]
     ];
 
-    lines.forEach(line => {
-        if (checkLine(m[line[0]], m[line[1]], m[line[2]])) {
-            drawFrame(line);
+    lines.forEach(line=>{
+        if (eq(m[line[0]],m[line[1]],m[line[2]])) {
+            mark(line);
             balance += 50;
         }
     });
 
+    // крест
+    if (eq(m[0],m[4],m[8]) && eq(m[2],m[4],m[6])) {
+        mark([0,2,4,6,8]);
+        balance += 150;
+    }
+
+    // плюс
+    if (eq(m[1],m[4],m[7]) && eq(m[3],m[4],m[5])) {
+        mark([1,3,4,5,7]);
+        balance += 150;
+    }
+
+    // бинго
+    if (m.every(v=>v===m[0])) {
+        mark([0,1,2,3,4,5,6,7,8]);
+        balance += 500;
+    }
+
+    update();
+}
+
+function update() {
     document.getElementById("money").innerText = balance;
 }
 
