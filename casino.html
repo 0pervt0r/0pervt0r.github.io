@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Казионики</title>
+<title>Казионики 2</title>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
@@ -99,6 +99,21 @@ const db = firebase.database();
 
 let playerName = prompt("Введите ник:");
 if (!playerName) playerName = "Player";
+
+    let playerName = localStorage.getItem("slot_name");
+
+if (!playerName) {
+    setTimeout(() => {
+        const name = prompt("Введите ник:");
+        if (name && name.trim().length > 0) {
+            playerName = name.trim();
+            localStorage.setItem("slot_name", playerName);
+        } else {
+            playerName = "Player";
+            localStorage.setItem("slot_name", playerName);
+        }
+    }, 100);
+}
 
     function loadLeaderboard() {
     db.ref("leaderboard")
