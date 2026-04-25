@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Slot Game</title>
+<title>Slot Machine</title>
 
 <style>
 body {
@@ -10,129 +10,89 @@ body {
     color: #c3e63e;
     font-family: Arial;
     text-align: center;
-    overflow: hidden;
-}
-
-/* затемнение краёв */
-body::after {
-    content: "";
-    position: fixed;
-    inset: 0;
-    box-shadow: inset 0 0 150px #000;
-    pointer-events: none;
 }
 
 h1 {
-    color: #ffffff;
-    text-shadow: 0 0 10px #83b625, 0 0 25px #83b625;
+    color: #fff;
+    text-shadow: 0 0 15px #83b625;
 }
 
 .machine {
+    position: relative;
     display: inline-block;
     padding: 20px;
     border-radius: 20px;
     background: linear-gradient(145deg, #021e00, #000300);
-    box-shadow:
-        0 0 20px #83b625,
-        inset 0 0 15px #83b625;
+    box-shadow: 0 0 25px #83b625, inset 0 0 15px #83b625;
 }
 
-#balance {
-    margin: 10px;
-    font-size: 20px;
+/* БАРАБАНЫ */
+.reels {
+    display: flex;
+    gap: 10px;
 }
 
-.grid {
-    display: grid;
-    grid-template-columns: repeat(3, 110px);
-    gap: 8px;
-    justify-content: center;
-    margin: 20px auto;
-}
-
-.cell {
+.reel {
     width: 110px;
-    height: 110px;
+    height: 330px;
+    overflow: hidden;
     background: #021e00;
     border-radius: 10px;
+    position: relative;
+}
+
+.reel-track {
+    position: absolute;
+    width: 100%;
+    top: 0;
+}
+
+.symbol {
+    height: 110px;
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
-
-    box-shadow:
-        inset 0 0 10px #000,
-        0 0 10px #000;
 }
 
-.cell img {
+.symbol img {
     width: 80px;
-    transition: transform 0.2s;
 }
 
-.cell img.spin {
-    transform: translateY(-10px);
-}
-
-.highlight {
-    animation: iconPulse 0.6s infinite alternate;
-}
-
+/* подсветка */
 .highlight img {
+    animation: pulse 0.6s infinite alternate;
     filter: drop-shadow(0 0 10px #83b625)
-            drop-shadow(0 0 20px #83b625);
+            drop-shadow(0 0 25px #83b625);
 }
 
-@keyframes iconPulse {
+@keyframes pulse {
     from { transform: scale(1); }
     to { transform: scale(1.15); }
 }
 
-button {
-    background: linear-gradient(145deg, #83b625, #5c8d1a);
-    color: #000;
-    border: none;
-    padding: 12px 25px;
-    cursor: pointer;
-    font-size: 18px;
-    border-radius: 10px;
-
-    box-shadow: 0 0 10px #83b625;
-    transition: 0.2s;
-}
-
-button:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 20px #83b625;
-}
-
-button:active {
-    transform: scale(0.95);
-}
-
-#bigWin {
+/* линии */
+#winLines {
     position: absolute;
-    top: 30%;
-    left: 50%;
-    transform: translateX(-50%) scale(0.5);
-    display: none;
-    opacity: 0;
+    inset: 0;
+    pointer-events: none;
 }
 
-#bigWin.show {
-    display: block;
-    animation: bigWinAnim 1s forwards;
+.line {
+    position: absolute;
+    background: #83b625;
+    height: 6px;
+    box-shadow: 0 0 10px #83b625, 0 0 30px #83b625;
+    border-radius: 10px;
 }
 
-@keyframes bigWinAnim {
-    0% { opacity: 0; transform: translateX(-50%) scale(0.5); }
-    50% { opacity: 1; transform: translateX(-50%) scale(1.2); }
-    100% { opacity: 1; transform: translateX(-50%) scale(1); }
-}
-
-#bigWin img {
-    width: 220px;
-    filter: drop-shadow(0 0 20px #83b625);
+/* кнопка */
+button {
+    margin-top: 15px;
+    padding: 12px 25px;
+    background: #83b625;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
 }
 </style>
 </head>
@@ -140,22 +100,14 @@ button:active {
 <body>
 
 <h1>Slot Machine</h1>
-
-<div id="balance">
-    Баланс: <span id="money">250</span>
-    <img src="Croners.png" width="20">
-</div>
+<div>Баланс: <span id="money">250</span></div>
 
 <div class="machine">
     <div id="winLines"></div>
-    <div class="grid" id="grid"></div>
+    <div class="reels" id="reels"></div>
 </div>
 
-<button onclick="spin()">Крутить!</button>
-
-<div id="bigWin">
-    <img id="bigWinImg" src="">
-</div>
+<button onclick="spin()">Крутить (-25)</button>
 
 <script>
 const symbols = [
@@ -167,80 +119,99 @@ const symbols = [
     "symbol6.png"
 ];
 
-let balance = 25000;
-let grid = [];
-const gridEl = document.getElementById("grid");
+let balance = 250;
+let reels = [];
+let resultGrid = [[],[],[]];
 
+const reelsEl = document.getElementById("reels");
+
+/* СОЗДАНИЕ БАРАБАНОВ */
 function init() {
-    for (let i = 0; i < 9; i++) {
-        let div = document.createElement("div");
-        div.classList.add("cell");
-        let img = document.createElement("img");
-        img.src = symbols[Math.floor(Math.random()*symbols.length)];
-        div.appendChild(img);
-        gridEl.appendChild(div);
-        grid.push(div);
+    for (let r = 0; r < 3; r++) {
+        let reel = document.createElement("div");
+        reel.classList.add("reel");
+
+        let track = document.createElement("div");
+        track.classList.add("reel-track");
+
+        // много символов для прокрутки
+        for (let i = 0; i < 20; i++) {
+            let sym = document.createElement("div");
+            sym.classList.add("symbol");
+
+            let img = document.createElement("img");
+            img.src = symbols[Math.floor(Math.random()*symbols.length)];
+
+            sym.appendChild(img);
+            track.appendChild(sym);
+        }
+
+        reel.appendChild(track);
+        reelsEl.appendChild(reel);
+
+        reels.push(track);
     }
 }
 
+/* СПИН */
 function spin() {
-    if (balance < 25) return alert("Недостаточно средств");
+    if (balance < 25) return alert("Нет денег");
 
     balance -= 25;
-    updateBalance();
-    clearHighlights();
+    document.getElementById("money").innerText = balance;
 
-    let spins = 0;
-
-    let interval = setInterval(() => {
-        grid.forEach(cell => {
-            let img = cell.querySelector("img");
-
-            img.classList.add("spin");
-
-            setTimeout(() => {
-                img.src = symbols[Math.floor(Math.random()*symbols.length)];
-                img.classList.remove("spin");
-            }, 50);
-        });
-
-        spins--;
-        if (spins <= 0) {
-            clearInterval(interval);
-            checkWin();
-        }
-    }, 100);
     document.getElementById("winLines").innerHTML = "";
+
+    reels.forEach((track, i) => {
+        let duration = 1000 + i * 500;
+        let distance = 110 * (10 + Math.floor(Math.random()*10));
+
+        track.style.transition = "none";
+        track.style.transform = "translateY(0px)";
+
+        setTimeout(() => {
+            track.style.transition = `transform ${duration}ms cubic-bezier(.1,.7,.2,1)`;
+            track.style.transform = `translateY(-${distance}px)`;
+        }, 50);
+
+        // остановка
+        setTimeout(() => {
+            let finalSymbols = [];
+
+            for (let j = 0; j < 3; j++) {
+                let sym = symbols[Math.floor(Math.random()*symbols.length)];
+                finalSymbols.push(sym);
+
+                track.children[j].querySelector("img").src = sym;
+            }
+
+            track.style.transition = "none";
+            track.style.transform = "translateY(0px)";
+
+            resultGrid[i] = finalSymbols;
+
+            if (i === 2) checkWin();
+
+        }, duration + 100);
+    });
 }
 
+/* ПОЛУЧЕНИЕ СЕТКИ */
 function getMatrix() {
-    return grid.map(cell => cell.querySelector("img").src);
+    let m = [];
+    for (let r = 0; r < 3; r++) {
+        for (let c = 0; c < 3; c++) {
+            m[r*3 + c] = resultGrid[c][r];
+        }
+    }
+    return m;
 }
 
-function checkLine(a,b,c) {
-    return a === b && b === c;
-}
-
-function highlight(indices) {
-    indices.forEach(i => grid[i].classList.add("highlight"));
-}
-
-function showBig(icon) {
-    const el = document.getElementById("bigWin");
-    const img = document.getElementById("bigWinImg");
-
-    img.src = icon;
-    el.classList.add("show");
-
-    setTimeout(() => {
-        el.classList.remove("show");
-        el.style.display = "none";
-    }, 2000);
-}
+/* ПРОВЕРКА */
+function checkLine(a,b,c){ return a===b && b===c }
 
 function checkWin() {
     let m = getMatrix();
-    let win = false;
 
     const lines = [
         [0,1,2],[3,4,5],[6,7,8],
@@ -250,116 +221,37 @@ function checkWin() {
 
     lines.forEach(line => {
         if (checkLine(m[line[0]], m[line[1]], m[line[2]])) {
-            highlight(line);
             drawLine(line);
             balance += 50;
-            win = true;
         }
     });
 
-    if (checkLine(m[0],m[4],m[8]) && checkLine(m[2],m[4],m[6])) {
-        showBig("Cross.png");
-        balance += 150;
-        highlight([0,2,4,6,8]);
-    }
-
-    if (checkLine(m[1],m[4],m[7]) && checkLine(m[3],m[4],m[5])) {
-        showBig("Plus.png");
-        balance += 150;
-        highlight([1,3,4,5,7]);
-    }
-
-    if (m.every(v => v === m[0])) {
-        showBig("Bingo.png");
-        balance += 500;
-        highlight([0,1,2,3,4,5,6,7,8]);
-    }
-
-    updateBalance();
-}
-
-function clearHighlights() {
-    grid.forEach(cell => cell.classList.remove("highlight"));
-}
-
-function updateBalance() {
     document.getElementById("money").innerText = balance;
 }
 
-init();
-
-    #winLines {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-}
-
-.line {
-    position: absolute;
-    background: #83b625;
-    box-shadow:
-        0 0 10px #83b625,
-        0 0 25px #83b625,
-        0 0 50px #83b625;
-    border-radius: 10px;
-    animation: lineFade 0.5s ease;
-}
-
-@keyframes lineFade {
-    from { opacity: 0; transform: scaleX(0.5); }
-    to { opacity: 1; transform: scaleX(1); }
-}
-
-    function drawLine(indices) {
+/* РИСОВАНИЕ ЛИНИИ */
+function drawLine(indices) {
     const container = document.getElementById("winLines");
-
-    const cells = indices.map(i => grid[i].getBoundingClientRect());
-    const parent = gridEl.getBoundingClientRect();
 
     let line = document.createElement("div");
     line.classList.add("line");
 
-    // горизонталь
-    if (indices[0] + 1 === indices[1]) {
-        let top = cells[0].top - parent.top + cells[0].height/2;
-        line.style.height = "6px";
-        line.style.width = (cells[2].right - cells[0].left) + "px";
-        line.style.left = (cells[0].left - parent.left) + "px";
-        line.style.top = top + "px";
-    }
-
-    // вертикаль
-    else if (indices[0] + 3 === indices[1]) {
-        let left = cells[0].left - parent.left + cells[0].width/2;
-        line.style.width = "6px";
-        line.style.height = (cells[2].bottom - cells[0].top) + "px";
-        line.style.top = (cells[0].top - parent.top) + "px";
-        line.style.left = left + "px";
-    }
-
-    // диагональ \
-    else if (indices[0] === 0 && indices[2] === 8) {
-        line.style.height = "6px";
-        line.style.width = "150%";
-        line.style.top = "50%";
-        line.style.left = "-25%";
-        line.style.transform = "rotate(45deg)";
-    }
-
-    // диагональ /
-    else {
-        line.style.height = "6px";
-        line.style.width = "150%";
-        line.style.top = "50%";
-        line.style.left = "-25%";
-        line.style.transform = "rotate(-45deg)";
+    if (indices[0] === 0 && indices[1] === 1) {
+        line.style.top = "55px";
+        line.style.width = "100%";
+    } else if (indices[0] === 3) {
+        line.style.top = "165px";
+        line.style.width = "100%";
+    } else if (indices[0] === 6) {
+        line.style.top = "275px";
+        line.style.width = "100%";
     }
 
     container.appendChild(line);
-
-    setTimeout(() => line.remove(), 1500);
+    setTimeout(()=>line.remove(),1500);
 }
+
+init();
 </script>
 
 </body>
