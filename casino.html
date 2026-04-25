@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Сasic</title>
+<title>3x3 Slot</title>
 
 <style>
 body {
@@ -55,6 +55,7 @@ body {
 
 button {
     margin-top: 15px;
+    padding: 10px 20px;
 }
 
 button:disabled {
@@ -89,7 +90,8 @@ const icons = [
 const cost = 20;
 const reward = 100;
 
-let balance = 200;
+let balance = 0;
+let lastBonusTime = 0;
 let spinning = false;
 
 const reels = [
@@ -99,11 +101,46 @@ const reels = [
 ];
 
 const btn = document.getElementById("spinBtn");
+const moneyEl = document.getElementById("money");
 
-function updateUI() {
-    money.innerText = balance;
+// ---------- Сохранение / загрузка ----------
+function loadGame() {
+    const savedBalance = localStorage.getItem("slot_balance");
+    const savedTime = localStorage.getItem("slot_last_bonus");
+
+    balance = savedBalance ? parseInt(savedBalance) : 200;
+    lastBonusTime = savedTime ? parseInt(savedTime) : Date.now();
+
+    applyDailyBonus();
 }
 
+function saveGame() {
+    localStorage.setItem("slot_balance", balance);
+    localStorage.setItem("slot_last_bonus", lastBonusTime);
+}
+
+// ---------- Бонус каждые 24 часа ----------
+function applyDailyBonus() {
+    const now = Date.now();
+    const day = 24 * 60 * 60 * 1000;
+
+    if (now - lastBonusTime >= day) {
+        const daysPassed = Math.floor((now - lastBonusTime) / day);
+
+        balance += daysPassed * 100;
+        lastBonusTime += daysPassed * day;
+
+        saveGame();
+    }
+}
+
+// ---------- UI ----------
+function updateUI() {
+    moneyEl.innerText = balance;
+    saveGame();
+}
+
+// ---------- Генерация барабана ----------
 function createStrip() {
     let arr = [];
     for (let i = 0; i < 30; i++) {
@@ -122,6 +159,7 @@ function render(reel, strip) {
     });
 }
 
+// ---------- Спин ----------
 function spin() {
     if (spinning || balance < cost) return;
 
@@ -131,9 +169,7 @@ function spin() {
     balance -= cost;
     updateUI();
 
-    let finalGrid = [
-        [], [], []
-    ]; // 3 колонки по 3 символа
+    let finalGrid = [[], [], []];
 
     reels.forEach((reel, i) => {
         let strip = createStrip();
@@ -141,7 +177,6 @@ function spin() {
 
         let stop = Math.floor(Math.random() * (strip.length - 3));
 
-        // формируем видимые 3 символа
         finalGrid[i] = [
             strip[stop],
             strip[stop + 1],
@@ -160,8 +195,8 @@ function spin() {
     }, 1400);
 }
 
+// ---------- Проверка выигрыша ----------
 function checkWin(gridCols) {
-    // превращаем в привычную 3x3 матрицу
     let g = [
         [gridCols[0][0], gridCols[1][0], gridCols[2][0]],
         [gridCols[0][1], gridCols[1][1], gridCols[2][1]],
@@ -191,7 +226,10 @@ function checkWin(gridCols) {
     updateUI();
 }
 
+// ---------- Запуск ----------
 btn.onclick = spin;
+
+loadGame();
 updateUI();
 </script>
 
