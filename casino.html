@@ -41,11 +41,6 @@ h1 {
     position: relative;
 }
 
-.strip {
-    position: absolute;
-    width: 100%;
-}
-
 .symbol {
     width: 80px;
     height: 80px;
@@ -88,7 +83,7 @@ button:disabled {
 
 <body>
 
-<h1>Сдохни или умри</h1>
+<h1>Слот</h1>
 
 <div id="balance">
     <img src="Croners.png" width="20">
@@ -97,12 +92,12 @@ button:disabled {
 
 <div id="machine">
     <div class="window">
-        <div class="reel"><div class="strip" id="r1"></div></div>
-        <div class="reel"><div class="strip" id="r2"></div></div>
-        <div class="reel"><div class="strip" id="r3"></div></div>
+        <div class="reel" id="r1"></div>
+        <div class="reel" id="r2"></div>
+        <div class="reel" id="r3"></div>
     </div>
 
-    <button id="spinBtn" onclick="spin()">SPIN (67)</button>
+    <button id="spinBtn" onclick="spin()">SPIN (25)</button>
 </div>
 
 <div id="resultIcon"></div>
@@ -110,13 +105,12 @@ button:disabled {
 <script>
 const icons = ["symbol1.png","symbol2.png","symbol3.png","symbol4.png","symbol5.png","symbol6.png"];
 const cost = 25;
-const reward = 100000000;
+const reward = 100;
 
 let balance = loadBalance();
 let isSpinning = false;
-let finished = 0;
 
-let reels = [
+const reels = [
     document.getElementById("r1"),
     document.getElementById("r2"),
     document.getElementById("r3")
@@ -128,7 +122,7 @@ function loadBalance() {
     let data = JSON.parse(localStorage.getItem("slotData"));
     let today = new Date().toDateString();
 
-    if (!data) data = { money: 67676767, lastLogin: today };
+    if (!data) data = { money: 250, lastLogin: today };
 
     if (data.lastLogin !== today) {
         data.money += 250;
@@ -149,25 +143,29 @@ function updateUI() {
     document.getElementById("money").innerText = balance;
 }
 
-function generateStrip(reel) {
-    reel.innerHTML = "";
+function generateStripWithCenter(centerSymbol) {
     let arr = [];
 
     for (let i = 0; i < 10; i++) {
-        let icon = icons[Math.floor(Math.random() * icons.length)];
-        arr.push(icon);
-
-        let div = document.createElement("div");
-        div.className = "symbol";
-        div.innerHTML = `<img src="${icon}">`;
-
-        reel.appendChild(div);
+        arr.push(icons[Math.floor(Math.random() * icons.length)]);
     }
+
+    // центр (визуально и логически)
+    arr[4] = centerSymbol;
 
     return arr;
 }
 
-let resultGrid = [];
+function renderReel(reel, strip) {
+    reel.innerHTML = "";
+
+    strip.forEach(icon => {
+        let div = document.createElement("div");
+        div.className = "symbol";
+        div.innerHTML = `<img src="${icon}">`;
+        reel.appendChild(div);
+    });
+}
 
 function spin() {
     if (isSpinning) return;
@@ -175,68 +173,44 @@ function spin() {
 
     isSpinning = true;
     button.disabled = true;
-    finished = 0;
 
     balance -= cost;
     updateUI();
     saveBalance();
 
     document.getElementById("resultIcon").innerHTML = "";
-    resultGrid = [];
+
+    // финальный результат (центральная линия)
+    let result = [
+        icons[Math.floor(Math.random() * icons.length)],
+        icons[Math.floor(Math.random() * icons.length)],
+        icons[Math.floor(Math.random() * icons.length)]
+    ];
+
+    let finished = 0;
 
     reels.forEach((reel, index) => {
-        let strip = generateStrip(reel);
+        let strip = generateStripWithCenter(result[index]);
+
+        renderReel(reel, strip);
 
         reel.classList.add("spin");
 
         setTimeout(() => {
             reel.classList.remove("spin");
 
-            let visible = strip.slice(3, 6);
-            resultGrid[index] = visible;
-
             finished++;
-
             if (finished === 3) {
-                setTimeout(checkWin, 100);
+                setTimeout(() => checkWin(result), 100);
             }
         }, 400 + index * 300);
     });
 }
 
-function checkWin() {
-    let grid = [
-        resultGrid[0][0], resultGrid[1][0], resultGrid[2][0],
-        resultGrid[0][1], resultGrid[1][1], resultGrid[2][1],
-        resultGrid[0][2], resultGrid[1][2], resultGrid[2][2],
-    ];
-
-    let lines = [
-        [0,1,2],[3,4,5],[6,7,8],
-        [0,3,6],[1,4,7],[2,5,8],
-        [0,4,8],[2,4,6]
-    ];
-
-    lines.forEach(line => {
-        let [a,b,c] = line;
-        if (grid[a] === grid[b] && grid[b] === grid[c]) {
-            balance += reward;
-        }
-    });
-
-    if (same(grid, [1,3,4,5,7])) {
-        showIcon("Plus.png");
-        balance += reward * 2;
-    }
-
-    if (same(grid, [0,2,4,6,8])) {
-        showIcon("Cross.png");
-        balance += reward * 2;
-    }
-
-    if (same(grid, [0,1,2,3,4,5,6,7,8])) {
-        showIcon("Bingo.png");
-        balance += reward * 5;
+function checkWin(result) {
+    // проверяем только центральную линию
+    if (result[0] === result[1] && result[1] === result[2]) {
+        balance += reward;
     }
 
     updateUI();
@@ -244,16 +218,6 @@ function checkWin() {
 
     isSpinning = false;
     button.disabled = false;
-}
-
-function same(grid, indexes) {
-    let first = grid[indexes[0]];
-    return indexes.every(i => grid[i] === first);
-}
-
-function showIcon(src) {
-    document.getElementById("resultIcon").innerHTML =
-        `<img src="${src}" width="120">`;
 }
 
 updateUI();
