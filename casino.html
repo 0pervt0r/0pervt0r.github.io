@@ -140,6 +140,17 @@ function askNameIfNeeded() {
   nameEl.innerText = playerName;
 }
 
+    function saveFirebase() {
+    console.log("SAVE FIREBASE:", playerName, balance);
+
+    set(ref(db, "leaderboard/" + playerName), {
+        balance: balance,
+        updated: Date.now()
+    }).catch(err => {
+        console.error("FIREBASE ERROR:", err);
+    });
+}
+
 // ---------- СМЕНА НИКА (ИСПРАВЛЕНО) ----------
 function changeName() {
   const n = prompt("Новый ник:", playerName);
