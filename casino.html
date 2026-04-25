@@ -103,22 +103,33 @@ function updateUI() {
     document.getElementById("money").innerText = balance;
 }
 
-function createStrip(centerSymbol) {
+// создаём ПОЛНУЮ сетку 3x3
+function generateGrid() {
+    let grid = [];
+    for (let i = 0; i < 9; i++) {
+        grid.push(icons[Math.floor(Math.random() * icons.length)]);
+    }
+    return grid;
+}
+
+// делаем ленту, встраивая нужные 3 символа
+function createStrip(colSymbols) {
     let arr = [];
 
     for (let i = 0; i < 12; i++) {
         arr.push(icons[Math.floor(Math.random() * icons.length)]);
     }
 
-    // фиксируем центр
-    arr[5] = centerSymbol;
+    // позиции 4,5,6 — это видимая область
+    arr[4] = colSymbols[0]; // верх
+    arr[5] = colSymbols[1]; // центр
+    arr[6] = colSymbols[2]; // низ
 
     return arr;
 }
 
 function renderStrip(reel, strip) {
     reel.innerHTML = "";
-
     strip.forEach(icon => {
         let div = document.createElement("div");
         div.className = "symbol";
@@ -137,22 +148,25 @@ function spin() {
     balance -= cost;
     updateUI();
 
-    // результат
-    let result = [
-        icons[Math.floor(Math.random() * icons.length)],
-        icons[Math.floor(Math.random() * icons.length)],
-        icons[Math.floor(Math.random() * icons.length)]
+    // итоговая сетка
+    let grid = generateGrid();
+
+    // разбиваем по колонкам
+    let cols = [
+        [grid[0], grid[3], grid[6]],
+        [grid[1], grid[4], grid[7]],
+        [grid[2], grid[5], grid[8]]
     ];
 
     let finished = 0;
 
     reels.forEach((reel, index) => {
-        let strip = createStrip(result[index]);
+        let strip = createStrip(cols[index]);
 
         renderStrip(reel, strip);
 
         reel.style.transform = "translateY(-400px)";
-        reel.offsetHeight; // форс рефлоу
+        reel.offsetHeight;
 
         reel.classList.add("spin");
 
@@ -162,16 +176,30 @@ function spin() {
 
             finished++;
             if (finished === 3) {
-                setTimeout(() => checkWin(result), 100);
+                setTimeout(() => checkWin(grid), 100);
             }
         }, 400 + index * 300);
     });
 }
 
-function checkWin(result) {
-    if (result[0] === result[1] && result[1] === result[2]) {
-        balance += reward;
-    }
+function checkWin(grid) {
+    let lines = [
+        [0,1,2],[3,4,5],[6,7,8],
+        [0,3,6],[1,4,7],[2,5,8],
+        [0,4,8],[2,4,6]
+    ];
+
+    let totalWin = 0;
+
+    lines.forEach(line => {
+        let [a,b,c] = line;
+        if (grid[a] === grid[b] && grid[b] === grid[c]) {
+            totalWin += reward;
+        }
+    });
+
+    // начисление ТОЛЬКО после анимации
+    balance += totalWin;
 
     updateUI();
 
