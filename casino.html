@@ -2,10 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Slot 3x3 + Leaderboard</title>
-
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<title>Slot 3x3 + Firebase</title>
 
 <style>
 body {
@@ -58,24 +55,15 @@ body {
 
 button {
     margin-top: 10px;
-    padding: 10px 20px;
-}
-
-button:disabled {
-    opacity: 0.5;
-}
-
-#board {
-    margin-top: 20px;
-    font-size: 14px;
+    padding: 10px 15px;
 }
 </style>
 </head>
 
 <body>
 
-<h3>Баланс: <span id="money"></span></h3>
-<h4>Игрок: <span id="name"></span></h4>
+<h3>Баланс: <span id="money">0</span></h3>
+<h4>Игрок: <span id="name">-</span></h4>
 
 <div id="machine">
     <div class="window">
@@ -91,38 +79,48 @@ button:disabled {
     <div id="board"></div>
 </div>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import {
+    getDatabase,
+    ref,
+    set,
+    onValue,
+    query,
+    orderByChild,
+    limitToLast
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-
+// ---------- FIREBASE ----------
 const firebaseConfig = {
   apiKey: "AIzaSyBHu6nNgmxC_Ll7eOMLSDryjx8pIdG4OQ8",
   authDomain: "chronicles-990c0.firebaseapp.com",
+  databaseURL: "https://chronicles-990c0-default-rtdb.firebaseio.com",
   projectId: "chronicles-990c0",
-  storageBucket: "chronicles-990c0.firebasestorage.app",
+  storageBucket: "chronicles-990c0.appspot.com",
   messagingSenderId: "1028854285177",
   appId: "1:1028854285177:web:0fa5158ad78a49f53b25a8",
   measurementId: "G-3NRK6QY8RT"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+const db = getDatabase(app);
 
+// ---------- GAME ----------
 const icons = ["symbol1.png","symbol2.png","symbol3.png","symbol4.png","symbol5.png"];
-
 const cost = 20;
 const reward = 100;
 
 let balance = 0;
-let lastBonus = 0;
 let spinning = false;
 
 let playerName = localStorage.getItem("slot_name") || "Player";
 
 document.getElementById("name").innerText = playerName;
 
+// ---------- UI ----------
+const moneyEl = document.getElementById("money");
+const btn = document.getElementById("spinBtn");
 
 const reels = [
     document.getElementById("r1"),
@@ -130,53 +128,29 @@ const reels = [
     document.getElementById("r3")
 ];
 
-const btn = document.getElementById("spinBtn");
-const moneyEl = document.getElementById("money");
-
+// ---------- LOCAL SAVE ----------
+function loadLocal() {
+    balance = parseInt(localStorage.getItem("slot_balance")) || 200;
+    updateUI();
+}
 
 function saveLocal() {
     localStorage.setItem("slot_balance", balance);
-    localStorage.setItem("slot_last", lastBonus);
 }
 
-function loadLocal() {
-    balance = parseInt(localStorage.getItem("slot_balance")) || 200;
-    lastBonus = parseInt(localStorage.getItem("slot_last")) || Date.now();
-    applyBonus();
-}
-
-function applyBonus() {
-    const now = Date.now();
-    const day = 86400000;
-
-    if (now - lastBonus >= day) {
-        const d = Math.floor((now - lastBonus) / day);
-        balance += d * 100;
-        lastBonus += d * day;
-        saveLocal();
-    }
-}
-
-
-function updateUI() {
-    moneyEl.innerText = balance;
-    saveLocal();
-    saveFirebase();
-}
-
-
-function saveFirebase() {
-    db.ref("leaderboard/" + playerName).set({
+// ---------- FIREBASE SAVE ----------
+function saveScore() {
+    set(ref(db, "leaderboard/" + playerName), {
         balance: balance,
         updated: Date.now()
     });
 }
 
+// ---------- LEADERBOARD ----------
 function loadLeaderboard() {
-    db.ref("leaderboard")
-    .orderByChild("balance")
-    .limitToLast(10)
-    .on("value", snap => {
+    const q = query(ref(db, "leaderboard"), orderByChild("balance"), limitToLast(10));
+
+    onValue(q, (snap) => {
         const data = snap.val() || {};
 
         let arr = Object.entries(data)
@@ -194,17 +168,17 @@ function loadLeaderboard() {
     });
 }
 
-
+// ---------- SLOT ----------
 function createStrip() {
-    let arr = [];
-    for (let i=0;i<30;i++) {
+    let arr=[];
+    for(let i=0;i<30;i++){
         arr.push(icons[Math.floor(Math.random()*icons.length)]);
     }
     return arr;
 }
 
-function render(reel, strip) {
-    reel.innerHTML = "";
+function render(reel, strip){
+    reel.innerHTML="";
     strip.forEach(icon=>{
         const d=document.createElement("div");
         d.className="symbol";
@@ -213,8 +187,8 @@ function render(reel, strip) {
     });
 }
 
-function spin() {
-    if (spinning || balance < cost) return;
+function spin(){
+    if(spinning || balance < cost) return;
 
     spinning = true;
     btn.disabled = true;
@@ -222,7 +196,7 @@ function spin() {
     balance -= cost;
     updateUI();
 
-    let grid = [[],[],[]];
+    let grid=[[],[],[]];
 
     reels.forEach((reel,i)=>{
         let strip=createStrip();
@@ -238,7 +212,7 @@ function spin() {
 
         setTimeout(()=>{
             reel.style.transform=`translateY(-${stop*80}px)`;
-        },i*200);
+        }, i*200);
     });
 
     setTimeout(()=>{
@@ -248,52 +222,58 @@ function spin() {
     },1400);
 }
 
-
-function checkWin(gcols){
-    let g=[
-        [gcols[0][0],gcols[1][0],gcols[2][0]],
-        [gcols[0][1],gcols[1][1],gcols[2][1]],
-        [gcols[0][2],gcols[1][2],gcols[2][2]]
+function checkWin(g){
+    let m=[
+        [g[0][0],g[1][0],g[2][0]],
+        [g[0][1],g[1][1],g[2][1]],
+        [g[0][2],g[1][2],g[2][2]]
     ];
 
     let lines=[
-        [g[0][0],g[0][1],g[0][2]],
-        [g[1][0],g[1][1],g[1][2]],
-        [g[2][0],g[2][1],g[2][2]],
-        [g[0][0],g[1][0],g[2][0]],
-        [g[0][1],g[1][1],g[2][1]],
-        [g[0][2],g[1][2],g[2][2]],
-        [g[0][0],g[1][1],g[2][2]],
-        [g[0][2],g[1][1],g[2][0]]
+        [m[0][0],m[0][1],m[0][2]],
+        [m[1][0],m[1][1],m[1][2]],
+        [m[2][0],m[2][1],m[2][2]],
+        [m[0][0],m[1][0],m[2][0]],
+        [m[0][1],m[1][1],m[2][1]],
+        [m[0][2],m[1][2],m[2][2]],
+        [m[0][0],m[1][1],m[2][2]],
+        [m[0][2],m[1][1],m[2][0]]
     ];
 
     let win=0;
 
     lines.forEach(l=>{
-        if(l[0]===l[1]&&l[1]===l[2]) win+=reward;
+        if(l[0]===l[1] && l[1]===l[2]) win+=reward;
     });
 
     balance+=win;
     updateUI();
 }
 
+function updateUI(){
+    moneyEl.innerText=balance;
+    saveLocal();
+    saveScore();
+}
+
+// ---------- NAME ----------
 function changeName(){
     let n=prompt("Ник:");
     if(n && n.trim()){
         playerName=n.trim();
         localStorage.setItem("slot_name",playerName);
         document.getElementById("name").innerText=playerName;
-        saveFirebase();
+        saveScore();
     }
 }
 
-
+// ---------- INIT ----------
 btn.onclick=spin;
 
 loadLocal();
-updateUI();
 loadLeaderboard();
-</script>
+updateUI();
 
+</script>
 </body>
 </html>
