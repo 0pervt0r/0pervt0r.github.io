@@ -2,7 +2,9 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>3x3 Slot</title>
+<title>Казионики</title>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
 <style>
 body {
@@ -78,7 +80,48 @@ button:disabled {
     <button id="spinBtn">SPIN</button>
 </div>
 
+    <h3>TOP PLAYERS</h3>
+        <div id="board"></div>
+
 <script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBHu6nNgmxC_Ll7eOMLSDryjx8pIdG4OQ8",
+    authDomain: "chronicles-990c0.firebaseapp.com",
+    projectId: "chronicles-990c0",
+    storageBucket: "chronicles-990c0.firebasestorage.app",
+    messagingSenderId: "1028854285177",
+    appId: "1:1028854285177:web:0fa5158ad78a49f53b25a8",
+    measurementId: "G-3NRK6QY8RT"
+  };
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+let playerName = prompt("Введите ник:");
+if (!playerName) playerName = "Player";
+
+    function loadLeaderboard() {
+    db.ref("leaderboard")
+      .orderByChild("balance")
+      .limitToLast(10)
+      .on("value", snap => {
+          const data = snap.val() || {};
+
+          let arr = Object.entries(data)
+              .map(([name, v]) => ({ name, balance: v.balance }))
+              .sort((a, b) => b.balance - a.balance);
+
+          const board = document.getElementById("board");
+          board.innerHTML = "";
+
+          arr.forEach((p, i) => {
+              const div = document.createElement("div");
+              div.textContent = `${i + 1}. ${p.name} — ${p.balance}`;
+              board.appendChild(div);
+          });
+      });
+}
+    
 const icons = [
     "symbol1.png",
     "symbol2.png",
@@ -137,7 +180,8 @@ function applyDailyBonus() {
 
 function updateUI() {
     moneyEl.innerText = balance;
-    saveGame();
+    saveGame();   
+    saveScore();   
 }
 
 
@@ -195,6 +239,12 @@ function spin() {
     }, 1400);
 }
 
+    function saveScore() {
+    db.ref("leaderboard/" + playerName).set({
+        balance: balance,
+        updated: Date.now()
+    });
+}
 
 function checkWin(gridCols) {
     let g = [
@@ -230,6 +280,7 @@ btn.onclick = spin;
 
 loadGame();
 updateUI();
+loadLeaderboard();
 </script>
 
 </body>
