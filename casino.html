@@ -12,10 +12,6 @@ body {
     text-align: center;
 }
 
-h1 {
-    color: #ffffff;
-}
-
 #machine {
     width: 320px;
     margin: 20px auto;
@@ -26,7 +22,6 @@ h1 {
 
 .window {
     display: flex;
-    justify-content: center;
     gap: 10px;
     background: #000;
     padding: 10px;
@@ -37,8 +32,12 @@ h1 {
     height: 240px;
     overflow: hidden;
     border: 2px solid #83b625;
-    background: #000;
     position: relative;
+}
+
+.strip {
+    position: absolute;
+    width: 100%;
 }
 
 .symbol {
@@ -62,52 +61,34 @@ h1 {
     100% { transform: translateY(0); }
 }
 
-button {
-    margin-top: 15px;
-    background: #83b625;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
-}
-
 button:disabled {
     opacity: 0.5;
-    cursor: not-allowed;
-}
-
-#balance {
-    margin: 10px;
 }
 </style>
 </head>
 
 <body>
 
-<h1>Слот</h1>
-
 <div id="balance">
-    <img src="Croners.png" width="20">
     <span id="money"></span>
 </div>
 
 <div id="machine">
     <div class="window">
-        <div class="reel" id="r1"></div>
-        <div class="reel" id="r2"></div>
-        <div class="reel" id="r3"></div>
+        <div class="reel"><div class="strip" id="r1"></div></div>
+        <div class="reel"><div class="strip" id="r2"></div></div>
+        <div class="reel"><div class="strip" id="r3"></div></div>
     </div>
 
-    <button id="spinBtn" onclick="spin()">SPIN (25)</button>
+    <button id="spinBtn" onclick="spin()">SPIN</button>
 </div>
-
-<div id="resultIcon"></div>
 
 <script>
 const icons = ["symbol1.png","symbol2.png","symbol3.png","symbol4.png","symbol5.png","symbol6.png"];
 const cost = 25;
 const reward = 100;
 
-let balance = loadBalance();
+let balance = 250;
 let isSpinning = false;
 
 const reels = [
@@ -118,45 +99,24 @@ const reels = [
 
 const button = document.getElementById("spinBtn");
 
-function loadBalance() {
-    let data = JSON.parse(localStorage.getItem("slotData"));
-    let today = new Date().toDateString();
-
-    if (!data) data = { money: 250, lastLogin: today };
-
-    if (data.lastLogin !== today) {
-        data.money += 250;
-        data.lastLogin = today;
-    }
-
-    localStorage.setItem("slotData", JSON.stringify(data));
-    return data.money;
-}
-
-function saveBalance() {
-    let data = JSON.parse(localStorage.getItem("slotData"));
-    data.money = balance;
-    localStorage.setItem("slotData", JSON.stringify(data));
-}
-
 function updateUI() {
     document.getElementById("money").innerText = balance;
 }
 
-function generateStripWithCenter(centerSymbol) {
+function createStrip(centerSymbol) {
     let arr = [];
 
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 12; i++) {
         arr.push(icons[Math.floor(Math.random() * icons.length)]);
     }
 
-    // центр (визуально и логически)
-    arr[4] = centerSymbol;
+    // фиксируем центр
+    arr[5] = centerSymbol;
 
     return arr;
 }
 
-function renderReel(reel, strip) {
+function renderStrip(reel, strip) {
     reel.innerHTML = "";
 
     strip.forEach(icon => {
@@ -176,11 +136,8 @@ function spin() {
 
     balance -= cost;
     updateUI();
-    saveBalance();
 
-    document.getElementById("resultIcon").innerHTML = "";
-
-    // финальный результат (центральная линия)
+    // результат
     let result = [
         icons[Math.floor(Math.random() * icons.length)],
         icons[Math.floor(Math.random() * icons.length)],
@@ -190,14 +147,18 @@ function spin() {
     let finished = 0;
 
     reels.forEach((reel, index) => {
-        let strip = generateStripWithCenter(result[index]);
+        let strip = createStrip(result[index]);
 
-        renderReel(reel, strip);
+        renderStrip(reel, strip);
+
+        reel.style.transform = "translateY(-400px)";
+        reel.offsetHeight; // форс рефлоу
 
         reel.classList.add("spin");
 
         setTimeout(() => {
             reel.classList.remove("spin");
+            reel.style.transform = "translateY(0)";
 
             finished++;
             if (finished === 3) {
@@ -208,13 +169,11 @@ function spin() {
 }
 
 function checkWin(result) {
-    // проверяем только центральную линию
     if (result[0] === result[1] && result[1] === result[2]) {
         balance += reward;
     }
 
     updateUI();
-    saveBalance();
 
     isSpinning = false;
     button.disabled = false;
