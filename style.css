@@ -117,48 +117,63 @@ body {
     font-size: 14px;
 }
 
-/* ===== КАРТА НА IMG ===== */
+/* ===== КАРТА БЕЗ ФОНА ===== */
 
 .map {
     position: relative;
     width: 100%;
-    max-width: 1000px;
-    margin: auto;
+    max-width: 900px;
+    aspect-ratio: 1 / 1;
+    margin: 40px auto;
 }
 
-/* фон */
-.map-bg {
-    width: 100%;
-    display: block;
-}
-
-/* зоны */
+/* все элементы */
 .zone {
     position: absolute;
     transform: translate(-50%, -50%);
-    display: block;
     transition: 0.25s ease;
+    cursor: pointer;
 }
 
 .zone img {
     width: 100%;
-    max-width: 250px;
+    max-width: 220px;
+    display: block;
     pointer-events: none;
 }
 
-/* hover (ПК) */
-.zone:hover {
-    transform: translate(-50%, -55%) scale(1.05);
-    filter: brightness(1.2);
-}
-
-/* тап (мобилки) */
-.zone:active {
-    transform: translate(-50%, -52%) scale(0.97);
-}
+/* ===== ПОЗИЦИИ (звезда) ===== */
 
 /* центр */
-.core img {
+.center {
+    top: 50%;
+    left: 50%;
+    z-index: 2;
+}
+
+/* лучи */
+.a { top: 75%; left: 25%; }
+.b { top: 25%; left: 20%; }
+.c { top: 20%; left: 75%; }
+.d { top: 65%; left: 80%; }
+.e { top: 85%; left: 55%; }
+
+/* ===== ЭФФЕКТЫ ===== */
+
+/* ПК */
+.zone:hover {
+    transform: translate(-50%, -60%) scale(1.05);
+    filter: brightness(1.2);
+    z-index: 3;
+}
+
+/* телефон */
+.zone:active {
+    transform: translate(-50%, -55%) scale(0.97);
+}
+
+/* чуть меньше центр */
+.center img {
     max-width: 160px;
 }
 
