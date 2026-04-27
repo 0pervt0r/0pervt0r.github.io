@@ -9,43 +9,70 @@
 
 <body>
 
-<div class="map-container">
+<body>
+<div class="page-wrapper">
 
 
-    <img src="map.png" class="map-image">
+    <aside class="sidebar">
+        <div class="logo-block">
+            <img src="ChroniclesLogo.png">
+        </div>
+
+        <nav class="menu">
+            <a href="#">Главная страница</a>
+            <a href="#">Летопись</a>
+            <a href="#">Персонажи</a>
+            <a href="#">Документы</a>
+            <a href="#">Карта комплекса</a>
+
+            <div class="divider"></div>
+
+            <a href="https://teletype.in/@yurubolski/GMpdKbCOIMu">Правила</a>
+            <a href="https://0pervt0r.github.io/relmap">Карта взаимоотношений</a>
+        </nav>
+    </aside>
 
 
-    <svg viewBox="0 0 1000 700" class="map-svg">
+    <main class="content">
 
+        <div class="map">
 
-        <a href="zone-a.html">
-            <polygon points="100,500 300,450 250,600 120,620"
-                     class="zone"/>
-        </a>
+    <!-- ФОН -->
+    <img src="map-bg.png" class="map-bg">
 
-        <a href="zone-b.html">
-            <polygon points="200,100 450,250 300,400"
-                     class="zone"/>
-        </a>
+    <!-- ЗОНЫ -->
+    <a href="zone-a.html" class="zone" style="top: 58%; left: 8%;">
+        <img src="zone-a.png">
+    </a>
 
-        <a href="zone-c.html">
-            <polygon points="600,100 850,50 780,300"
-                     class="zone"/>
-        </a>
+    <a href="zone-b.html" class="zone" style="top: 10%; left: 12%;">
+        <img src="zone-b.png">
+    </a>
 
-        <a href="zone-d.html">
-            <polygon points="650,350 950,450 900,650 600,600"
-                     class="zone"/>
-        </a>
-      
-        <a href="core.html">
-            <polygon points="450,350 520,300 600,350 580,450 470,450"
-                     class="zone core"/>
-        </a>
+    <a href="zone-c.html" class="zone" style="top: 5%; left: 55%;">
+        <img src="zone-c.png">
+    </a>
 
-    </svg>
+    <a href="zone-d.html" class="zone" style="top: 48%; left: 60%;">
+        <img src="zone-d.png">
+    </a>
+
+    <!-- Центр -->
+    <a href="core.html" class="zone core" style="top: 35%; left: 42%;">
+        <img src="zone-core.png">
+    </a>
 
 </div>
+        
+   </main>
+
+
+</div>
+
+
+<footer class="footer">
+    <p>Urbanshade Chronicles © 2026</p>
+</footer>
 
 </body>
 </html>
