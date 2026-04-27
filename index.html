@@ -2,147 +2,71 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Urbanshade Chronicles</title>
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, Helvetica, sans-serif;
-            background-color: #000000;
-            color: #fffff2;
-        }
-
-        a {
-            color: #c3e63f;
-            text-decoration: none;
-        }
-
-        a:hover {
-            color: #2c7503;
-        }
-
-        header {
-            background-color: #111;
-            padding: 20px;
-            border-bottom: 2px solid #2c7503;
-        }
-
-        header h1 {
-            margin: 0;
-            color: #ffffff;
-            font-size: 28px;
-        }
-
-        .container {
-            display: flex;
-        }
-
-        nav {
-            width: 250px;
-            background-color: #0a0a0a;
-            padding: 20px;
-            border-right: 1px solid #2c7503;
-        }
-
-        nav h2 {
-            color: #ffffff;
-            font-size: 16px;
-            margin-top: 20px;
-            border-bottom: 1px solid #2c7503;
-            padding-bottom: 5px;
-        }
-
-        nav ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        nav li {
-            margin: 8px 0;
-        }
-
-        main {
-            flex: 1;
-            padding: 30px;
-        }
-
-        main h2 {
-            color: #ffffff;
-            border-bottom: 1px solid #2c7503;
-            padding-bottom: 5px;
-        }
-
-        .article-box {
-            border: 1px solid #2c7503;
-            padding: 15px;
-            margin-top: 20px;
-            background-color: #050505;
-        }
-
-        footer {
-            text-align: center;
-            padding: 15px;
-            border-top: 1px solid #2c7503;
-            background-color: #111;
-            font-size: 12px;
-        }
-
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chronicles — Главная страница</title>
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-<header>
-    <h1>Urbanshade Chronicles</h1>
-</header>
+<div class="page-container">
 
-<div class="container">
-
-    <nav>
-        <h2>Навигация</h2>
-        <ul>
-            <li><a href="#">Главная</a></li>
-            <li><a href="#">Объекты</a></li>
-            <li><a href="#">Персонажи</a></li>
-            <li><a href="#">Локации</a></li>
-            <li><a href="#">Архив</a></li>
-        </ul>
-
-        <h2>Служебное</h2>
-        <ul>
-            <li><a href="#">Правила</a></li>
-            <li><a href="#">Форум</a></li>
-            <li><a href="#">Контакты</a></li>
-        </ul>
-    </nav>
-
-    <main>
-        <h2>Добро пожаловать</h2>
-        <p> </p>
-
-        <div class="article-box">
-            <h3>Файл: US-001</h3>
-            <p><strong>Класс:</strong> Неопределён</p>
-            <p>
-                Объект проявляет себя в виде искажений городской инфраструктуры.
-                Зафиксированы случаи изменения топологии зданий без физического вмешательства.
-            </p>
-            <p><a href="#">Читать далее →</a></p>
+    <!-- Боковое меню -->
+    <aside class="sidebar">
+        <div class="logo-box">
+            <img src="ChroniclesLogo.png" alt="Логотип" class="logo">
         </div>
 
-        <div class="article-box">
-            <h3>Файл: US-014</h3>
-            <p><strong>Класс:</strong> Контролируемый</p>
-            <p>
-                Сущность, обитающая в системах метро. Контакт приводит к дезориентации
-                и частичной потере памяти.
-            </p>
-            <p><a href="#">Читать далее →</a></p>
+        <nav class="menu">
+            <a href="#">Об организации</a>
+            <a href="#">Главная страница</a>
+            <a href="#">Летопись</a>
+            <a href="#">Персонажи</a>
+            <a href="#">Документы</a>
+            <a href="#">Карта комплекса</a>
+
+            <div class="divider"></div>
+
+            <a href="#">Правила</a>
+            <a href="#">Карта взаимоотношений</a>
+            <a href="#">Казино</a>
+        </nav>
+    </aside>
+
+    <!-- Основная часть -->
+    <main class="content">
+
+        <h1>Добро пожаловать в Chronicles</h1>
+
+        <p>
+            Приветствуем вас на официальной вики проекта <b>Chronicles</b>.  
+            Здесь вы можете изучить материалы, связанные с организацией, 
+            историей, персонажами и внутренним устройством комплекса.
+        </p>
+
+        <div class="bottom-blocks">
+
+            <div class="buttons-row">
+                <a class="round-button" href="#">С чего начать</a>
+                <a class="round-button" href="#">Канал сети</a>
+            </div>
+
+            <div class="about-box">
+                <h2>О проекте</h2>
+                <p>
+                    «Chronicles» — это мир, созданный для объединения 
+                    сюжетов, документов и персонажей в единую связанную вселенную.
+                </p>
+            </div>
+
         </div>
 
     </main>
 
 </div>
 
-<footer>
+<footer class="footer">
+    © 2026 Chronicles Project. Все права защищены.
 </footer>
 
 </body>
