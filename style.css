@@ -117,52 +117,49 @@ body {
     font-size: 14px;
 }
 
-/* ===== КАРТА ===== */
+/* ===== КАРТА НА IMG ===== */
 
-.map-container {
+.map {
     position: relative;
+    width: 100%;
     max-width: 1000px;
     margin: auto;
 }
 
-.map-image {
+/* фон */
+.map-bg {
     width: 100%;
     display: block;
 }
 
-/* SVG поверх */
-.map-svg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-}
-
-/* Зоны */
+/* зоны */
 .zone {
-    fill: rgba(118, 173, 32, 0.15);
-    stroke: #c3e63e;
-    stroke-width: 2;
-    transition: 0.25s;
-    cursor: pointer;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    display: block;
+    transition: 0.25s ease;
 }
 
-/* Hover (ПК) */
+.zone img {
+    width: 100%;
+    max-width: 250px;
+    pointer-events: none;
+}
+
+/* hover (ПК) */
 .zone:hover {
-    fill: rgba(195, 230, 62, 0.3);
-    transform: translateY(-8px);
+    transform: translate(-50%, -55%) scale(1.05);
+    filter: brightness(1.2);
 }
 
-/* Нажатие (мобилки) */
+/* тап (мобилки) */
 .zone:active {
-    transform: translateY(-4px) scale(0.98);
+    transform: translate(-50%, -52%) scale(0.97);
 }
 
-/* Центр */
-.core {
-    stroke: #76ad20;
-    fill: rgba(118, 173, 32, 0.25);
+/* центр */
+.core img {
+    max-width: 160px;
 }
 
 
