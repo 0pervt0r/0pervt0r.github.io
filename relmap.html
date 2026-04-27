@@ -7,15 +7,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-    body {
-        margin: 0;
-        background: #111;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        overflow: hidden;
-    }
 
     .viewer {
         width: 95vw;
@@ -46,8 +37,30 @@
 </head>
 
 <body>
-<div class="viewer" id="viewer">
-    <img src="RelChart.png" id="img" alt="RelChart" />
+    <div class="page-wrapper">
+    <aside class="sidebar">
+        <div class="logo-block">
+            <img src="ChroniclesLogo.png">
+        </div>
+
+        <nav class="menu">
+            <a href="https://0pervt0r.github.io">Главная страница</a>
+            <a href="#">Летопись</a>
+            <a href="#">Персонажи</a>
+            <a href="#">Документы</a>
+            <a href="#">Карта комплекса</a>
+
+            <div class="divider"></div>
+
+            <a href="#">Правила</a>
+            <a href="#">Карта взаимоотношений</a>
+        </nav>
+    </aside>
+<main class="content">
+    <div class="viewer" id="viewer">
+        <img src="RelChart.png" id="img" alt="RelChart" />
+    </div>
+ </main>
 </div>
 
 
