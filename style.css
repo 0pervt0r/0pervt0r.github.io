@@ -519,4 +519,133 @@ body::after {
     0 0 8px rgba(0, 170, 255, 0.4),
     inset 0 0 8px rgba(0, 100, 200, 0.1);
 }
+
+/* ===================== МОБИЛЬНАЯ АДАПТАЦИЯ ===================== */
+    @media (max-width: 640px) {
+ 
+      /* Окно на весь экран без отступов */
+      .window {
+        margin: 0;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+        min-height: 100vh;
+      }
+ 
+      /* Titlebar чуть выше для удобства пальца */
+      .titlebar {
+        height: 44px;
+        padding: 0 14px;
+      }
+ 
+      .titlebar-icon {
+        width: 20px;
+        height: 20px;
+        font-size: 11px;
+      }
+ 
+      .titlebar-title {
+        font-size: 10px;
+        letter-spacing: 0.5px;
+      }
+ 
+      .win-btns { display: none; }
+ 
+      /* Лэйаут: колонка вместо строки */
+      .main-layout {
+        flex-direction: column;
+        min-height: unset;
+        padding-bottom: 64px; /* место для нижней навигации */
+      }
+ 
+      /* Боковое меню скрыто на мобиле — заменяется нижней панелью */
+      .sidebar { display: none; }
+ 
+      /* Контент */
+      .content {
+        padding: 20px 16px;
+      }
+ 
+      .content-title {
+        font-size: 16px;
+        line-height: 1.4;
+        margin-bottom: 12px;
+      }
+ 
+      .content-desc {
+        font-size: 13px;
+        line-height: 1.7;
+        margin-bottom: 18px;
+      }
+ 
+      .info-block {
+        padding: 14px 14px;
+      }
+ 
+      .info-block-title {
+        font-size: 13px;
+        margin-bottom: 8px;
+      }
+ 
+      .info-block-text {
+        font-size: 13px;
+        line-height: 1.7;
+      }
+ 
+      /* Нижняя навигационная панель */
+      .mobile-nav {
+        display: flex !important;
+      }
+    }
+ 
+    /* Нижняя панель — скрыта на ПК */
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      background: var(--header-bg);
+      border-top: 1px solid var(--border-main);
+      z-index: 1000;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scrollbar-width: none;
+    }
+ 
+    .mobile-nav::-webkit-scrollbar { display: none; }
+ 
+    .mobile-nav-inner {
+      display: flex;
+      align-items: stretch;
+      height: 100%;
+      min-width: max-content;
+      padding: 0 4px;
+    }
+ 
+    .mobile-nav-link {
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      color: var(--text-dim);
+      text-decoration: none;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+      cursor: pointer;
+    }
+ 
+    .mobile-nav-link.active {
+      color: var(--nav-active);
+      border-bottom-color: var(--accent);
+    }
+ 
+    .mobile-nav-link:hover {
+      color: var(--text-primary);
+      background: rgba(0, 80, 180, 0.2);
+    }
 </style>
