@@ -553,6 +553,17 @@
           <button class="filter-tab" data-filter="medical">МЕДИЦИНСКИЙ ПЕРСОНАЛ</button>
         </div>
 
+        <div class="filter-tabs" style="margin-top:-10px;">
+          <button class="filter-tab active" data-divfilter="all">ВСЕ ПОДРАЗДЕЛЕНИЯ</button>
+          <button class="filter-tab" data-divfilter="nost">N.O.S.T.</button>
+          <button class="filter-tab" data-divfilter="bioparanormal">Биопаронормальное</button>
+          <button class="filter-tab" data-divfilter="infiltration">Отдел Проникновений</button>
+          <button class="filter-tab" data-divfilter="expedition">Отдел Экспедиций</button>
+          <button class="filter-tab" data-divfilter="hazards">Отдел угроз и этики</button>
+          <button class="filter-tab" data-divfilter="marketing">Отдел маркетинга</button>
+          <button class="filter-tab" data-divfilter="medical">Медицинско-социальный отдел</button>
+        </div>
+
         <div class="table-header">
           <div class="th th-num">#</div>
           <div class="th th-id">ID</div>
@@ -579,6 +590,7 @@ const PERSONNEL = [
     alias:  'Доктор Нет',
     role:   'Исследователи',
     dept:   'admin',
+    div:    null,
     status: 'active',
     url:    'HR-R1029043470.html',
   },
@@ -588,6 +600,7 @@ const PERSONNEL = [
     alias:  '',
     role:   'Медицинский персонал',
     dept:   'medical',
+    div:    'medical',
     status: 'active',
     url:    'MR-R0359789631.html',
   },
@@ -597,6 +610,7 @@ const PERSONNEL = [
     alias:  null,
     role:   null,
     dept:   null,
+    div:    null,
     status: null,
     url:    null,
   },
@@ -695,29 +709,32 @@ const PERSONNEL = [
 // =====================================================================
 
 const STATUS_MAP = {
-  active:     { label: 'В СЛУЖБЕ',  cls: 'status-active' },
-  inactive:   { label: 'НЕАКТИВЕН', cls: 'status-inactive' },
-  pending:    { label: 'ОЖИДАНИЕ',  cls: 'status-pending' },
-  classified: { label: 'ЗАСЕКРЕЧЕН',cls: 'status-classified' },
+  active:     { label: 'ЖИВ',  cls: 'status-active' },
+  inactive:   { label: 'ПОГИБ', cls: 'status-inactive' },
+  pending:    { label: 'ОЖИДАЕТ ВОЗРОЖДЕНИЯ',  cls: 'status-pending' },
+  classified: { label: 'ЗАСЕКРЕЧЕНО',cls: 'status-classified' },
 };
 
 let currentFilter = 'all';
+let currentDiv = 'all';
 let currentSearch = '';
 
 function render() {
   const list      = document.getElementById('personnel-list');
   const noResults = document.getElementById('no-results');
+  
   list.innerHTML  = '';
 
   const filtered = PERSONNEL.filter(p => {
     const matchFilter = currentFilter === 'all' || p.dept === currentFilter;
+    const matchDiv    = currentDiv === 'all' || p.div === currentDiv;
     const q           = currentSearch.toLowerCase();
     const matchSearch = !q
       || p.name.toLowerCase().includes(q)
       || p.id.toLowerCase().includes(q)
       || (p.alias && p.alias.toLowerCase().includes(q))
       || p.role.toLowerCase().includes(q);
-    return matchFilter && matchSearch;
+    return matchFilter && matchDiv && matchSearch;;
   });
 
   document.getElementById('total-count').textContent = filtered.length;
@@ -734,7 +751,6 @@ function render() {
       ? `${p.name} <span style="color:var(--text-dim);font-size:10px;">${p.alias}</span>`
       : p.name;
 
-    // Кнопка View: если url задан — ссылка, иначе — серая и некликабельная
     const viewBtn = p.url
       ? `<a class="btn-view" href="${p.url}">View</a>`
       : `<span class="btn-view no-link">View</span>`;
@@ -767,6 +783,14 @@ document.getElementById('search-input').addEventListener('input', e => {
   render();
 });
 
+  document.querySelectorAll('[data-divfilter]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-divfilter]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentDiv = btn.dataset.divfilter;
+    render();
+  });
+});
 render();
 </script>
 </body>
