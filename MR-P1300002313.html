@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hadal Database — Досье сотрудника</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0d12;
+    --bg2: #0e1219;
+    --bg3: #12171f;
+    --panel: #0d1520;
+    --accent: #1a6bff;
+    --accent2: #3d8bff;
+    --accent-glow: rgba(26,107,255,0.18);
+    --cyan: #00e5ff;
+    --cyan-dim: rgba(0,229,255,0.12);
+    --text: #c8d8f0;
+    --text-dim: #5a7090;
+    --text-bright: #e8f4ff;
+    --border: rgba(30,80,160,0.35);
+    --border2: rgba(0,150,255,0.2);
+    --green: #00ff88;
+    --green-dim: rgba(0,255,136,0.08);
+    --red: #ff4455;
+    --amber: #ffaa00;
+    --purple: #b06fff;
+    --scanline: rgba(0,0,0,0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, var(--scanline) 2px, var(--scanline) 4px);
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.35;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at 30% 20%, rgba(26,107,255,0.05) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 80%, rgba(0,229,255,0.03) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+.sidebar-item a:visited {
+  color: inherit;
+}
+
+  /* OS WRAPPER */
+  .os-wrapper {
+    position: relative;
+    z-index: 2;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 16px;
+    min-height: calc(100vh - 44px);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .titlebar {
+    background: linear-gradient(90deg, #0d1a2e 0%, #0a1520 100%);
+    border: 1px solid var(--border);
+    border-bottom: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 12px;
+    border-radius: 6px 6px 0 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .titlebar::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent2), transparent);
+    opacity: 0.6;
+  }
+
+  .titlebar-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+  }
+
+  .titlebar-controls { display: flex; gap: 6px; }
+  .titlebar-controls span {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .ctrl-close { background: #ff4455; opacity: 0.7; }
+  .ctrl-min { background: #ffaa00; opacity: 0.7; }
+  .ctrl-max { background: #00cc66; opacity: 0.7; }
+
+  .main-window {
+    display: flex;
+    flex: 1;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 0 0 6px 6px;
+    overflow: hidden;
+    min-height: calc(100vh - 120px);
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 200px;
+    min-width: 200px;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    padding: 16px 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sidebar-user {
+    padding: 12px 16px 16px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 8px;
+  }
+
+  .sidebar-username {
+    font-family: 'Orbitron', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--accent2);
+    letter-spacing: 0.08em;
+    margin-bottom: 2px;
+  }
+
+  .sidebar-role {
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+  }
+
+  .sidebar-section {
+    padding: 10px 16px 4px;
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .sidebar-item {
+    padding: 5px 16px;
+    font-size: 11px;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .sidebar-item::before { content: '• '; color: var(--text-dim); }
+
+  .sidebar-item:hover {
+    color: var(--text);
+    background: rgba(26,107,255,0.06);
+  }
+
+  .sidebar-item.active {
+    color: var(--cyan);
+  }
+  .sidebar-item.active::before { color: var(--cyan); }
+
+  .sidebar-bottom {
+    margin-top: auto;
+    padding: 12px 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  .status-dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    margin-right: 6px;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .status-text { font-size: 9px; color: var(--text-dim); }
+
+  /* CONTENT */
+  .content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+  .topbar {
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+    padding: 8px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .topbar-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-bright);
+    letter-spacing: 0.05em;
+    animation: flicker 8s infinite;
+  }
+
+  @keyframes flicker {
+    0%, 95%, 100% { opacity: 1; }
+    96% { opacity: 0.7; }
+    97% { opacity: 1; }
+    98% { opacity: 0.5; }
+    99% { opacity: 1; }
+  }
+
+  .topbar-actions { display: flex; gap: 8px; }
+
+  .btn-sm {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    padding: 4px 12px;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    color: var(--text-dim);
+    cursor: pointer;
+    background: transparent;
+    transition: all 0.15s;
+    letter-spacing: 0.05em;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .btn-sm:hover {
+    border-color: var(--accent2);
+    color: var(--accent2);
+  }
+
+  .btn-sm.btn-back::before { content: '← '; }
+
+  .page {
+    flex: 1;
+    padding: 24px;
+    overflow-y: auto;
+  }
+
+  .page::-webkit-scrollbar { width: 6px; }
+  .page::-webkit-scrollbar-track { background: var(--bg2); }
+  .page::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* ─── DOSSIER LAYOUT ─── */
+
+  /* Top strip — classified banner */
+  .classified-banner {
+    border: 1px solid rgba(176,111,255,0.3);
+    background: rgba(176,111,255,0.05);
+    border-radius: 2px;
+    padding: 5px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+  }
+
+  .classified-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 9px;
+    color: var(--purple);
+    letter-spacing: 0.2em;
+  }
+
+  .classified-code {
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+  }
+
+  /* Main dossier grid */
+  .dossier-grid {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+
+  /* Portrait column */
+  .portrait-col { display: flex; flex-direction: column; gap: 12px; }
+
+  .portrait-frame {
+    position: relative;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    aspect-ratio: 3/4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .portrait-frame::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(135deg, rgba(26,107,255,0.08) 0%, transparent 50%),
+      repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(26,107,255,0.03) 8px, rgba(26,107,255,0.03) 9px);
+  }
+
+  .portrait-inner {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+  }
+
+  /* Silhouette SVG placeholder */
+  .portrait-silhouette {
+    width: 90px;
+    height: 90px;
+    margin: 0 auto 10px;
+    opacity: 0.18;
+  }
+
+  .portrait-placeholder-text {
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+  }
+
+  /* Corner marks */
+  .portrait-frame::after {
+    content: '';
+    position: absolute;
+    inset: 6px;
+    border: 1px solid var(--border);
+    border-radius: 1px;
+    pointer-events: none;
+  }
+
+  .corner-mark {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    z-index: 2;
+  }
+  .corner-mark::before, .corner-mark::after { content: ''; position: absolute; background: var(--accent2); }
+  .corner-mark::before { width: 10px; height: 1px; }
+  .corner-mark::after { width: 1px; height: 10px; }
+  .corner-tl { top: 4px; left: 4px; }
+  .corner-tr { top: 4px; right: 4px; transform: scaleX(-1); }
+  .corner-bl { bottom: 4px; left: 4px; transform: scaleY(-1); }
+  .corner-br { bottom: 4px; right: 4px; transform: scale(-1); }
+
+  /* Portrait stamp */
+  .portrait-stamp {
+    position: absolute;
+    bottom: 10px;
+    right: 8px;
+    font-family: 'Orbitron', monospace;
+    font-size: 8px;
+    color: var(--accent2);
+    letter-spacing: 0.08em;
+    opacity: 0.5;
+    z-index: 3;
+  }
+
+  /* Quick ID card */
+  .id-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .id-card-header {
+    background: rgba(26,107,255,0.08);
+    border-bottom: 1px solid var(--border);
+    padding: 5px 10px;
+    font-size: 9px;
+    color: var(--accent2);
+    letter-spacing: 0.1em;
+  }
+
+  .id-card-body { padding: 10px; }
+
+  .id-field {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(30,80,160,0.15);
+    gap: 8px;
+  }
+
+  .id-field:last-child { border-bottom: none; }
+
+  .id-label {
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    flex-shrink: 0;
+  }
+
+  .id-value {
+    font-size: 10px;
+    color: var(--text-bright);
+    letter-spacing: 0.04em;
+    text-align: right;
+  }
+
+  .id-value.cyan { color: var(--cyan); }
+  .id-value.amber { color: var(--amber); }
+  .id-value.green { color: var(--green); }
+  .id-value.red { color: var(--red); }
+  .id-value.purple { color: var(--purple); }
+
+  /* Status badge in id-card */
+  .status-badge {
+    display: inline-block;
+    font-size: 8px;
+    padding: 1px 7px;
+    border-radius: 2px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .status-active { background: rgba(0,255,136,0.08); border: 1px solid rgba(0,255,136,0.25); color: var(--green); }
+  .status-inactive { background: rgba(255,68,85,0.08); border: 1px solid rgba(255,68,85,0.2); color: var(--red); }
+  .status-pending { background: rgba(255,170,0,0.08); border: 1px solid rgba(255,170,0,0.2); color: var(--amber); }
+  .status-classified { background: rgba(176,111,255,0.08); border: 1px solid rgba(176,111,255,0.2); color: var(--purple); }
+
+  /* Info column */
+  .info-col { display: flex; flex-direction: column; gap: 14px; }
+
+  /* Name block */
+  .name-block {
+    border-left: 2px solid var(--accent2);
+    padding-left: 14px;
+    margin-bottom: 4px;
+  }
+
+  .page-badge {
+    display: inline-block;
+    background: var(--cyan-dim);
+    border: 1px solid rgba(0,229,255,0.25);
+    color: var(--cyan);
+    font-size: 9px;
+    padding: 2px 10px;
+    border-radius: 2px;
+    letter-spacing: 0.12em;
+    margin-bottom: 8px;
+  }
+
+  .dossier-name {
+    font-family: 'Orbitron', monospace;
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--text-bright);
+    letter-spacing: 0.04em;
+    line-height: 1.1;
+    margin-bottom: 4px;
+  }
+
+  .dossier-alias {
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    font-style: italic;
+    margin-bottom: 6px;
+  }
+
+  .dossier-role {
+    font-size: 11px;
+    color: var(--accent2);
+    letter-spacing: 0.06em;
+  }
+
+  /* Dossier section block */
+  .dossier-section {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 14px;
+    background: rgba(26,107,255,0.06);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 9px;
+    color: var(--accent2);
+    letter-spacing: 0.12em;
+  }
+
+  .section-tag {
+    font-size: 8px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+  }
+
+  .section-body {
+    padding: 14px;
+  }
+
+  /* Bio text */
+  .bio-text {
+    font-size: 11px;
+    color: var(--text);
+    line-height: 1.75;
+    letter-spacing: 0.03em;
+  }
+
+  .bio-text p { margin-bottom: 10px; }
+  .bio-text p:last-child { margin-bottom: 0; }
+
+  /* Redacted span */
+  .redacted {
+    background: var(--text-dim);
+    color: transparent;
+    border-radius: 1px;
+    padding: 0 2px;
+    user-select: none;
+    cursor: not-allowed;
+  }
+
+  /* Trait tags */
+  .trait-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .trait-tag {
+    font-size: 9px;
+    padding: 3px 10px;
+    border-radius: 2px;
+    letter-spacing: 0.06em;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    background: transparent;
+  }
+
+  .trait-tag.positive {
+    border-color: rgba(0,255,136,0.2);
+    color: var(--green);
+    background: rgba(0,255,136,0.04);
+  }
+
+  .trait-tag.negative {
+    border-color: rgba(255,68,85,0.2);
+    color: var(--red);
+    background: rgba(255,68,85,0.04);
+  }
+
+  .trait-tag.neutral {
+    border-color: rgba(61,139,255,0.2);
+    color: var(--accent2);
+    background: rgba(61,139,255,0.04);
+  }
+
+  .trait-tag.warning {
+    border-color: rgba(255,170,0,0.2);
+    color: var(--amber);
+    background: rgba(255,170,0,0.04);
+  }
+
+  /* Psych profile bars */
+  .psych-rows { display: flex; flex-direction: column; gap: 8px; }
+
+  .psych-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .psych-label {
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    width: 120px;
+    flex-shrink: 0;
+  }
+
+  .psych-bar-track {
+    flex: 1;
+    height: 4px;
+    background: rgba(30,80,160,0.2);
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .psych-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: var(--accent2);
+    transition: width 0.6s ease;
+  }
+
+  .psych-bar-fill.high { background: var(--red); }
+  .psych-bar-fill.mid { background: var(--amber); }
+  .psych-bar-fill.low { background: var(--green); }
+  .psych-bar-fill.neutral { background: var(--accent2); }
+
+  .psych-value {
+    font-size: 9px;
+    color: var(--text-dim);
+    width: 28px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* Gallery */
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .gallery-item {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    aspect-ratio: 4/3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+
+  .gallery-item:hover { border-color: var(--accent2); }
+
+  .gallery-item::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(45deg, transparent, transparent 6px, rgba(26,107,255,0.03) 6px, rgba(26,107,255,0.03) 7px);
+  }
+
+  .gallery-placeholder {
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    position: relative;
+    z-index: 1;
+    text-align: center;
+  }
+
+  .gallery-caption {
+    position: absolute;
+    bottom: 0;
+    left: 0; right: 0;
+    padding: 4px 8px;
+    background: rgba(10,13,18,0.85);
+    font-size: 8px;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+    border-top: 1px solid var(--border);
+  }
+
+  /* Bottom row: full-width sections */
+  .dossier-full { margin-top: 0; }
+
+  /* Access log */
+  .log-rows { display: flex; flex-direction: column; gap: 0; }
+
+  .log-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    border-bottom: 1px solid rgba(30,80,160,0.12);
+    padding: 6px 0;
+    font-size: 10px;
+  }
+
+  .log-ts {
+    width: 160px;
+    color: var(--text-dim);
+    flex-shrink: 0;
+    font-size: 9px;
+  }
+
+  .log-event {
+    flex: 1;
+    color: var(--text);
+  }
+
+  .log-level {
+    width: 80px;
+    text-align: right;
+    flex-shrink: 0;
+    font-size: 9px;
+  }
+
+  .log-level.info { color: var(--accent2); }
+  .log-level.warn { color: var(--amber); }
+  .log-level.alert { color: var(--red); }
+
+  /* Watermark */
+  .dossier-watermark {
+    position: fixed;
+    bottom: 40px;
+    right: 40px;
+    font-family: 'Orbitron', monospace;
+    font-size: 60px;
+    font-weight: 900;
+    color: rgba(26,107,255,0.04);
+    letter-spacing: 0.1em;
+    pointer-events: none;
+    z-index: 0;
+    transform: rotate(-20deg);
+    user-select: none;
+  }
+
+  /* TYPOLOGY CARDS */
+  .typo-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+
+  .typo-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 10px 12px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.15s;
+  }
+
+  .typo-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--accent2), transparent);
+    opacity: 0.5;
+  }
+
+  .typo-card:hover { border-color: var(--accent2); }
+
+  .typo-card-label {
+    font-size: 8px;
+    color: var(--text-dim);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .typo-card-value {
+    font-family: 'Orbitron', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-bright);
+    letter-spacing: 0.04em;
+    margin-bottom: 4px;
+    line-height: 1.1;
+  }
+
+  .typo-card-sub {
+    font-size: 8px;
+    color: var(--text-dim);
+    letter-spacing: 0.04em;
+    margin-bottom: 8px;
+    line-height: 1.4;
+  }
+
+  /* MBTI letters */
+  .typo-mbti { display: flex; gap: 3px; }
+
+  .mbti-letter {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px; height: 22px;
+    border: 1px solid rgba(61,139,255,0.35);
+    border-radius: 2px;
+    font-size: 13px;
+    font-weight: 900;
+    color: var(--accent2);
+    background: rgba(26,107,255,0.06);
+  }
+
+  /* Temperament dots */
+  .typo-dots { display: flex; gap: 4px; margin-top: 2px; }
+
+  .typo-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: transparent;
+    transition: background 0.15s;
+  }
+
+  .typo-dot.active { background: var(--accent2); border-color: var(--accent2); }
+  .typo-dot.active.dim { background: rgba(61,139,255,0.4); border-color: rgba(61,139,255,0.5); }
+
+  /* Enneagram labels */
+  .typo-enneagram { display: flex; flex-direction: column; gap: 2px; margin-top: 2px; }
+
+  .enneagram-type {
+    font-size: 9px;
+    color: var(--cyan);
+    letter-spacing: 0.04em;
+  }
+
+  .enneagram-wing {
+    font-size: 8px;
+    color: var(--text-dim);
+    letter-spacing: 0.04em;
+  }
+
+  /* Responsive */
+  @media (max-width: 700px) {
+    .sidebar { display: none; }
+    .dossier-grid { grid-template-columns: 1fr; }
+    .portrait-col { flex-direction: row; flex-wrap: wrap; }
+    .portrait-frame { width: 140px; aspect-ratio: 3/4; }
+    .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+    .typo-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<div class="dossier-watermark">ДОСЬЕ</div>
+
+<div class="os-wrapper">
+  <div class="titlebar">
+    <span class="titlebar-title">HADAL DATABASE ACCESS</span>
+    <div class="titlebar-controls">
+      <span class="ctrl-close"></span>
+      <span class="ctrl-min"></span>
+      <span class="ctrl-max"></span>
+    </div>
+  </div>
+
+  <div class="main-window">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sidebar-user">
+        <div class="sidebar-username">ПОЛЬЗОВАТЕЛЬ</div>
+        <div class="sidebar-role">Уровень доступа: 3</div>
+      </div>
+
+      <div class="sidebar-section">Навигация</div>
+      <div class="sidebar-item">Главная</div>
+      <div class="sidebar-item active"> <a href="personnel.html">Персоналии</a></div>
+      <div class="sidebar-item"><a href="prisoners.html">Заключённые</a></div>
+      <div class="sidebar-item">Документация</div>
+      <div class="sidebar-section">Дополнительно</div>
+      <div class="sidebar-item">Карта</div>
+      <div class="sidebar-item">Рассказы</div>
+      <div class="sidebar-item">Классификация объектов</div>
+      <div class="sidebar-item"><a href="https://teletype.in/@yurubolski/GMpdKbCOIMu" style="color:inherit;text-decoration:none;">Правила</a></div>
+
+      <div class="sidebar-bottom">
+        <div><span class="status-dot"></span><span class="status-text">ПОЛЬЗОВАТЕЛЬ В СЕТИ</span></div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+      <div class="topbar">
+        <div class="topbar-title">ДОСЬЕ СОТРУДНИКА</div>
+        <div class="topbar-actions">
+          <a class="btn-sm btn-back" href="personnel.html">Назад к реестру</a>
+        </div>
+      </div>
+
+      <div class="page">
+
+        <!-- Classified banner -->
+        <div class="classified-banner">
+          <span class="classified-label">⬛ ОГРАНИЧЕННЫЙ ДОСТУП ⸺ УРОВЕНЬ 3+</span>
+          <span class="classified-code">ОБНОВЛЕНО: 2019-14-07</span>
+        </div>
+
+        <!-- Main grid: portrait + info -->
+        <div class="dossier-grid">
+
+          <!-- Portrait column -->
+          <div class="portrait-col">
+
+            <!-- Portrait frame -->
+            <div class="portrait-frame">
+              <div class="corner-mark corner-tl"></div>
+              <div class="corner-mark corner-tr"></div>
+              <div class="corner-mark corner-bl"></div>
+              <div class="corner-mark corner-br"></div>
+              <!-- Replace the svg+text below with an <img> tag for a real portrait -->
+              <div class="portrait-inner">
+                <svg class="portrait-silhouette" viewBox="0 0 100 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <ellipse cx="50" cy="32" rx="22" ry="26" fill="#c8d8f0"/>
+                  <path d="M10 120 Q10 72 50 72 Q90 72 90 120Z" fill="#c8d8f0"/>
+                </svg>
+                <div class="portrait-placeholder-text">ФОТО НЕ ЗАГРУЖЕНО</div>
+              </div>
+              <div class="portrait-stamp">АЛЕКСАНДЕР ЛАРСЕН</div>
+            </div>
+
+            <!-- ID card -->
+            <div class="id-card">
+              <div class="id-card-header">ИДЕНТИФИКАЦИЯ</div>
+              <div class="id-card-body">
+                <div class="id-field">
+                  <span class="id-label">ID</span>
+                  <span class="id-value cyan">MR-P #1300002313</span>
+                </div>
+                <div class="id-field">
+                  <span class="id-label">СТАТУС</span>
+                  <span class="id-value"><span class="status-badge status-active">ИЗМЕНЁН</span></span>
+                </div>
+                <div class="id-field">
+                  <span class="id-label">ДОЛЖНОСТЬ</span>
+                  <span class="id-value">Садовник</span>
+              </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Info column -->
+          <div class="info-col">
+
+            <!-- Name block -->
+            <div class="name-block">
+              <div class="page-badge">URBANSHADE CORP — ХАДАЛЬНОЕ ПОДРАЗДЕЛЕНИЕ</div>
+              <div class="dossier-name">Александер Ларсен</div>
+              <div class="dossier-alias">«Психимик»</div>
+              <div class="dossier-role">Мужчина · 33 года · 192 см · 90 кг</div>
+            </div>
+
+            <!-- Biography -->
+            <div class="dossier-section">
+              <div class="section-header">
+                <span class="section-title">БИОГРАФИЯ</span>
+                <span class="section-tag">ФАЙЛ 01 / ИСТОРИЯ</span>
+              </div>
+              <div class="section-body">
+                <div class="bio-text">
+                  <p>Александр Ларсен провел детство и юность в Тронхейме. О родителях соседи отзывались как о порядочных людях, пусть и выглядели те несколько отстранённо. В дошкольном возрасте Александер не демонстрировал отклонений в поведении, если не считать одного инцидента, произошедшего в возрасте шести лет.</p>
+                  <p>Александр окончил школу со стабильно высокой успеваемостью, особенно в естественных науках. Социально адаптирован, имел узкий, но устойчивый круг общения. Во время учёбы в старшей школе вступил в отношения с одноклассницей, Кари Йохансен.</p>
+                  <p>По окончании старшей школы Ларсен поступил на факультет психиатрии Медицинского университета Осло, где показал выдающиеся способности в изучении анатомии ЦНС и психофармакологии. После получения диплома Ларсен начал практику в клинике г. Осло.</p>
+                  <p>Кари, по словам знакомых, была мягкой, сострадательной девушкой, с сильной моральной позицией. В возрасте 25 лет он женился на Кари Йохансен. Внешне они безупречная пара, но в личной переписке Кари, изъятой после событий 20██ года, сохранились фрагменты, в которых она жаловалась подруге на «странное поведение» мужа и его склонность подолгу смотреть за огонём.</p>
+                  <p>Через шесть месяцев после их свадьбы автомобиль, в котором находилась Кари, был протаранен группой подростков, находившихся в состоянии алкогольного и наркотического опьянения. Смерть наступила мгновенно. Водитель (███ ██████) и двое пассажиров (██████ █████ и ████ ███████) скрылись с места преступления. Несмотря на собранные улики, ошибки в следствии и давление адвокатов привели к тому, что обвиняемые избежали значительного наказания, отделавшись условными сроками и штрафами.</p>
+                  <p>Ларсен взял отпуск по состоянию, изолировался от друзей, вёл себя холодно при редких контактах с родными. По прошествии нескольких месяцев он вернулся на работу.</p>
+                  <p>Через семь месяцев после случившегося трое подозреваемых (███ ██████, ██████ █████ и ████ ███████ соответственно) исчезли из своих домов. Они были обнаружены в заброшенном гараже на окраине города через █ часов после смерти. Судмедэксперты установили, что все они умерли с интервалом менее чем в шесть часов. На телах были зафиксированы следы пыток, ожоги, многочисленные ножевые ранения. Описание места преступления было приобщено к делу, но позже засекречено. Сотрудникам полиции, осматривавшим место, потребовалась психологическая помощь. В ходе экспертизы на месте нашли следы кетамина, этанола, и вещества, идентифицированного как домашний аналог эфира. Следствие признало, что [ДАННЫЕ УДАЛЕНЫ].</p>
+                  <p>При последующем изучении его записей и личных вещей были обнаружены блокноты с подробными зарисовками анатомических экспериментов, фрагментами внутренних органов. Некоторые страницы содержали воспоминания детства, в том числе воспроизведение сцены, где он, будучи девятилетним, наблюдал за тем, как горела соседская собака, запертая им в старом деревянном сарае.</p>
+                  <p>Ларсен не предпринимал попыток скрыться или оказать сопротивление при задержании. Суд признал Александра Ларсена виновным в тройном умышленном убийстве с особой жестокостью. Учитывая отягчающие обстоятельства и характер преступления, был вынесен смертный приговор. За двое суток до назначенной даты приведения приговора в исполнение, он был изъят из места заключения организацией Urbanshade. </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Psychological profile -->
+            <div class="dossier-section">
+              <div class="section-header">
+                <span class="section-title">ПСИХОЛОГИЧЕСКИЙ ПРОФИЛЬ</span>
+                <span class="section-tag">ФАЙЛ 02 / ОЦЕНКА</span>
+              </div>
+              <div class="section-body">
+                <div class="typo-grid">
+
+                  <div class="typo-card">
+                    <div class="typo-card-label">ТЕМПЕРАМЕНТ</div>
+                    <div class="typo-card-value">Phlegmatic-Sanguine</div>
+                    <div class="typo-card-sub">Первичный · Вторичный</div>
+                    <div class="typo-dots">
+                      <span class="typo-dot" title="Холерик"></span>
+                      <span class="typo-dot active dim" title="Сангвиник"></span>
+                      <span class="typo-dot active dim" title="Флегматик"></span>
+                      <span class="typo-dot" title="Меланхолик"></span>
+                    </div>
+                  </div>
+
+                  <div class="typo-card">
+                    <div class="typo-card-label">MBTI</div>
+                    <div class="typo-card-value typo-mbti">
+                      <span class="mbti-letter">I</span><span class="mbti-letter">S</span><span class="mbti-letter">F</span><span class="mbti-letter">J</span>
+                    </div>
+                    <div class="typo-card-sub">Introverted · Sensing · Feeling · Judging</div>
+                  </div>
+
+                  <div class="typo-card">
+                    <div class="typo-card-label">ЭННЕАГРАММА</div>
+                    <div class="typo-card-value">5w4</div>
+                    <div class="typo-card-sub">Тип · Крыло</div>
+                    <div class="typo-enneagram">
+                      <span class="enneagram-type">Observer</span>
+                      <span class="enneagram-wing">+ Individualist</span>
+                    </div>
+                  </div>
+
+                  <div class="typo-card">
+                    <div class="typo-card-label">ИНСТИНКТ</div>
+                    <div class="typo-card-value">sp/8</div>
+                    <div class="typo-card-sub">Self-Preservation</div>
+                    <div class="typo-enneagram">
+                      <span class="enneagram-type">Удовлетворённость</span>
+                    </div>
+                  </div>
+
+                </div>
+
+                <div class="trait-list" style="margin-top: 14px;">
+                  <span class="trait-tag positive">Логичность</span>
+                  <span class="trait-tag positive">Хладнокровие</span>
+                  <span class="trait-tag neutral">Педантичность</span>
+                  <span class="trait-tag warning">Склонность к изоляции</span>
+                  <span class="trait-tag negative">Диссоциативное расстройство идентичности</span>
+                  <span class="trait-tag negative">Садистическое расстройство личности</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Gallery row -->
+        <div class="dossier-section dossier-full" style="margin-bottom:14px;">
+          <div class="section-header">
+            <span class="section-title">ГАЛЕРЕЯ / МАТЕРИАЛЫ</span>
+            <span class="section-tag">ФАЙЛ 03 / АРХИВ</span>
+          </div>
+          <div class="section-body">
+            <div class="gallery-grid">
+              <div class="gallery-item">
+                <!-- Replace .gallery-placeholder with <img src="..." style="width:100%;height:100%;object-fit:cover;"> -->
+                <div class="gallery-placeholder">[ ИЗОБРАЖЕНИЕ ]</div>
+                <div class="gallery-caption">Изображение не загружено</div>
+              </div>
+              <div class="gallery-item">
+                <div class="gallery-placeholder">[ ИЗОБРАЖЕНИЕ ]</div>
+                <div class="gallery-caption">Изображение не загружено</div>
+              </div>
+              <div class="gallery-item">
+                <div class="gallery-placeholder">[ ИЗОБРАЖЕНИЕ ]</div>
+                <div class="gallery-caption">Изображение не загружено</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Access log -->
+        <div class="dossier-section dossier-full">
+          <div class="section-header">
+            <span class="section-title">ЖУРНАЛ СОБЫТИЙ</span>
+            <span class="section-tag">ФАЙЛ 04 / СИСТЕМНЫЕ ЗАПИСИ</span>
+          </div>
+          <div class="section-body">
+            <div class="log-rows">
+              <div class="log-row">
+                <span class="log-ts">2023-17-02 · 18:44</span>
+                <span class="log-event">Переназначение статуса с MR-P #1300002313 до Z-638.</span>
+                <span class="log-level info">INFO</span>
+              </div>
+              <div class="log-row">
+                <span class="log-ts">2022-21-12 · 18:44</span>
+                <span class="log-event">Перевод MR-P #1300002313 в отдел генетических мутаций.</span>
+                <span class="log-level info">INFO</span>
+              </div>
+              <div class="log-row">
+                <span class="log-ts">2021-07-02 · 18:44</span>
+                <span class="log-event">Повышение с LR-P #1300002313 до MR-P #1300002313.</span>
+                <span class="log-level info">INFO</span>
+              </div>
+              <div class="log-row">
+                <span class="log-ts">2020-19-11 · 04:54</span>
+                <span class="log-event">Прибытие LR-P #1300002313 в Тайный Хадальный Объект.</span>
+                <span class="log-level info">INFO</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /page -->
+    </div><!-- /content -->
+  </div><!-- /main-window -->
+</div><!-- /os-wrapper -->
+
+</body>
+</html>
