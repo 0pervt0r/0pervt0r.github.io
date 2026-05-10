@@ -577,6 +577,19 @@
           <button class="filter-tab" data-divfilter="medical">МЕДИЦИНСКО-СОЦИАЛЬНЫЙ ОТДЕЛ</button>
         </div>
 
+        <div style="font-size:9px; color:var(--text-dim); letter-spacing:0.1em; margin-bottom:6px;">
+          СТАТУС
+        </div>
+
+        <div class="filter-tabs" id="status-tabs" style="margin-top:-10px;">
+          <button class="filter-tab active" data-statusfilter="all">ВСЕ</button>
+          <button class="filter-tab" data-statusfilter="active">ЖИВ</button>
+          <button class="filter-tab" data-statusfilter="inactive">ПОГИБ</button>
+          <button class="filter-tab" data-statusfilter="pending">ОЖИДАЕТ ВОЗРОЖДЕНИЯ</button>
+          <button class="filter-tab" data-statusfilter="fired">УВОЛЕН</button>
+          <button class="filter-tab" data-statusfilter="classified">ЗАСЕКРЕЧЕНО</button>
+        </div>
+
         <div class="table-header">
           <div class="th th-num">#</div>
           <div class="th th-id">ID</div>
@@ -617,7 +630,7 @@ const PERSONNEL = [
     status: 'active',
     url:    'MR-R0359789631.html',
   },
-    {
+  {
     id:     'MR-R9223000242',
     name:   'Оливия Эриксон',
     alias:  'Лебёдушка',
@@ -639,17 +652,17 @@ const PERSONNEL = [
   },
 ];
 
-// =====================================================================
-
 const STATUS_MAP = {
-  active:     { label: 'ЖИВ',               cls: 'status-active' },
-  inactive:   { label: 'ПОГИБ',             cls: 'status-inactive' },
-  pending:    { label: 'ОЖИДАЕТ ВОЗРОЖДЕНИЯ', cls: 'status-pending' },
-  classified: { label: 'ЗАСЕКРЕЧЕНО',       cls: 'status-classified' },
+  active:     { label: 'ЖИВ',                  cls: 'status-active' },
+  inactive:   { label: 'ПОГИБ',                cls: 'status-inactive' },
+  pending:    { label: 'ОЖИДАЕТ ВОЗРОЖДЕНИЯ',  cls: 'status-pending' },
+  classified: { label: 'ЗАСЕКРЕЧЕНО',          cls: 'status-classified' },
+  fired: { label: 'УВОЛЕН',          cls: 'status-fired' },
 };
 
 let currentFilter = 'all';
 let currentDiv    = 'all';
+let currentStatus = 'all';
 let currentSearch = '';
 
 function render() {
@@ -660,15 +673,16 @@ function render() {
 
   const filtered = PERSONNEL.filter(p => {
     if (!p.id) return false;
-    const matchFilter = currentFilter === 'all' || p.dept === currentFilter;
-    const matchDiv    = currentDiv    === 'all' || p.div  === currentDiv;
+    const matchFilter = currentFilter === 'all' || p.dept   === currentFilter;
+    const matchDiv    = currentDiv    === 'all' || p.div    === currentDiv;
+    const matchStatus = currentStatus === 'all' || p.status === currentStatus;
     const q           = currentSearch.toLowerCase();
     const matchSearch = !q
-      || p.name.toLowerCase().includes(q)
+      || p.name?.toLowerCase().includes(q)
       || p.id.toLowerCase().includes(q)
       || (p.alias && p.alias.toLowerCase().includes(q))
-      || p.role.toLowerCase().includes(q);
-    return matchFilter && matchDiv && matchSearch;
+      || p.role?.toLowerCase().includes(q);
+    return matchFilter && matchDiv && matchStatus && matchSearch;
   });
 
   document.getElementById('total-count').textContent = filtered.length;
@@ -717,6 +731,15 @@ document.querySelectorAll('[data-divfilter]').forEach(btn => {
     document.querySelectorAll('[data-divfilter]').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     currentDiv = btn.dataset.divfilter;
+    render();
+  });
+});
+
+document.querySelectorAll('[data-statusfilter]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-statusfilter]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentStatus = btn.dataset.statusfilter;
     render();
   });
 });
