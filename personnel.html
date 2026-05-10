@@ -533,11 +533,10 @@
           <div class="page-header-left">
             <div class="page-badge">URBANSHADE CORP — ХАДАЛЬНОЕ ПОДРАЗДЕЛЕНИЕ</div>
 
-            <!-- Уведомление о тесте (без кнопки закрытия) -->
             <div class="inline-alert">
               <div class="alert-icon"><div class="alert-icon-inner">!</div></div>
               <div class="alert-text"><strong>ВНИМАНИЕ:</strong> Не знаете, какая должность вам подойдёт? Пройдите официальный тест распределения персонала.</div>
-              <a class="alert-link" href="personelquiz.html">▶ Z-638 «ВОСЬМИРУЧКА»</a>
+              <a class="alert-link" href="personelquiz.html">▶ ПРОЙТИ ТЕСТ</a>
             </div>
 
             <div class="page-title">Персоналии</div>
@@ -550,43 +549,42 @@
         </div>
 
         <div style="font-size:9px; color:var(--text-dim); letter-spacing:0.1em; margin-bottom:6px;">
-          ДОЛЖНОСТЬ
-        </div>
+  ДОЛЖНОСТЬ
+</div>
+<div class="filter-tabs">
+  <button class="filter-tab active" data-filter="all">ВСЕ</button>
+  <button class="filter-tab" data-filter="admin">АДМИНИСТРАЦИЯ</button>
+  <button class="filter-tab" data-filter="guard">ГВАРДИЯ</button>
+  <button class="filter-tab" data-filter="research">ИССЛЕДОВАТЕЛИ</button>
+  <button class="filter-tab" data-filter="tech">ТЕХНИЧЕСКИЙ ПЕРСОНАЛ</button>
+  <button class="filter-tab" data-filter="medical">МЕДИЦИНСКИЙ ПЕРСОНАЛ</button>
+</div>
 
-        <div class="filter-tabs">
-          <button class="filter-tab active" data-filter="all">ВСЕ</button>
-          <button class="filter-tab" data-filter="admin">АДМИНИСТРАЦИЯ</button>
-          <button class="filter-tab" data-filter="guard">ГВАРДИЯ</button>
-          <button class="filter-tab" data-filter="research">ИССЛЕДОВАТЕЛИ</button>
-          <button class="filter-tab" data-filter="tech">ТЕХНИЧЕСКИЙ ПЕРСОНАЛ</button>
-          <button class="filter-tab" data-filter="medical">МЕДИЦИНСКИЙ ПЕРСОНАЛ</button>
-        </div>
+<div style="font-size:9px; color:var(--text-dim); letter-spacing:0.1em; margin-bottom:6px; margin-top:14px;">
+  ПОДРАЗДЕЛЕНИЯ
+</div>
+<div class="filter-tabs">
+  <button class="filter-tab active" data-divfilter="all">ВСЕ</button>
+  <button class="filter-tab" data-divfilter="nost">N.O.S.T.</button>
+  <button class="filter-tab" data-divfilter="bioparanormal">БИОПАРАНОРМАЛЬНОЕ ПОДРАЗДЕЛЕНИЕ</button>
+  <button class="filter-tab" data-divfilter="infiltration">ОТДЕЛ ПРОНИКНОВЕНИЙ</button>
+  <button class="filter-tab" data-divfilter="expedition">ОТДЕЛ ЭКСПЕДИЦИЙ</button>
+  <button class="filter-tab" data-divfilter="hazards">ОТДЕЛ УГРОЗ И ЭТИКИ</button>
+  <button class="filter-tab" data-divfilter="marketing">ОТДЕЛ МАРКЕТИНГА</button>
+  <button class="filter-tab" data-divfilter="medical">МЕДИЦИНСКО-СОЦИАЛЬНЫЙ ОТДЕЛ</button>
+</div>
 
-        <div style="font-size:9px; color:var(--text-dim); letter-spacing:0.1em; margin-bottom:6px;">
-          ПОДРАЗДЕЛЕНИЯ
-        </div>
-
-        <div class="filter-tabs" style="font-size:9px; color:var(--text-dim); letter-spacing:0.1em; margin-bottom:6px; margin-top:14px;">
-          <button class="filter-tab active" data-divfilter="all">ВСЕ</button>
-          <button class="filter-tab" data-divfilter="nost">N.O.S.T.</button>
-          <button class="filter-tab" data-divfilter="bioparanormal">БИОПАРАНОРМАЛЬНОЕ ПОДРАЗДЕЛЕНИЕ</button>
-          <button class="filter-tab" data-divfilter="infiltration">ОТДЕЛ ПРОНИКНОВЕНИЙ</button>
-          <button class="filter-tab" data-divfilter="expedition">ОТДЕЛ ЭКСПЕДИЦИЙ</button>
-          <button class="filter-tab" data-divfilter="hazards">ОТДЕЛ УГРОЗ И ЭТИКИ</button>
-          <button class="filter-tab" data-divfilter="marketing">ОТДЕЛ МАРКЕТИНГА</button>
-          <button class="filter-tab" data-divfilter="medical">МЕДИЦИНСКО-СОЦИАЛЬНЫЙ ОТДЕЛ</button>
-        </div>
-
-        <div style="font-size:9px; color:var(--text-dim); letter-spacing:0.1em; margin-bottom:6px; margin-top:14px;">
-          СТАТУС
-        </div>
-          <button class="filter-tab active" data-statusfilter="all">ВСЕ</button>
-          <button class="filter-tab" data-statusfilter="active">ЖИВ</button>
-          <button class="filter-tab" data-statusfilter="inactive">ПОГИБ</button>
-          <button class="filter-tab" data-statusfilter="pending">ОЖИДАЕТ ВОЗРОЖДЕНИЯ</button>
-          <button class="filter-tab" data-statusfilter="fired">УВОЛЕН</button>
-          <button class="filter-tab" data-statusfilter="classified">ЗАСЕКРЕЧЕНО</button>
-        </div>
+<div style="font-size:9px; color:var(--text-dim); letter-spacing:0.1em; margin-bottom:6px; margin-top:14px;">
+  СТАТУС
+</div>
+<div class="filter-tabs">
+  <button class="filter-tab active" data-statusfilter="all">ВСЕ</button>
+  <button class="filter-tab" data-statusfilter="active">ЖИВ</button>
+  <button class="filter-tab" data-statusfilter="inactive">ПОГИБ</button>
+  <button class="filter-tab" data-statusfilter="pending">ОЖИДАЕТ ВОЗРОЖДЕНИЯ</button>
+  <button class="filter-tab" data-statusfilter="fired">УВОЛЕН</button>
+  <button class="filter-tab" data-statusfilter="classified">ЗАСЕКРЕЧЕНО</button>
+</div>
 
         <div class="table-header">
           <div class="th th-num">#</div>
