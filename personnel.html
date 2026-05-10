@@ -544,6 +544,10 @@
           </div>
         </div>
 
+        <div style="font-size:9px; color:var(--text-dim); letter-spacing:0.1em; margin-bottom:6px;">
+          ДОЛЖНОСТЬ
+        </div>
+
         <div class="filter-tabs">
           <button class="filter-tab active" data-filter="all">ВСЕ</button>
           <button class="filter-tab" data-filter="admin">АДМИНИСТРАЦИЯ</button>
@@ -553,15 +557,19 @@
           <button class="filter-tab" data-filter="medical">МЕДИЦИНСКИЙ ПЕРСОНАЛ</button>
         </div>
 
+        <div style="font-size:9px; color:var(--text-dim); letter-spacing:0.1em; margin-bottom:6px;">
+          ПОДРАЗДЕЛЕНИЯ
+        </div>
+
         <div class="filter-tabs" style="margin-top:-10px;">
-          <button class="filter-tab active" data-divfilter="all">ВСЕ ПОДРАЗДЕЛЕНИЯ</button>
+          <button class="filter-tab active" data-divfilter="all">ВСЕ</button>
           <button class="filter-tab" data-divfilter="nost">N.O.S.T.</button>
-          <button class="filter-tab" data-divfilter="bioparanormal">Биопаронормальное</button>
-          <button class="filter-tab" data-divfilter="infiltration">Отдел Проникновений</button>
-          <button class="filter-tab" data-divfilter="expedition">Отдел Экспедиций</button>
-          <button class="filter-tab" data-divfilter="hazards">Отдел угроз и этики</button>
-          <button class="filter-tab" data-divfilter="marketing">Отдел маркетинга</button>
-          <button class="filter-tab" data-divfilter="medical">Медицинско-социальный отдел</button>
+          <button class="filter-tab" data-divfilter="bioparanormal">БИОПАРАНОРМАЛЬНОЕ ПОДРАЗДЕЛЕНИЕ</button>
+          <button class="filter-tab" data-divfilter="infiltration">ОТДЕЛ ПРОНИКНОВЕНИЙ</button>
+          <button class="filter-tab" data-divfilter="expedition">ОТДЕЛ ЭКСПЕДИЦИЙ</button>
+          <button class="filter-tab" data-divfilter="hazards">ОТДЕЛ УГРОЗ И ЭТИКИ</button>
+          <button class="filter-tab" data-divfilter="marketing">ОТДЕЛ МАРКЕТИНГА</button>
+          <button class="filter-tab" data-divfilter="medical">МЕДИЦИНСКО-СОЦИАЛЬНЫЙ ОТДЕЛ</button>
         </div>
 
         <div class="table-header">
@@ -614,127 +622,38 @@ const PERSONNEL = [
     status: null,
     url:    null,
   },
-  {
-    id:     null,
-    name:   null,
-    alias:  null,
-    role:   null,
-    dept:   null,
-    status: null,
-    url:    null,
-  },
-  {
-    id:     null,
-    name:   null,
-    alias:  null,
-    role:   null,
-    dept:   null,
-    status: null,
-    url:    null,
-  },
-  {
-    id:     null,
-    name:   null,
-    alias:  null,
-    role:   null,
-    dept:   null,
-    status: null,
-    url:    null,
-  },
-  {
-    id:     null,
-    name:   null,
-    alias:  null,
-    role:   null,
-    dept:   null,
-    status: null,
-    url:    null,
-  },
-  {
-    id:     null,
-    name:   null,
-    alias:  null,
-    role:   null,
-    dept:   null,
-    status: null,
-    url:    null,
-  },
-  {
-    id:     null,
-    name:   null,
-    alias:  null,
-    role:   null,
-    dept:   null,
-    status: null,
-    url:    null,
-  },
-  {
-    id:     null,
-    name:   null,
-    alias:  null,
-    role:   null,
-    dept:   null,
-    status: null,
-    url:    null,
-  },
-  {
-    id:     null,
-    name:   null,
-    alias:  null,
-    role:   null,
-    dept:   null,
-    status: null,
-    url:    null,
-  },
-  {
-    id:     null,
-    name:   null,
-    alias:  null,
-    role:   null,
-    dept:   null,
-    status: null,
-    url:    null,
-  },
-  {
-    id:     null,
-    name:   null,
-    alias:  null,
-    role:   null,
-    dept:   null,
-    status: null,
-    url:    null,
-  },
 ];
 
 // =====================================================================
 
 const STATUS_MAP = {
-  active:     { label: 'ЖИВ',  cls: 'status-active' },
-  inactive:   { label: 'ПОГИБ', cls: 'status-inactive' },
-  pending:    { label: 'ОЖИДАЕТ ВОЗРОЖДЕНИЯ',  cls: 'status-pending' },
-  classified: { label: 'ЗАСЕКРЕЧЕНО',cls: 'status-classified' },
+  active:     { label: 'ЖИВ',               cls: 'status-active' },
+  inactive:   { label: 'ПОГИБ',             cls: 'status-inactive' },
+  pending:    { label: 'ОЖИДАЕТ ВОЗРОЖДЕНИЯ', cls: 'status-pending' },
+  classified: { label: 'ЗАСЕКРЕЧЕНО',       cls: 'status-classified' },
 };
 
 let currentFilter = 'all';
-let currentDiv = 'all';
+let currentDiv    = 'all';
 let currentSearch = '';
 
 function render() {
   const list      = document.getElementById('personnel-list');
   const noResults = document.getElementById('no-results');
-  
-  list.innerHTML  = '';
+
+  list.innerHTML = '';
 
   const filtered = PERSONNEL.filter(p => {
+    if (!p.id) return false;
     const matchFilter = currentFilter === 'all' || p.dept === currentFilter;
-    const matchDiv    = currentDiv === 'all' || p.div === currentDiv;
+    const matchDiv    = currentDiv    === 'all' || p.div  === currentDiv;
     const q           = currentSearch.toLowerCase();
     const matchSearch = !q
       || p.name.toLowerCase().includes(q)
       || p.id.toLowerCase().includes(q)
       || (p.alias && p.alias.toLowerCase().includes(q))
       || p.role.toLowerCase().includes(q);
-    return matchFilter && matchDiv && matchSearch;;
+    return matchFilter && matchDiv && matchSearch;
   });
 
   document.getElementById('total-count').textContent = filtered.length;
@@ -769,11 +688,20 @@ function render() {
   });
 }
 
-document.querySelectorAll('.filter-tab').forEach(btn => {
+document.querySelectorAll('[data-filter]').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('[data-filter]').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     currentFilter = btn.dataset.filter;
+    render();
+  });
+});
+
+document.querySelectorAll('[data-divfilter]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-divfilter]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentDiv = btn.dataset.divfilter;
     render();
   });
 });
@@ -783,14 +711,6 @@ document.getElementById('search-input').addEventListener('input', e => {
   render();
 });
 
-  document.querySelectorAll('[data-divfilter]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('[data-divfilter]').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    currentDiv = btn.dataset.divfilter;
-    render();
-  });
-});
 render();
 </script>
 </body>
