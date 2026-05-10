@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hadal Database Access — Personnel Assignment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0d12;
+    --bg2: #0e1219;
+    --bg3: #12171f;
+    --panel: #0d1520;
+    --panel2: #111827;
+    --accent: #1a6bff;
+    --accent2: #3d8bff;
+    --accent-glow: rgba(26,107,255,0.18);
+    --cyan: #00e5ff;
+    --cyan-dim: rgba(0,229,255,0.12);
+    --text: #c8d8f0;
+    --text-dim: #5a7090;
+    --text-bright: #e8f4ff;
+    --border: rgba(30,80,160,0.35);
+    --border2: rgba(0,150,255,0.2);
+    --green: #00ff88;
+    --green-dim: rgba(0,255,136,0.08);
+    --red: #ff4455;
+    --scanline: rgba(0,0,0,0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      var(--scanline) 2px,
+      var(--scanline) 4px
+    );
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at 30% 20%, rgba(26,107,255,0.06) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 80%, rgba(0,229,255,0.04) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .os-wrapper {
+    position: relative;
+    z-index: 2;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 16px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  /* TITLE BAR */
+  .titlebar {
+    background: linear-gradient(90deg, #0d1a2e 0%, #0a1520 100%);
+    border: 1px solid var(--border);
+    border-bottom: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 12px;
+    border-radius: 6px 6px 0 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .titlebar::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent2), transparent);
+    opacity: 0.6;
+  }
+
+  .titlebar-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+  }
+
+  .titlebar-controls {
+    display: flex;
+    gap: 6px;
+  }
+  .titlebar-controls span {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .ctrl-close { background: #ff4455; opacity: 0.7; }
+  .ctrl-min { background: #ffaa00; opacity: 0.7; }
+  .ctrl-max { background: #00cc66; opacity: 0.7; }
+
+  /* MAIN WINDOW */
+  .main-window {
+    display: flex;
+    flex: 1;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 0 0 6px 6px;
+    overflow: hidden;
+    min-height: calc(100vh - 80px);
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 200px;
+    min-width: 200px;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    padding: 16px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .sidebar-user {
+    padding: 12px 16px 16px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 8px;
+  }
+
+  .sidebar-username {
+    font-family: 'Orbitron', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--accent2);
+    letter-spacing: 0.08em;
+    margin-bottom: 2px;
+  }
+
+  .sidebar-role {
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+  }
+
+  .sidebar-section {
+    padding: 8px 16px 4px;
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .sidebar-item {
+    padding: 5px 16px;
+    font-size: 11px;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+  }
+
+  .sidebar-item::before {
+    content: '• ';
+    color: var(--text-dim);
+  }
+
+  .sidebar-item:hover {
+    color: var(--text);
+    background: rgba(26,107,255,0.06);
+  }
+
+  .sidebar-item.active {
+    color: var(--cyan);
+  }
+  .sidebar-item.active::before {
+    color: var(--cyan);
+  }
+
+  .sidebar-bottom {
+    margin-top: auto;
+    padding: 12px 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  .status-dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    margin-right: 6px;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .status-text {
+    font-size: 9px;
+    color: var(--text-dim);
+  }
+
+  /* CONTENT AREA */
+  .content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* TOP BAR */
+  .topbar {
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+    padding: 8px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .topbar-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-bright);
+    letter-spacing: 0.05em;
+  }
+
+  .search-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 4px 10px;
+    font-size: 11px;
+    color: var(--text-dim);
+    width: 220px;
+  }
+
+  .search-bar::before {
+    content: '⌕';
+    font-size: 14px;
+  }
+
+  /* PAGE CONTENT */
+  .page {
+    flex: 1;
+    padding: 24px;
+    overflow-y: auto;
+  }
+
+  .page::-webkit-scrollbar { width: 6px; }
+  .page::-webkit-scrollbar-track { background: var(--bg2); }
+  .page::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* QUIZ STATES */
+  .quiz-state { display: none; }
+  .quiz-state.active { display: block; }
+
+  /* INTRO */
+  .intro-header {
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .intro-badge {
+    display: inline-block;
+    background: var(--cyan-dim);
+    border: 1px solid rgba(0,229,255,0.3);
+    color: var(--cyan);
+    font-size: 9px;
+    padding: 3px 10px;
+    border-radius: 2px;
+    letter-spacing: 0.12em;
+    margin-bottom: 10px;
+  }
+
+  .intro-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--text-bright);
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+    line-height: 1.2;
+  }
+
+  .intro-sub {
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.03em;
+    line-height: 1.6;
+  }
+
+  .intro-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 20px 0;
+  }
+
+  .info-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 12px 14px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .info-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 2px;
+    background: var(--accent);
+  }
+
+  .info-card-label {
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.12em;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+  }
+
+  .info-card-value {
+    font-family: 'Orbitron', monospace;
+    font-size: 13px;
+    color: var(--accent2);
+    font-weight: 700;
+  }
+
+  .btn-start {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: transparent;
+    border: 1px solid var(--accent2);
+    color: var(--accent2);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    padding: 10px 24px;
+    border-radius: 3px;
+    cursor: pointer;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+    margin-top: 12px;
+  }
+
+  .btn-start::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--accent-glow);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s;
+  }
+
+  .btn-start:hover::before { transform: scaleX(1); }
+  .btn-start:hover {
+    color: var(--text-bright);
+    border-color: var(--cyan);
+    box-shadow: 0 0 16px rgba(0,229,255,0.15);
+  }
+
+  /* QUESTION */
+  .q-progress-bar {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    height: 4px;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+
+  .q-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--cyan));
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  .q-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .q-counter {
+    font-family: 'Orbitron', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+  }
+
+  .q-counter span {
+    color: var(--accent2);
+  }
+
+  .q-category {
+    font-size: 9px;
+    color: var(--text-dim);
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 3px 8px;
+    border-radius: 2px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .q-text {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-bright);
+    line-height: 1.4;
+    margin-bottom: 24px;
+    padding-left: 12px;
+    border-left: 2px solid var(--accent);
+  }
+
+  .q-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .q-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 11px 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .q-option::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--accent-glow);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .q-option:hover {
+    border-color: rgba(26,107,255,0.5);
+  }
+  .q-option:hover::before { opacity: 1; }
+
+  .q-option.selected {
+    border-color: var(--accent2);
+    background: rgba(26,107,255,0.12);
+  }
+  .q-option.selected .opt-key {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+
+  .opt-key {
+    min-width: 24px;
+    height: 24px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Orbitron', monospace;
+    font-size: 9px;
+    color: var(--text-dim);
+    flex-shrink: 0;
+    transition: all 0.15s;
+    position: relative;
+    z-index: 1;
+  }
+
+  .opt-text {
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--text);
+    position: relative;
+    z-index: 1;
+    padding-top: 3px;
+  }
+
+  .q-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  .btn-nav {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    padding: 7px 16px;
+    border-radius: 3px;
+    cursor: pointer;
+    letter-spacing: 0.06em;
+    transition: all 0.15s;
+  }
+
+  .btn-nav:hover {
+    border-color: var(--accent2);
+    color: var(--accent2);
+  }
+
+  .btn-nav:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .btn-nav.primary {
+    border-color: var(--accent2);
+    color: var(--accent2);
+    background: var(--accent-glow);
+  }
+
+  .btn-nav.primary:hover {
+    background: rgba(26,107,255,0.25);
+    color: var(--text-bright);
+  }
+
+  .btn-nav.primary:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  /* RESULT */
+  .result-header {
+    text-align: center;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .result-clearance {
+    display: inline-block;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    color: var(--green);
+    background: var(--green-dim);
+    border: 1px solid rgba(0,255,136,0.25);
+    padding: 3px 12px;
+    border-radius: 2px;
+    margin-bottom: 12px;
+  }
+
+  .result-title-label {
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+  }
+
+  .result-role {
+    font-family: 'Orbitron', monospace;
+    font-size: 26px;
+    font-weight: 900;
+    color: var(--text-bright);
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+    line-height: 1.1;
+  }
+
+  .result-role-en {
+    font-size: 11px;
+    color: var(--accent2);
+    letter-spacing: 0.1em;
+    margin-bottom: 16px;
+  }
+
+  .result-desc {
+    font-size: 12px;
+    color: var(--text);
+    line-height: 1.7;
+    max-width: 580px;
+    margin: 0 auto 20px;
+  }
+
+  .result-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+
+  .result-stat {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 12px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .result-stat::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent2), transparent);
+  }
+
+  .result-stat-label {
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .result-stat-val {
+    font-family: 'Orbitron', monospace;
+    font-size: 13px;
+    color: var(--accent2);
+    font-weight: 700;
+  }
+
+  .profile-bars {
+    margin-bottom: 24px;
+  }
+
+  .bar-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .bar-label {
+    font-size: 10px;
+    color: var(--text-dim);
+    min-width: 130px;
+    text-align: right;
+    letter-spacing: 0.04em;
+  }
+
+  .bar-track {
+    flex: 1;
+    height: 6px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .bar-val {
+    font-size: 10px;
+    color: var(--text-dim);
+    min-width: 28px;
+  }
+
+  .btn-restart {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    padding: 8px 18px;
+    border-radius: 3px;
+    cursor: pointer;
+    letter-spacing: 0.08em;
+    transition: all 0.2s;
+    margin-top: 8px;
+  }
+
+  .btn-restart:hover {
+    border-color: var(--accent2);
+    color: var(--accent2);
+  }
+
+  /* ANIMATED TYPING */
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  .cursor {
+    display: inline-block;
+    width: 8px; height: 14px;
+    background: var(--accent2);
+    vertical-align: middle;
+    margin-left: 2px;
+    animation: blink 1s infinite;
+  }
+
+  /* DECORATIVE CORNER BRACKETS */
+  .bracket-box {
+    position: relative;
+    padding: 4px;
+  }
+  .bracket-box::before, .bracket-box::after {
+    content: '';
+    position: absolute;
+    width: 12px; height: 12px;
+    border-color: var(--accent2);
+    border-style: solid;
+    opacity: 0.5;
+  }
+  .bracket-box::before {
+    top: 0; left: 0;
+    border-width: 1px 0 0 1px;
+  }
+  .bracket-box::after {
+    bottom: 0; right: 0;
+    border-width: 0 1px 1px 0;
+  }
+
+  /* FLICKER animation for logo/intro */
+  @keyframes flicker {
+    0%, 95%, 100% { opacity: 1; }
+    96% { opacity: 0.7; }
+    97% { opacity: 1; }
+    98% { opacity: 0.5; }
+    99% { opacity: 1; }
+  }
+
+  .flicker { animation: flicker 8s infinite; }
+
+  /* WARNING STRIPE */
+  .warning-stripe {
+    height: 3px;
+    background: repeating-linear-gradient(
+      90deg,
+      var(--accent) 0px, var(--accent) 12px,
+      transparent 12px, transparent 18px
+    );
+    margin: 16px 0;
+    opacity: 0.3;
+  }
+
+  /* SCAN ANIM on option hover */
+  @keyframes scanline-anim {
+    0% { top: 0; }
+    100% { top: 100%; }
+  }
+
+  .q-option:hover .scan-line {
+    display: block;
+  }
+
+  .scan-line {
+    display: none;
+    position: absolute;
+    left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent2), transparent);
+    top: 0;
+    animation: scanline-anim 0.3s linear;
+  }
+
+  /* RESULT ICON */
+  .result-icon-wrap {
+    width: 80px; height: 80px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    background: var(--bg2);
+    position: relative;
+  }
+
+  .result-icon-wrap::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 1px solid var(--accent-glow);
+    animation: spin 8s linear infinite;
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .result-icon {
+    font-size: 32px;
+  }
+
+  /* LOADING */
+  .loading-screen {
+    display: none;
+    text-align: center;
+    padding: 60px 20px;
+  }
+
+  .loading-screen.active { display: block; }
+
+  .loading-bar {
+    width: 300px;
+    height: 4px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    margin: 20px auto;
+    overflow: hidden;
+  }
+
+  .loading-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--cyan));
+    border-radius: 2px;
+    width: 0%;
+    transition: width 0.1s;
+  }
+
+  .loading-text {
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+  }
+
+  @media (max-width: 700px) {
+    .sidebar { display: none; }
+    .intro-grid { grid-template-columns: 1fr; }
+    .result-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="os-wrapper">
+  <div class="titlebar">
+    <span class="titlebar-title">HADAL DATABASE ACCESS — v4.8.2 — SECURE CONNECTION</span>
+    <div class="titlebar-controls">
+      <span class="ctrl-close"></span>
+      <span class="ctrl-min"></span>
+      <span class="ctrl-max"></span>
+    </div>
+  </div>
+
+  <div class="main-window">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sidebar-user">
+        <div class="sidebar-username">НОВЫЙ СОТРУДНИК</div>
+        <div class="sidebar-role">Уровень доступа: 0 / Проверка</div>
+      </div>
+
+      <div class="sidebar-section">Навигация</div>
+      <div class="sidebar-item active">Главная</div>
+      <div class="sidebar-item">Обзор</div>
+      <div class="sidebar-item">Связь</div>
+      <div class="sidebar-item">Личные данные</div>
+
+      <div class="sidebar-section">Категории</div>
+      <div class="sidebar-item">Z-Клас. объекты</div>
+      <div class="sidebar-item">Разное</div>
+      <div class="sidebar-item">Фауна Летванд</div>
+      <div class="sidebar-item">Каталог файлов</div>
+      <div class="sidebar-item">Документация</div>
+      <div class="sidebar-item">Журнал опытов</div>
+
+      <div class="sidebar-bottom">
+        <div><span class="status-dot"></span><span class="status-text">СИСТЕМА В СЕТИ</span></div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+      <div class="topbar">
+        <div class="topbar-title flicker">ТЕСТ РАСПРЕДЕЛЕНИЯ ПЕРСОНАЛА</div>
+        <div class="search-bar">Поиск в базе данных</div>
+      </div>
+
+      <div class="page">
+
+        <!-- INTRO STATE -->
+        <div class="quiz-state active" id="state-intro">
+          <div class="intro-header">
+            <div class="intro-badge">URBANSHADE CORP — HADAL DIVISION — КОНФИДЕНЦИАЛЬНО</div>
+            <div class="intro-title">НАЗНАЧЕНИЕ ДОЛЖНОСТИ</div>
+            <div class="intro-sub">Данный тест проводится Отделом кадров Urbanshade для определения оптимальной позиции нового сотрудника в структуре Хадального Тайного Объекта. Ваши ответы будут проанализированы системой и переданы непосредственному руководству.</div>
+          </div>
+
+          <div class="intro-grid">
+            <div class="info-card">
+              <div class="info-card-label">Вопросов</div>
+              <div class="info-card-value">12</div>
+            </div>
+            <div class="info-card">
+              <div class="info-card-label">Вариантов ответа</div>
+              <div class="info-card-value">7</div>
+            </div>
+            <div class="info-card">
+              <div class="info-card-label">Возможных должностей</div>
+              <div class="info-card-value">7</div>
+            </div>
+            <div class="info-card">
+              <div class="info-card-label">Уровень секретности</div>
+              <div class="info-card-value">МАКС.</div>
+            </div>
+          </div>
+
+          <div class="warning-stripe"></div>
+
+          <div style="font-size:11px; color: var(--text-dim); line-height:1.8; margin-bottom:16px;">
+            Возможные назначения: <span style="color:var(--accent2)">Администрация Urbanshade</span> · <span style="color:var(--accent2)">Гвардеец</span> · <span style="color:var(--accent2)">Исследователь</span> · <span style="color:var(--accent2)">Диспетчер</span> · <span style="color:var(--accent2)">Инженер-строитель</span> · <span style="color:var(--accent2)">Медик</span> · <span style="color:var(--accent2)">Шпион</span>
+          </div>
+
+          <button class="btn-start" onclick="startQuiz()">
+            ▶ НАЧАТЬ ТЕСТИРОВАНИЕ
+          </button>
+        </div>
+
+        <!-- QUESTION STATE -->
+        <div class="quiz-state" id="state-question">
+          <div class="q-progress-bar">
+            <div class="q-progress-fill" id="progress-fill"></div>
+          </div>
+          <div class="q-meta">
+            <div class="q-counter">ВОПРОС <span id="q-num">1</span> / 12</div>
+            <div class="q-category" id="q-cat">ПСИХОЛОГИЧЕСКИЙ ПРОФИЛЬ</div>
+          </div>
+          <div class="q-text" id="q-text">Текст вопроса</div>
+          <div class="q-options" id="q-options"></div>
+          <div class="q-nav">
+            <button class="btn-nav" id="btn-prev" onclick="prevQ()">← НАЗАД</button>
+            <button class="btn-nav primary" id="btn-next" onclick="nextQ()" disabled>ДАЛЕЕ →</button>
+          </div>
+        </div>
+
+        <!-- LOADING STATE -->
+        <div class="loading-screen" id="state-loading">
+          <div style="font-family:'Orbitron',monospace; font-size:12px; color:var(--accent2); letter-spacing:0.1em; margin-bottom:12px;">ОБРАБОТКА ДАННЫХ</div>
+          <div class="loading-bar"><div class="loading-fill" id="load-fill"></div></div>
+          <div class="loading-text" id="load-text">Анализ психологического профиля...</div>
+        </div>
+
+        <!-- RESULT STATE -->
+        <div class="quiz-state" id="state-result">
+          <div class="result-header">
+            <div class="result-clearance">ПРОФИЛЬ СФОРМИРОВАН — ДОПУСК ПРИСВОЕН</div>
+            <div class="result-icon-wrap">
+              <div class="result-icon" id="result-icon">⬡</div>
+            </div>
+            <div class="result-title-label">Рекомендованная должность</div>
+            <div class="result-role" id="result-role">—</div>
+            <div class="result-role-en" id="result-role-en">—</div>
+            <div class="result-desc" id="result-desc">—</div>
+          </div>
+
+          <div class="result-grid" id="result-grid"></div>
+
+          <div class="warning-stripe"></div>
+
+          <div style="font-size:11px; color:var(--text-dim); margin-bottom:16px; letter-spacing:0.05em;">Профиль компетенций</div>
+          <div class="profile-bars" id="profile-bars"></div>
+
+          <div style="text-align:center; margin-top:24px;">
+            <button class="btn-restart" onclick="restart()">↺ ПРОЙТИ ПОВТОРНО</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const ROLES = {
+  admin: {
+    name: 'Администрация Urbanshade',
+    en: 'CORPORATE ADMINISTRATION',
+    icon: '⬡',
+    desc: 'Вы обладаете стратегическим мышлением, способностью принимать жёсткие решения и редкой устойчивостью перед лицом моральной неоднозначности. Urbanshade нуждается в таких людях — тех, кто видит систему целиком, не отвлекаясь на её части. Ваш приоритет — результат. Лицо компании в ваших руках.',
+    stats: {loyalty: 95, analytical: 88, combat: 25, technical: 60, social: 72, secrecy: 90}
+  },
+  guard: {
+    name: 'Гвардеец',
+    en: 'HADAL GUARD DIVISION',
+    icon: '⚔',
+    desc: 'Дисциплина, реакция, молчание — ваши главные инструменты. Вы не задаёте вопросов о том, что охраняете. Вы не заводите дружбу с объектами. Вы — первая и последняя линия между стабильностью комплекса и катастрофой. Именно такой персонал нам нужен.',
+    stats: {loyalty: 80, analytical: 40, combat: 95, technical: 35, social: 30, secrecy: 75}
+  },
+  researcher: {
+    name: 'Исследователь',
+    en: 'ANOMALOUS RESEARCH UNIT',
+    icon: '⬢',
+    desc: 'Вы смотрите на непознанное и видите не угрозу, а возможность. Ваш разум работает методично, вы умеете удерживать дистанцию — в том числе эмоциональную — и фиксировать даже мельчайшие отклонения. Хадальное Подразделение будет рассчитывать на вашу скрупулёзность.',
+    stats: {loyalty: 55, analytical: 98, combat: 20, technical: 80, social: 50, secrecy: 70}
+  },
+  dispatcher: {
+    name: 'Диспетчер',
+    en: 'OPERATIONS DISPATCH',
+    icon: '⬡',
+    desc: 'Комплекс — это организм. Вы — его нервная система. Вы обрабатываете потоки информации, координируете смены, отслеживаете аномалии в расписании и удерживаете порядок в хаосе. Без таких людей, как вы, всё рухнет — тихо и незаметно.',
+    stats: {loyalty: 70, analytical: 82, combat: 15, technical: 65, social: 85, secrecy: 60}
+  },
+  engineer: {
+    name: 'Инженер-строитель',
+    en: 'STRUCTURAL ENGINEERING',
+    icon: '⚙',
+    desc: 'Вы мыслите пространством и конструкцией. Стены, шлюзы, системы сдерживания — всё это ваши инструменты. На глубине, где давление способно уничтожить любую ошибку в расчётах, ваша точность — это жизнь для всего персонала.',
+    stats: {loyalty: 60, analytical: 75, combat: 30, technical: 97, social: 40, secrecy: 55}
+  },
+  medic: {
+    name: 'Медик',
+    en: 'MEDICAL DIVISION',
+    icon: '✚',
+    desc: 'В условиях изоляции здоровье — это ресурс. Вы понимаете человеческое тело как систему, которую можно поддерживать, восстанавливать и адаптировать. Но медицина в Хадальном Подразделении — это не только лечение. Это приоритизация, принятие решений и сохранение работоспособности актива.',
+    stats: {loyalty: 65, analytical: 78, combat: 25, technical: 72, social: 78, secrecy: 50}
+  },
+  spy: {
+    name: 'Шпион',
+    en: 'INTERNAL INTELLIGENCE',
+    icon: '◈',
+    desc: 'Urbanshade работает в тени — и её внутренняя разведка должна быть ещё глубже в этой тени. Вы наблюдаете, запоминаете, адаптируетесь. Вы знаете, когда солгать, когда промолчать и когда исчезнуть. Ни один сотрудник не подозревает о вашей настоящей роли. Так и должно быть.',
+    stats: {loyalty: 85, analytical: 88, combat: 60, technical: 45, social: 90, secrecy: 99}
+  }
+};
+
+const STAT_LABELS = {
+  loyalty: 'Лояльность',
+  analytical: 'Аналитика',
+  combat: 'Боеготовность',
+  technical: 'Техн. знания',
+  social: 'Коммуникация',
+  secrecy: 'Скрытность'
+};
+
+const STAT_COLORS = {
+  loyalty: '#1a6bff',
+  analytical: '#00e5ff',
+  combat: '#ff4455',
+  technical: '#ffaa00',
+  social: '#00ff88',
+  secrecy: '#b06fff'
+};
+
+const QUESTIONS = [
+  {
+    text: 'Вы обнаружили, что ваш коллега систематически нарушает протокол — не критично, но заметно. Что вы делаете?',
+    cat: 'ПОВЕДЕНИЕ В КОМАНДЕ',
+    options: [
+      { text: 'Сообщу руководству. Правила существуют не просто так.', weights: {admin:3, guard:2, spy:3} },
+      { text: 'Поговорю с ним напрямую — дам шанс исправиться.', weights: {medic:3, dispatcher:2} },
+      { text: 'Буду молча наблюдать и документировать. Информация — актив.', weights: {spy:3, researcher:2} },
+      { text: 'Проигнорирую, если это не угрожает безопасности.', weights: {engineer:2, guard:2} },
+      { text: 'Разберусь сам, не привлекая лишнего внимания.', weights: {spy:2, admin:2} },
+      { text: 'Поищу способ формализовать его действия как допустимые.', weights: {admin:3, dispatcher:1} },
+      { text: 'Подожду, пока это станет проблемой чужого уровня допуска.', weights: {researcher:1, engineer:1} }
+    ]
+  },
+  {
+    text: 'Вам предстоит провести несколько месяцев в абсолютной изоляции. Без солнца, без новостей, без привычного окружения. Ваша первая реакция?',
+    cat: 'ПСИХОЛОГИЧЕСКИЙ ПРОФИЛЬ',
+    options: [
+      { text: 'Приму как условие работы. Это часть контракта.', weights: {guard:3, admin:2} },
+      { text: 'Создам собственный режим дня с чёткими ритуалами.', weights: {researcher:3, engineer:2} },
+      { text: 'Меня это беспокоит, но я справлюсь, сосредоточившись на задачах.', weights: {medic:2, dispatcher:3} },
+      { text: 'Буду использовать время для изучения коллег и их слабостей.', weights: {spy:3, admin:2} },
+      { text: 'Построю внутреннюю иерархию связей — нужные люди скрасят любую изоляцию.', weights: {spy:2, admin:3} },
+      { text: 'Найду занятие руками — работа со структурами успокаивает.', weights: {engineer:3, guard:1} },
+      { text: 'Буду заботиться о психологическом состоянии окружающих.', weights: {medic:3, dispatcher:2} }
+    ]
+  },
+  {
+    text: 'Перед вами аномальный объект, который ведёт себя иначе, чем указано в досье. Он смотрит на вас. Ваши действия?',
+    cat: 'РЕАКЦИЯ НА АНОМАЛЬНОЕ',
+    options: [
+      { text: 'Медленно отвожу взгляд на приборы. Фиксирую отклонение.', weights: {researcher:3, admin:1} },
+      { text: 'Подаю сигнал Гвардии. Это не моя зона ответственности.', weights: {dispatcher:3, medic:2} },
+      { text: 'Встречаю взгляд. Хочу понять, что за ним стоит.', weights: {researcher:2, spy:2} },
+      { text: 'Отступаю к выходу, не поворачиваясь спиной.', weights: {guard:3, engineer:1} },
+      { text: 'Сохраняю позицию. Страх — это информация для объекта.', weights: {guard:2, spy:3} },
+      { text: 'Анализирую, не является ли это частью циклической активности.', weights: {researcher:3, admin:1} },
+      { text: 'Думаю, как использовать этот момент с пользой для протокола.', weights: {admin:3, spy:2} }
+    ]
+  },
+  {
+    text: 'Ваш начальник отдаёт приказ, который, по вашей оценке, технически некорректен и может привести к потерям. Но он настаивает.',
+    cat: 'СУБОРДИНАЦИЯ И ИНИЦИАТИВА',
+    options: [
+      { text: 'Выполняю. Моё дело — исполнение, а не оценка.', weights: {guard:3, admin:1} },
+      { text: 'Выполняю, но фиксирую своё несогласие в письменной форме.', weights: {researcher:3, admin:2} },
+      { text: 'Выполняю, но параллельно ищу способ минимизировать ущерб.', weights: {engineer:3, medic:2} },
+      { text: 'Прошу разрешения изложить альтернативный расчёт перед выполнением.', weights: {engineer:2, researcher:2, admin:1} },
+      { text: 'Соглашаюсь вслух, но саботирую тихо — во имя результата.', weights: {spy:3, admin:1} },
+      { text: 'Обращаюсь через голову, если ставки высоки.', weights: {admin:3, spy:1} },
+      { text: 'Подготавливаю медицинские ресурсы на случай потерь.', weights: {medic:3, dispatcher:2} }
+    ]
+  },
+  {
+    text: 'Вам нужно передать крайне неприятную новость группе людей. Каков ваш подход?',
+    cat: 'КОММУНИКАЦИЯ',
+    options: [
+      { text: 'Прямо. Без лишних слов. Факты, последствия, план.', weights: {admin:3, guard:2} },
+      { text: 'Начну с контекста, чтобы люди были готовы к информации.', weights: {medic:3, dispatcher:2} },
+      { text: 'Сообщу только тем, кому это необходимо знать.', weights: {spy:3, admin:2} },
+      { text: 'Структурирую технически: что произошло, почему, что дальше.', weights: {engineer:3, researcher:2} },
+      { text: 'Оберну в формат отчёта — это снижает эмоциональную нагрузку.', weights: {researcher:3, admin:1} },
+      { text: 'Дозирую информацию — сначала главное, детали потом.', weights: {dispatcher:3, spy:2} },
+      { text: 'Буду честен и останусь рядом, пока людям нужна поддержка.', weights: {medic:3, dispatcher:1} }
+    ]
+  },
+  {
+    text: 'Вы случайно узнаёте нечто, что компания явно хочет скрыть. Это может быть опасно, но не катастрофично. Что вы предпримете?',
+    cat: 'ЭТИКА И ЛОЯЛЬНОСТЬ',
+    options: [
+      { text: 'Ничего. Меньше знаешь — крепче спишь. Политика О3.', weights: {guard:3, engineer:2} },
+      { text: 'Аккуратно задокументирую и спрячу на всякий случай.', weights: {spy:3, researcher:2} },
+      { text: 'Доложу уполномоченному лицу внутри структуры.', weights: {admin:3, dispatcher:2} },
+      { text: 'Оценю, насколько это ставит под угрозу персонал комплекса.', weights: {medic:2, engineer:2, researcher:1} },
+      { text: 'Использую как козырь в подходящий момент.', weights: {spy:3, admin:2} },
+      { text: 'Буду делать вид, что ничего не знаю, но поменяю своё поведение.', weights: {spy:2, guard:2} },
+      { text: 'Немедленно найду способ нейтрализовать угрозу своими силами.', weights: {engineer:2, admin:2} }
+    ]
+  },
+  {
+    text: 'Один из заключённых рассказывает вам о несправедливости своего содержания. Он выглядит искренне. Что происходит у вас внутри?',
+    cat: 'ПСИХОЛОГИЧЕСКИЙ ПРОФИЛЬ',
+    options: [
+      { text: 'Ничего. Объект на содержании мне не друг. Протокол.', weights: {guard:3, admin:2} },
+      { text: 'Испытываю сочувствие, но подавляю его — это профессионализм.', weights: {medic:2, guard:2} },
+      { text: 'Анализирую: манипуляция это или реальная информация?', weights: {spy:3, researcher:2} },
+      { text: 'Подаю рапорт на психологический осмотр — себе.', weights: {medic:3, researcher:1} },
+      { text: 'Слушаю внимательно. Это данные о состоянии контингента.', weights: {medic:2, dispatcher:3} },
+      { text: 'Думаю, можно ли использовать его показания в интересах работы.', weights: {admin:3, spy:2} },
+      { text: 'Заканчиваю контакт. Не прощаясь. Согласно инструкции.', weights: {guard:3, admin:1} }
+    ]
+  },
+  {
+    text: 'Вы работаете над важным проектом. До дедлайна 6 часов. Выясняется, что один ключевой узел системы имеет конструктивный дефект.',
+    cat: 'КРИЗИС И РЕШЕНИЯ',
+    options: [
+      { text: 'Немедленно переключаюсь: ищу обходной путь в пределах имеющихся ресурсов.', weights: {engineer:3, researcher:2} },
+      { text: 'Сообщаю руководству и жду решения сверху.', weights: {guard:2, dispatcher:3} },
+      { text: 'Оцениваю: можно ли сдать с дефектом и какова цена риска?', weights: {admin:3, spy:2} },
+      { text: 'Собираю команду и делегирую части проблемы параллельно.', weights: {admin:2, dispatcher:3} },
+      { text: 'Работаю один, не привлекая лишних. Огласка снизит эффективность.', weights: {spy:2, engineer:2} },
+      { text: 'Провожу диагностику, чтобы понять глубину проблемы, прежде чем действовать.', weights: {researcher:3, engineer:2} },
+      { text: 'Готовлю «план Б» по минимизации последствий на случай провала.', weights: {medic:2, dispatcher:2, admin:1} }
+    ]
+  },
+  {
+    text: 'Какое из следующих утверждений наиболее точно описывает вашу роль в любой группе?',
+    cat: 'ЛИЧНЫЙ ПРОФИЛЬ',
+    options: [
+      { text: 'Тот, кто удерживает порядок, даже когда никто не просил.', weights: {guard:3, admin:2} },
+      { text: 'Тот, кто знает о группе больше, чем группа думает.', weights: {spy:3, researcher:1} },
+      { text: 'Тот, кто находит решение, пока остальные обсуждают проблему.', weights: {engineer:3, researcher:2} },
+      { text: 'Тот, кого замечают, только когда он уходит.', weights: {dispatcher:3, medic:2} },
+      { text: 'Тот, кто видит систему целиком и управляет ею.', weights: {admin:3, dispatcher:2} },
+      { text: 'Тот, к кому приходят, когда всё становится слишком плохо.', weights: {medic:3, spy:1} },
+      { text: 'Тот, кто задаёт вопросы, которые никто не решался задать.', weights: {researcher:3, spy:2} }
+    ]
+  },
+  {
+    text: 'Вам предлагают повышение, но для этого нужно переложить часть ответственности за ошибку на коллегу, который технически виноват лишь косвенно.',
+    cat: 'ЭТИКА И ЛОЯЛЬНОСТЬ',
+    options: [
+      { text: 'Соглашусь. Выживает компетентнейший, а не добродетельный.', weights: {admin:3, spy:2} },
+      { text: 'Откажусь. Это может выйти боком позже.', weights: {researcher:2, engineer:2} },
+      { text: 'Откажусь. Я не продаюсь такой ценой.', weights: {medic:3, guard:2} },
+      { text: 'Изучу ситуацию: насколько коллега действительно причастен?', weights: {spy:3, admin:1} },
+      { text: 'Воздержусь от решения, пока не пойму намерения предлагающего.', weights: {spy:2, dispatcher:2} },
+      { text: 'Приму, если коллега сам согласится стать «козлом отпущения».', weights: {admin:2, spy:1} },
+      { text: 'Откажусь, но запомню, кто мне это предложил.', weights: {spy:3, guard:1} }
+    ]
+  },
+  {
+    text: 'Вы замечаете, что структура, которую вы обслуживаете, имеет скрытую уязвимость. Никто другой об этом не знает. Что вы делаете?',
+    cat: 'ОТВЕТСТВЕННОСТЬ',
+    options: [
+      { text: 'Немедленно докладываю и предлагаю решение.', weights: {engineer:3, admin:2} },
+      { text: 'Исправляю тихо. Зачем создавать панику?', weights: {engineer:2, spy:2} },
+      { text: 'Документирую и жду подходящего момента для доклада.', weights: {researcher:3, dispatcher:1} },
+      { text: 'Сначала убеждаюсь, что мой анализ верен. Потом — доклад.', weights: {researcher:2, engineer:2, medic:1} },
+      { text: 'Использую знание об уязвимости как личный актив.', weights: {spy:3, admin:1} },
+      { text: 'Предупреждаю медицинский персонал о возможных последствиях.', weights: {medic:3, dispatcher:2} },
+      { text: 'Оцениваю, не является ли это намеренной «закладкой» со стороны конкурентов.', weights: {spy:2, admin:2, researcher:1} }
+    ]
+  },
+  {
+    text: 'Опишите ваше отношение к правилам, которые кажутся вам избыточными или нелогичными.',
+    cat: 'ХАРАКТЕР',
+    options: [
+      { text: 'Правила существуют не для логики, а для порядка. Исполняю.', weights: {guard:3, admin:2} },
+      { text: 'Следую, но изучаю причину. Понимание укрепляет исполнение.', weights: {researcher:3, admin:1} },
+      { text: 'Исполняю публично, адаптирую в частном порядке.', weights: {spy:3, engineer:1} },
+      { text: 'Ищу способ легально обойти, если это повышает эффективность.', weights: {admin:2, engineer:2} },
+      { text: 'Подаю официальный запрос на пересмотр. Система должна работать.', weights: {admin:3, dispatcher:2} },
+      { text: 'Оцениваю риск несоблюдения и принимаю взвешенное решение.', weights: {spy:2, researcher:2} },
+      { text: 'Забочусь, чтобы такие правила не вредили здоровью персонала.', weights: {medic:3, dispatcher:2} }
+    ]
+  }
+];
+
+let answers = new Array(12).fill(null);
+let currentQ = 0;
+let scores = {};
+
+function startQuiz() {
+  scores = {admin:0, guard:0, researcher:0, dispatcher:0, engineer:0, medic:0, spy:0};
+  answers = new Array(12).fill(null);
+  currentQ = 0;
+  showState('question');
+  renderQuestion();
+}
+
+function showState(state) {
+  document.querySelectorAll('.quiz-state').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.loading-screen').forEach(el => el.classList.remove('active'));
+  if (state === 'loading') {
+    document.getElementById('state-loading').classList.add('active');
+  } else {
+    const el = document.getElementById('state-' + state);
+    if (el) el.classList.add('active');
+  }
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[currentQ];
+  document.getElementById('q-num').textContent = currentQ + 1;
+  document.getElementById('q-cat').textContent = q.cat;
+  document.getElementById('q-text').textContent = q.text;
+
+  const fill = ((currentQ) / 12) * 100;
+  document.getElementById('progress-fill').style.width = fill + '%';
+
+  const container = document.getElementById('q-options');
+  container.innerHTML = '';
+  const letters = ['A','B','C','D','E','F','G'];
+  q.options.forEach((opt, i) => {
+    const div = document.createElement('div');
+    div.className = 'q-option' + (answers[currentQ] === i ? ' selected' : '');
+    div.innerHTML = `<div class="scan-line"></div><div class="opt-key">${letters[i]}</div><div class="opt-text">${opt.text}</div>`;
+    div.onclick = () => selectAnswer(i);
+    container.appendChild(div);
+  });
+
+  document.getElementById('btn-prev').disabled = currentQ === 0;
+  document.getElementById('btn-next').disabled = answers[currentQ] === null;
+  document.getElementById('btn-next').textContent = currentQ === 11 ? 'ЗАВЕРШИТЬ ▶' : 'ДАЛЕЕ →';
+}
+
+function selectAnswer(idx) {
+  answers[currentQ] = idx;
+  document.querySelectorAll('.q-option').forEach((el, i) => {
+    el.classList.toggle('selected', i === idx);
+  });
+  document.getElementById('btn-next').disabled = false;
+}
+
+function nextQ() {
+  if (answers[currentQ] === null) return;
+  if (currentQ < 11) {
+    currentQ++;
+    renderQuestion();
+  } else {
+    showLoading();
+  }
+}
+
+function prevQ() {
+  if (currentQ > 0) {
+    currentQ--;
+    renderQuestion();
+  }
+}
+
+function showLoading() {
+  showState('loading');
+  const messages = [
+    'Анализ психологического профиля...',
+    'Сверка с базой персонала...',
+    'Оценка уровня лояльности...',
+    'Проверка допуска безопасности...',
+    'Формирование рекомендации...'
+  ];
+  let progress = 0;
+  let msgIdx = 0;
+  const fill = document.getElementById('load-fill');
+  const txt = document.getElementById('load-text');
+  const interval = setInterval(() => {
+    progress += Math.random() * 8 + 2;
+    if (progress >= 100) { progress = 100; }
+    fill.style.width = Math.round(progress) + '%';
+    msgIdx = Math.floor((progress / 100) * (messages.length - 1));
+    txt.textContent = messages[Math.min(msgIdx, messages.length - 1)];
+    if (progress >= 100) {
+      clearInterval(interval);
+      setTimeout(calcResult, 500);
+    }
+  }, 120);
+}
+
+function calcResult() {
+  scores = {admin:0, guard:0, researcher:0, dispatcher:0, engineer:0, medic:0, spy:0};
+  QUESTIONS.forEach((q, qi) => {
+    const ai = answers[qi];
+    if (ai !== null && ai < q.options.length) {
+      const w = q.options[ai].weights;
+      for (const role in w) {
+        if (scores[role] !== undefined) scores[role] += w[role];
+      }
+    }
+  });
+  const winner = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
+  showResult(winner);
+}
+
+function showResult(roleKey) {
+  const role = ROLES[roleKey];
+  document.getElementById('result-icon').textContent = role.icon;
+  document.getElementById('result-role').textContent = role.name;
+  document.getElementById('result-role-en').textContent = role.en;
+  document.getElementById('result-desc').textContent = role.desc;
+
+  const stats = role.stats;
+  const gridEl = document.getElementById('result-grid');
+  gridEl.innerHTML = `
+    <div class="result-stat">
+      <div class="result-stat-label">Идентификатор</div>
+      <div class="result-stat-val">HR-${Math.floor(Math.random()*9000)+1000}</div>
+    </div>
+    <div class="result-stat">
+      <div class="result-stat-label">Уровень допуска</div>
+      <div class="result-stat-val">${roleKey === 'admin' ? '5' : roleKey === 'spy' ? '5' : roleKey === 'researcher' ? '4' : roleKey === 'guard' ? '3' : '3'} / 5</div>
+    </div>
+    <div class="result-stat">
+      <div class="result-stat-label">Индекс совместимости</div>
+      <div class="result-stat-val">${Math.min(99, 70 + Math.floor(Math.random()*28))}%</div>
+    </div>
+  `;
+
+  const barsEl = document.getElementById('profile-bars');
+  barsEl.innerHTML = '';
+  for (const key in stats) {
+    const val = stats[key];
+    const row = document.createElement('div');
+    row.className = 'bar-row';
+    row.innerHTML = `
+      <div class="bar-label">${STAT_LABELS[key]}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:0%; background:${STAT_COLORS[key]}" data-target="${val}"></div></div>
+      <div class="bar-val">${val}</div>
+    `;
+    barsEl.appendChild(row);
+  }
+
+  showState('result');
+  setTimeout(() => {
+    document.querySelectorAll('.bar-fill').forEach(el => {
+      el.style.width = el.dataset.target + '%';
+    });
+  }, 200);
+}
+
+function restart() {
+  showState('intro');
+}
+</script>
+</body>
+</html>
