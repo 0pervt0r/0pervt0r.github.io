@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hadal Database — Персоналии</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0d12;
+    --bg2: #0e1219;
+    --bg3: #12171f;
+    --panel: #0d1520;
+    --accent: #1a6bff;
+    --accent2: #3d8bff;
+    --accent-glow: rgba(26,107,255,0.18);
+    --cyan: #00e5ff;
+    --cyan-dim: rgba(0,229,255,0.12);
+    --text: #c8d8f0;
+    --text-dim: #5a7090;
+    --text-bright: #e8f4ff;
+    --border: rgba(30,80,160,0.35);
+    --green: #00ff88;
+    --red: #ff4455;
+    --amber: #ffaa00;
+    --scanline: rgba(0,0,0,0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, var(--scanline) 2px, var(--scanline) 4px);
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.35;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at 30% 20%, rgba(26,107,255,0.05) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 80%, rgba(0,229,255,0.03) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .os-wrapper {
+    position: relative;
+    z-index: 2;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 16px;
+    min-height: calc(100vh - 44px);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .titlebar {
+    background: linear-gradient(90deg, #0d1a2e 0%, #0a1520 100%);
+    border: 1px solid var(--border);
+    border-bottom: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 12px;
+    border-radius: 6px 6px 0 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .titlebar::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent2), transparent);
+    opacity: 0.6;
+  }
+
+  .titlebar-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+  }
+
+  .titlebar-controls { display: flex; gap: 6px; }
+  .titlebar-controls span { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+  .ctrl-close { background: #ff4455; opacity: 0.7; }
+  .ctrl-min   { background: #ffaa00; opacity: 0.7; }
+  .ctrl-max   { background: #00cc66; opacity: 0.7; }
+
+  .main-window {
+    display: flex;
+    flex: 1;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 0 0 6px 6px;
+    overflow: hidden;
+    min-height: calc(100vh - 120px);
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: 200px;
+    min-width: 200px;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    padding: 16px 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sidebar-user {
+    padding: 12px 16px 16px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 8px;
+  }
+
+  .sidebar-username {
+    font-family: 'Orbitron', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--accent2);
+    letter-spacing: 0.08em;
+    margin-bottom: 2px;
+  }
+
+  .sidebar-role { font-size: 9px; color: var(--text-dim); letter-spacing: 0.05em; }
+
+  .sidebar-section {
+    padding: 10px 16px 4px;
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .sidebar-item {
+    padding: 5px 16px;
+    font-size: 11px;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .sidebar-item::before { content: '• '; color: var(--text-dim); }
+  .sidebar-item:hover { color: var(--text); background: rgba(26,107,255,0.06); }
+  .sidebar-item.active { color: var(--cyan); }
+  .sidebar-item.active::before { color: var(--cyan); }
+  .sidebar-item a { color: inherit; text-decoration: none; }
+
+  .sidebar-bottom {
+    margin-top: auto;
+    padding: 12px 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  .status-dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    margin-right: 6px;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.4; }
+  }
+
+  .status-text { font-size: 9px; color: var(--text-dim); }
+
+  /* ── CONTENT ── */
+  .content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+  .topbar {
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+    padding: 8px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .topbar-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-bright);
+    letter-spacing: 0.05em;
+    animation: flicker 8s infinite;
+  }
+
+  @keyframes flicker {
+    0%, 95%, 100% { opacity: 1; }
+    96% { opacity: 0.7; }
+    97% { opacity: 1; }
+    98% { opacity: 0.5; }
+    99% { opacity: 1; }
+  }
+
+  .search-wrap { position: relative; }
+
+  .search-wrap::before {
+    content: '⌕';
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 14px;
+    color: var(--text-dim);
+    pointer-events: none;
+  }
+
+  .search-bar {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 5px 10px 5px 24px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    width: 220px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .search-bar:focus { border-color: rgba(26,107,255,0.5); color: var(--text); }
+
+  .page {
+    flex: 1;
+    padding: 24px;
+    overflow-y: auto;
+  }
+
+  .page::-webkit-scrollbar { width: 6px; }
+  .page::-webkit-scrollbar-track { background: var(--bg2); }
+  .page::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* ── PAGE HEADER ── */
+  .page-header {
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .page-badge {
+    display: inline-block;
+    background: var(--cyan-dim);
+    border: 1px solid rgba(0,229,255,0.25);
+    color: var(--cyan);
+    font-size: 9px;
+    padding: 3px 10px;
+    border-radius: 2px;
+    letter-spacing: 0.12em;
+    margin-bottom: 8px;
+  }
+
+  /* Уведомление о тесте — без кнопки закрытия */
+  .inline-alert {
+    background: rgba(255,170,0,0.06);
+    border: 1px solid rgba(255,170,0,0.25);
+    border-left: 2px solid var(--amber);
+    border-radius: 3px;
+    padding: 9px 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 10px 0 14px;
+  }
+
+  .alert-icon {
+    width: 22px; height: 22px;
+    border: 1px solid var(--amber);
+    border-radius: 3px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    animation: pulse-border 2s infinite;
+  }
+
+  @keyframes pulse-border {
+    0%, 100% { border-color: var(--amber); box-shadow: none; }
+    50%       { border-color: #ffd000; box-shadow: 0 0 6px rgba(255,170,0,0.25); }
+  }
+
+  .alert-icon-inner { font-size: 11px; color: var(--amber); font-family: 'Orbitron', monospace; font-weight: 900; }
+
+  .alert-text { font-size: 11px; color: var(--text); letter-spacing: 0.03em; flex: 1; }
+  .alert-text strong { color: var(--amber); font-weight: 400; }
+
+  .alert-link {
+    font-size: 10px;
+    color: var(--accent2);
+    border: 1px solid rgba(61,139,255,0.35);
+    padding: 3px 10px;
+    border-radius: 2px;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+    transition: all 0.15s;
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+
+  .alert-link:hover { background: var(--accent-glow); border-color: var(--accent2); color: var(--text-bright); }
+
+  .page-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--text-bright);
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+  }
+
+  .page-sub { font-size: 10px; color: var(--text-dim); letter-spacing: 0.04em; }
+
+  .page-count {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .page-count span {
+    display: block;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--accent2);
+    line-height: 1;
+    margin-bottom: 2px;
+  }
+
+  /* ── FILTER TABS ── */
+  .filter-tabs { display: flex; gap: 6px; margin-bottom: 18px; flex-wrap: wrap; }
+
+  .filter-tab {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    padding: 4px 12px;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    color: var(--text-dim);
+    cursor: pointer;
+    letter-spacing: 0.06em;
+    transition: all 0.15s;
+    background: transparent;
+  }
+
+  .filter-tab:hover        { border-color: var(--accent2); color: var(--accent2); }
+  .filter-tab.active       { border-color: var(--accent2); color: var(--accent2); background: var(--accent-glow); }
+
+  /* ── TABLE ── */
+  .table-header {
+    display: flex;
+    border-bottom: 1px solid rgba(61,139,255,0.3);
+    margin-bottom: 2px;
+    padding-bottom: 6px;
+  }
+
+  .th { font-size: 9px; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; padding: 0 12px; }
+  .th-num    { width: 44px; }
+  .th-id     { width: 130px; }
+  .th-name   { flex: 1; }
+  .th-role   { width: 180px; }
+  .th-status { width: 90px; }
+  .th-actions{ width: 70px; text-align: center; }
+
+  .personnel-list { display: flex; flex-direction: column; }
+
+  .personnel-row {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.12s;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .personnel-row::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--accent-glow);
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+
+  .personnel-row:hover::before { opacity: 1; }
+  .personnel-row:hover .p-id  { color: var(--cyan); }
+
+  .p-num    { width: 44px;  padding: 11px 12px; font-size: 10px; color: var(--text-dim);   flex-shrink: 0; position: relative; z-index: 1; }
+  .p-id     { width: 130px; padding: 11px 12px; font-family: 'Orbitron', monospace; font-size: 10px; color: var(--accent2); letter-spacing: 0.06em; flex-shrink: 0; transition: color 0.15s; position: relative; z-index: 1; }
+  .p-name   { flex: 1;      padding: 11px 12px; font-size: 12px; color: var(--text-bright); position: relative; z-index: 1; }
+  .p-role   { width: 180px; padding: 11px 12px; font-size: 10px; color: var(--text-dim);   flex-shrink: 0; position: relative; z-index: 1; }
+  .p-status { width: 90px;  padding: 11px 12px; flex-shrink: 0; position: relative; z-index: 1; }
+  .p-view   { width: 70px;  padding: 11px 12px; flex-shrink: 0; position: relative; z-index: 1; display: flex; justify-content: center; }
+
+  .status-badge { display: inline-block; font-size: 9px; padding: 2px 8px; border-radius: 2px; letter-spacing: 0.08em; text-transform: uppercase; }
+  .status-active     { background: rgba(0,255,136,0.08); border: 1px solid rgba(0,255,136,0.25); color: var(--green); }
+  .status-inactive   { background: rgba(255,68,85,0.08);  border: 1px solid rgba(255,68,85,0.2);  color: var(--red); }
+  .status-pending    { background: rgba(255,170,0,0.08);  border: 1px solid rgba(255,170,0,0.2);  color: var(--amber); }
+  .status-classified { background: rgba(176,111,255,0.08);border: 1px solid rgba(176,111,255,0.2);color: #b06fff; }
+
+  .btn-view {
+    font-size: 9px;
+    padding: 2px 10px;
+    border-radius: 2px;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    font-family: 'Share Tech Mono', monospace;
+    background: transparent;
+    transition: all 0.15s;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .btn-view:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  /* нет ссылки — кнопка серая и некликабельная */
+  .btn-view.no-link { opacity: 0.3; cursor: default; pointer-events: none; }
+
+  /* ── PAGINATION ── */
+  .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 20px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+
+  .page-info { font-size: 10px; color: var(--text-dim); letter-spacing: 0.05em; }
+  .page-info span { color: var(--accent2); }
+  .page-btns { display: flex; gap: 4px; }
+
+  .page-btn {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    padding: 4px 10px;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    color: var(--text-dim);
+    cursor: pointer;
+    background: transparent;
+    transition: all 0.15s;
+    letter-spacing: 0.04em;
+  }
+
+  .page-btn:hover, .page-btn.active { border-color: var(--accent2); color: var(--accent2); }
+
+  .no-results { text-align: center; padding: 48px 20px; color: var(--text-dim); font-size: 11px; letter-spacing: 0.05em; display: none; }
+  .no-results.visible { display: block; }
+
+  @media (max-width: 700px) {
+    .sidebar { display: none; }
+    .p-role, .th-role { display: none; }
+    .p-view, .th-actions { width: 50px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="os-wrapper">
+  <div class="titlebar">
+    <span class="titlebar-title">HADAL DATABASE ACCESS</span>
+    <div class="titlebar-controls">
+      <span class="ctrl-close"></span>
+      <span class="ctrl-min"></span>
+      <span class="ctrl-max"></span>
+    </div>
+  </div>
+
+  <div class="main-window">
+
+    <div class="sidebar">
+      <div class="sidebar-user">
+        <div class="sidebar-username">ПОЛЬЗОВАТЕЛЬ</div>
+        <div class="sidebar-role">Уровень доступа: 3</div>
+      </div>
+      <div class="sidebar-section">Навигация</div>
+      <div class="sidebar-item">Главная</div>
+      <div class="sidebar-item active">Персоналии</div>
+      <div class="sidebar-item">Заключённые</div>
+      <div class="sidebar-item">Документация</div>
+      <div class="sidebar-section">Дополнительно</div>
+      <div class="sidebar-item">Карта</div>
+      <div class="sidebar-item">Рассказы</div>
+      <div class="sidebar-item">Классификация объектов</div>
+      <div class="sidebar-item"><a href="https://teletype.in/@yurubolski/GMpdKbCOIMu">Правила</a></div>
+      <div class="sidebar-bottom">
+        <div><span class="status-dot"></span><span class="status-text">ПОЛЬЗОВАТЕЛЬ В СЕТИ</span></div>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="topbar">
+        <div class="topbar-title">БАЗА ДАННЫХ — ЗАКЛЮЧЁННЫЕ</div>
+        <div class="search-wrap">
+          <input class="search-bar" type="text" placeholder="Поиск в базе данных" id="search-input" />
+        </div>
+      </div>
+
+      <div class="page">
+        <div class="page-header">
+          <div class="page-header-left">
+            <div class="page-badge">URBANSHADE CORP — ХАДАЛЬНОЕ ПОДРАЗДЕЛЕНИЕ</div>
+
+            <div class="page-title">Персоналии</div>
+            <div class="page-sub">Реестр заключённых Хадального Тайного Объекта · Уровень доступа 2+</div>
+          </div>
+          <div class="page-count">
+            <span id="total-count">2</span>
+            ЗАПИСЕЙ
+          </div>
+        </div>
+
+        <div style="font-size:9px; color:var(--text-dim); letter-spacing:0.1em; margin-bottom:6px;">
+          ДОЛЖНОСТЬ
+        </div>
+
+        <div class="filter-tabs">
+          <button class="filter-tab active" data-filter="all">ВСЕ</button>
+          <button class="filter-tab" data-filter="lrp">LR-P</button>
+          <button class="filter-tab" data-filter="mrp">MR-P</button>
+          <button class="filter-tab" data-filter="exrp">EXR-P</button>
+
+        </div>
+
+        <div class="table-header">
+          <div class="th th-num">#</div>
+          <div class="th th-id">ID</div>
+          <div class="th th-name">Имя / Псевдоним</div>
+          <div class="th th-role">Должность</div>
+          <div class="th th-status">Статус</div>
+        </div>
+
+        <div class="personnel-list" id="personnel-list"></div>
+        <div class="no-results" id="no-results">— Совпадений не найдено —</div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const PERSONNEL = [
+    {
+    id:     'MR-R9223000242',
+    name:   'Оливия Эриксон',
+    alias:  'Лебёдушка',
+    role:   'Исследователи',
+    dept:   'mrp',
+    status: 'active',
+    url:    'MR-R9223000242.html',
+  },
+  {
+    id:     null,
+    name:   null,
+    alias:  null,
+    role:   null,
+    dept:   null,
+    status: null,
+    url:    null,
+  },
+];
+
+// =====================================================================
+
+const STATUS_MAP = {
+  active:     { label: 'ЖИВ',               cls: 'status-active' },
+  inactive:   { label: 'ПОГИБ',             cls: 'status-inactive' },
+  pending:    { label: 'ИЗМЕНЁН', cls: 'status-pending' },
+};
+
+let currentFilter = 'all';
+let currentSearch = '';
+
+function render() {
+  const list      = document.getElementById('personnel-list');
+  const noResults = document.getElementById('no-results');
+
+  list.innerHTML = '';
+
+  const filtered = PERSONNEL.filter(p => {
+    if (!p.id) return false;
+    const matchFilter = currentFilter === 'all' || p.dept === currentFilter;
+    const q           = currentSearch.toLowerCase();
+    const matchSearch = !q
+      || p.name.toLowerCase().includes(q)
+      || p.id.toLowerCase().includes(q)
+      || (p.alias && p.alias.toLowerCase().includes(q))
+      || p.role.toLowerCase().includes(q);
+    return matchFilter && matchDiv && matchSearch;
+  });
+
+  document.getElementById('total-count').textContent = filtered.length;
+
+  if (filtered.length === 0) {
+    noResults.classList.add('visible');
+    return;
+  }
+  noResults.classList.remove('visible');
+
+  filtered.forEach((p, i) => {
+    const s           = STATUS_MAP[p.status];
+    const displayName = p.alias
+      ? `${p.name} <span style="color:var(--text-dim);font-size:10px;">${p.alias}</span>`
+      : p.name;
+
+    const viewBtn = p.url
+      ? `<a class="btn-view" href="${p.url}">View</a>`
+      : `<span class="btn-view no-link">View</span>`;
+
+    const row = document.createElement('div');
+    row.className = 'personnel-row';
+    row.innerHTML = `
+      <div class="p-num">${String(i + 1).padStart(2, '0')}</div>
+      <div class="p-id">${p.id}</div>
+      <div class="p-name">${displayName}</div>
+      <div class="p-role">${p.role}</div>
+      <div class="p-status"><span class="status-badge ${s.cls}">${s.label}</span></div>
+      <div class="p-view">${viewBtn}</div>
+    `;
+    list.appendChild(row);
+  });
+}
+
+document.querySelectorAll('[data-filter]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-filter]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.filter;
+    render();
+  });
+});
+
+document.querySelectorAll('[data-divfilter]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-divfilter]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentDiv = btn.dataset.divfilter;
+    render();
+  });
+});
+
+document.getElementById('search-input').addEventListener('input', e => {
+  currentSearch = e.target.value;
+  render();
+});
+
+render();
+</script>
+</body>
+</html>
