@@ -499,12 +499,12 @@
     <div class="sidebar">
       <div class="sidebar-user">
         <div class="sidebar-username">ПОЛЬЗОВАТЕЛЬ</div>
-        <div class="sidebar-role">Уровень доступа: 3</div>
+        <div class="sidebar-role">Уровень доступа: 2</div>
       </div>
       <div class="sidebar-section">Навигация</div>
       <div class="sidebar-item">Главная</div>
-      <div class="sidebar-item active">Персоналии</div>
-      <div class="sidebar-item">Заключённые</div>
+      <div class="sidebar-item">Персоналии</div>
+      <div class="sidebar-item active">Заключённые</div>
       <div class="sidebar-item">Документация</div>
       <div class="sidebar-section">Дополнительно</div>
       <div class="sidebar-item">Карта</div>
@@ -528,34 +528,33 @@
         <div class="page-header">
           <div class="page-header-left">
             <div class="page-badge">URBANSHADE CORP — ХАДАЛЬНОЕ ПОДРАЗДЕЛЕНИЕ</div>
-
-            <div class="page-title">Персоналии</div>
+            <div class="page-title">Заключённые</div>
             <div class="page-sub">Реестр заключённых Хадального Тайного Объекта · Уровень доступа 2+</div>
           </div>
           <div class="page-count">
-            <span id="total-count">2</span>
+            <span id="total-count">0</span>
             ЗАПИСЕЙ
           </div>
         </div>
 
         <div style="font-size:9px; color:var(--text-dim); letter-spacing:0.1em; margin-bottom:6px;">
-          ДОЛЖНОСТЬ
+          РАНГ
         </div>
 
         <div class="filter-tabs">
           <button class="filter-tab active" data-filter="all">ВСЕ</button>
+          <button class="filter-tab" data-filter="exrp">EXR-P</button>
           <button class="filter-tab" data-filter="lrp">LR-P</button>
           <button class="filter-tab" data-filter="mrp">MR-P</button>
-          <button class="filter-tab" data-filter="exrp">EXR-P</button>
-
         </div>
 
         <div class="table-header">
           <div class="th th-num">#</div>
           <div class="th th-id">ID</div>
-          <div class="th th-name">Имя / Псевдоним</div>
+          <div class="th th-name">Прозвище / Имя</div>
           <div class="th th-role">Должность</div>
           <div class="th th-status">Статус</div>
+          <div class="th th-actions">Доступ</div>
         </div>
 
         <div class="personnel-list" id="personnel-list"></div>
@@ -569,32 +568,36 @@
 
 <script>
 const PERSONNEL = [
-    {
-    id:     'MR-R9223000242',
-    name:   'Оливия Эриксон',
+  {
+    id:     'MR-P1300002313',
     alias:  'Лебёдушка',
-    role:   'Исследователи',
-    dept:   'mrp',
-    status: 'active',
-    url:    'MR-R9223000242.html',
+    name:   'Александер Ларсен',
+    role:   'Садовник',
+    rank:   'mrp',
+    status: 'pending',
+    url:    null,
   },
   {
     id:     null,
-    name:   null,
     alias:  null,
+    name:   null,
     role:   null,
-    dept:   null,
+    rank:   null,
     status: null,
     url:    null,
   },
 ];
 
-// =====================================================================
-
 const STATUS_MAP = {
-  active:     { label: 'ЖИВ',               cls: 'status-active' },
-  inactive:   { label: 'ПОГИБ',             cls: 'status-inactive' },
-  pending:    { label: 'ИЗМЕНЁН', cls: 'status-pending' },
+  active:   { label: 'ЖИВ',    cls: 'status-active' },
+  inactive: { label: 'ПОГИБ',  cls: 'status-inactive' },
+  pending:  { label: 'ИЗМЕНЁН', cls: 'status-pending' },
+};
+
+const RANK_LABEL = {
+  exrp: 'EXR-P',
+  lrp:  'LR-P',
+  mrp:  'MR-P',
 };
 
 let currentFilter = 'all';
@@ -608,14 +611,14 @@ function render() {
 
   const filtered = PERSONNEL.filter(p => {
     if (!p.id) return false;
-    const matchFilter = currentFilter === 'all' || p.dept === currentFilter;
+    const matchFilter = currentFilter === 'all' || p.rank === currentFilter;
     const q           = currentSearch.toLowerCase();
     const matchSearch = !q
       || p.name.toLowerCase().includes(q)
       || p.id.toLowerCase().includes(q)
       || (p.alias && p.alias.toLowerCase().includes(q))
       || p.role.toLowerCase().includes(q);
-    return matchFilter && matchDiv && matchSearch;
+    return matchFilter && matchSearch;
   });
 
   document.getElementById('total-count').textContent = filtered.length;
@@ -628,8 +631,9 @@ function render() {
 
   filtered.forEach((p, i) => {
     const s           = STATUS_MAP[p.status];
+    const rankLabel   = RANK_LABEL[p.rank] || p.rank;
     const displayName = p.alias
-      ? `${p.name} <span style="color:var(--text-dim);font-size:10px;">${p.alias}</span>`
+      ? `${p.alias} <span style="color:var(--text-dim);font-size:10px;">${p.name}</span>`
       : p.name;
 
     const viewBtn = p.url
@@ -655,15 +659,6 @@ document.querySelectorAll('[data-filter]').forEach(btn => {
     document.querySelectorAll('[data-filter]').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     currentFilter = btn.dataset.filter;
-    render();
-  });
-});
-
-document.querySelectorAll('[data-divfilter]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('[data-divfilter]').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    currentDiv = btn.dataset.divfilter;
     render();
   });
 });
