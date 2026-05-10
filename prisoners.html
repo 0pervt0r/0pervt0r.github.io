@@ -542,15 +542,26 @@
         </div>
 
         <div style="font-size:9px; color:var(--text-dim); letter-spacing:0.1em; margin-bottom:6px;">
-          РАНГ
-        </div>
+  РАНГ
+</div>
 
-        <div class="filter-tabs">
-          <button class="filter-tab active" data-filter="all">ВСЕ</button>
-          <button class="filter-tab" data-filter="exrp">EXR-P</button>
-          <button class="filter-tab" data-filter="lrp">LR-P</button>
-          <button class="filter-tab" data-filter="mrp">MR-P</button>
-        </div>
+<div class="filter-tabs" id="rank-tabs">
+  <button class="filter-tab active" data-rank="all">ВСЕ</button>
+  <button class="filter-tab" data-rank="exrp">EXR-P</button>
+  <button class="filter-tab" data-rank="lrp">LR-P</button>
+  <button class="filter-tab" data-rank="mrp">MR-P</button>
+</div>
+
+<div style="font-size:9px; color:var(--text-dim); letter-spacing:0.1em; margin-bottom:6px; margin-top:12px;">
+  СТАТУС
+</div>
+
+<div class="filter-tabs" id="status-tabs">
+  <button class="filter-tab active" data-status="all">ВСЕ</button>
+  <button class="filter-tab" data-status="active">ЖИВ</button>
+  <button class="filter-tab" data-status="inactive">ПОГИБ</button>
+  <button class="filter-tab" data-status="pending">ИЗМЕНЁН</button>
+</div>
 
         <div class="table-header">
           <div class="th th-num">#</div>
@@ -581,7 +592,7 @@ const PERSONNEL = [
     status: 'pending',
     url:    'MR-P1300002313.html',
   },
-    {
+  {
     id:     'MR-P1313446325',
     alias:  null,
     name:   'Себастьян Солас',
@@ -590,7 +601,7 @@ const PERSONNEL = [
     status: 'active',
     url:    null,
   },
-    {
+  {
     id:     'MR-P',
     alias:  null,
     name:   'Стефан Кирби',
@@ -622,7 +633,8 @@ const RANK_LABEL = {
   mrp:  'MR-P',
 };
 
-let currentFilter = 'all';
+let currentRank   = 'all';
+let currentStatus = 'all';
 let currentSearch = '';
 
 function render() {
@@ -633,14 +645,18 @@ function render() {
 
   const filtered = PERSONNEL.filter(p => {
     if (!p.id) return false;
-    const matchFilter = currentFilter === 'all' || p.rank === currentFilter;
-    const q           = currentSearch.toLowerCase();
+
+    const matchRank   = currentRank   === 'all' || p.rank   === currentRank;
+    const matchStatus = currentStatus === 'all' || p.status === currentStatus;
+
+    const q = currentSearch.toLowerCase();
     const matchSearch = !q
-      || p.name.toLowerCase().includes(q)
+      || p.name?.toLowerCase().includes(q)
       || p.id.toLowerCase().includes(q)
       || (p.alias && p.alias.toLowerCase().includes(q))
-      || p.role.toLowerCase().includes(q);
-    return matchFilter && matchSearch;
+      || p.role?.toLowerCase().includes(q);
+
+    return matchRank && matchStatus && matchSearch;
   });
 
   document.getElementById('total-count').textContent = filtered.length;
@@ -668,7 +684,7 @@ function render() {
       <div class="p-num">${String(i + 1).padStart(2, '0')}</div>
       <div class="p-id">${p.id}</div>
       <div class="p-name">${displayName}</div>
-      <div class="p-role">${p.role}</div>
+      <div class="p-role">${p.role || '—'}</div>
       <div class="p-status"><span class="status-badge ${s.cls}">${s.label}</span></div>
       <div class="p-view">${viewBtn}</div>
     `;
@@ -676,13 +692,22 @@ function render() {
   });
 }
 
-document.querySelectorAll('[data-filter]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('[data-filter]').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    currentFilter = btn.dataset.filter;
-    render();
-  });
+document.getElementById('rank-tabs').addEventListener('click', e => {
+  const btn = e.target.closest('[data-rank]');
+  if (!btn) return;
+  document.querySelectorAll('[data-rank]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentRank = btn.dataset.rank;
+  render();
+});
+
+document.getElementById('status-tabs').addEventListener('click', e => {
+  const btn = e.target.closest('[data-status]');
+  if (!btn) return;
+  document.querySelectorAll('[data-status]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentStatus = btn.dataset.status;
+  render();
 });
 
 document.getElementById('search-input').addEventListener('input', e => {
