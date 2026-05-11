@@ -44,6 +44,260 @@
   --scanline:     rgba(0, 0, 0, 0.18);
 }
 
+/* ═══════════════════════════════════════════════════════════
+   HADAL DATABASE — MOBILE RESPONSIVE PATCH
+   Заменяет существующий блок @media (max-width: 700px)
+   в конце файла стилей.
+   ═══════════════════════════════════════════════════════════ */
+
+
+/* ─────────────────────────────────────────────────────────
+   ≤ 768px  —  планшеты / большие телефоны
+───────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+
+  /* == Обёртка == */
+  .os-wrapper { padding: 0; }
+
+  /* == Тайтлбар == */
+  .titlebar { padding: 5px 10px; border-radius: 0; }
+  .titlebar-title { font-size: 9px; }
+  .titlebar-controls { display: none; }
+
+  /* == Главное окно — вертикальная колонка == */
+  .main-window {
+    flex-direction: column;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    min-height: calc(100vh - 36px);
+  }
+
+  /* == Сайдбар → горизонтальная навигационная полоса == */
+  .sidebar {
+    width: 100%;
+    min-width: unset;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    padding: 4px 0;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .sidebar::-webkit-scrollbar { display: none; }
+
+  .sidebar-user,
+  .sidebar-section,
+  .sidebar-bottom { display: none; }
+
+  .sidebar-item {
+    display: inline-block;
+    padding: 8px 14px;
+    font-size: 10px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* == Топбар == */
+  .topbar { padding: 8px 12px; gap: 8px; }
+  .topbar-title { font-size: 11px; }
+  .topbar-actions { gap: 6px; }
+  .btn-sm { font-size: 9px; padding: 3px 8px; }
+
+  /* == Страница == */
+  .page { padding: 14px 12px; }
+
+  /* == Classified banner == */
+  .classified-banner {
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-start;
+  }
+
+  /* == Досье: одна колонка == */
+  .dossier-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  /* Портрет + ID-карточка — горизонтально */
+  .portrait-col {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .portrait-frame {
+    width: 120px;
+    aspect-ratio: 3/4;
+    flex-shrink: 0;
+  }
+  .id-card { flex: 1; min-width: 160px; }
+
+  /* Имя */
+  .dossier-name  { font-size: 16px; }
+  .dossier-alias { font-size: 10px; }
+  .dossier-role  { font-size: 10px; }
+
+  /* == Типология: 2 колонки == */
+  .typo-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+  .typo-card { padding: 10px 8px; }
+  .typo-card-value { font-size: 11px; }
+
+  /* == Галерея: 2 колонки == */
+  .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+
+  /* == Лог доступа: строки сложены вертикально == */
+  .log-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    padding: 8px 0;
+  }
+  .log-ts    { width: auto; font-size: 8px; }
+  .log-event { font-size: 10px; }
+  .log-level { width: auto; text-align: left; }
+
+  /* == Psych bars: уже label == */
+  .psych-label { width: 90px; font-size: 8px; }
+
+  /* == Таблица персонала/объектов == */
+
+  /* Скрываем незначимые колонки */
+  .th-class, .p-class,
+  .th-num,   .p-num   { display: none; }
+
+  /* Уменьшаем ширины */
+  .th-id, .p-id       { width: 90px; }
+  .p-id               { font-size: 9px; letter-spacing: 0.04em; }
+  .th-status, .p-status { width: 100px; }
+  .th-actions, .p-view  { width: 52px; }
+  .p-name              { font-size: 11px; }
+
+  /* Паддинги ячеек */
+  .th, .p-id, .p-name, .p-status, .p-view { padding: 9px 8px; }
+
+  .status-badge { font-size: 7px; padding: 1px 5px; }
+
+  /* == Заголовок страницы == */
+  .page-header  { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .page-title   { font-size: 15px; }
+  .page-count   { text-align: left; }
+  .page-count span { font-size: 18px; }
+
+  /* Поиск — на всю ширину */
+  .search-wrap, .search-bar { width: 100%; }
+
+  /* Фильтр-табы */
+  .filter-tabs { gap: 4px; }
+  .filter-tab  { font-size: 9px; padding: 3px 8px; }
+
+  /* == Интро / квиз == */
+  .intro-grid  { grid-template-columns: 1fr; gap: 8px; }
+  .intro-title { font-size: 16px; }
+
+  /* == Вопрос квиза == */
+  .q-text   { font-size: 15px; margin-bottom: 16px; }
+  .q-option { padding: 10px 12px; gap: 10px; }
+  .opt-text { font-size: 11px; }
+  .opt-key  { min-width: 20px; height: 20px; font-size: 8px; }
+  .q-meta   { flex-direction: column; align-items: flex-start; gap: 6px; }
+
+  /* == Экран результата == */
+  .result-grid { grid-template-columns: 1fr 1fr; }
+  .result-role { font-size: 20px; }
+  .bar-label   { min-width: 100px; font-size: 9px; }
+
+  /* == Водяной знак — убираем == */
+  .dossier-watermark { display: none; }
+
+  /* == Инлайн-алёрт == */
+  .inline-alert { flex-direction: column; gap: 8px; }
+  .alert-link   { align-self: flex-start; }
+
+  /* == Прочее == */
+  .info-col      { gap: 10px; }
+  .section-body  { padding: 12px 10px; }
+  .bio-text      { font-size: 10px; }
+  .trait-tag     { font-size: 8px; padding: 2px 8px; }
+  .loading-bar   { width: 90%; }
+
+  /* Сканлайны — снижаем на мобильном для производительности */
+  body::before { opacity: 0.15; }
+}
+
+
+/* ─────────────────────────────────────────────────────────
+   ≤ 480px  —  обычные телефоны
+───────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+
+  /* Тайтлбар */
+  .titlebar-title { display: none; }
+
+  /* Портрет — стопкой */
+  .portrait-col   { flex-direction: column; }
+  .portrait-frame { width: 100%; max-width: 180px; }
+
+  /* Типология — 2 колонки, компактно */
+  .typo-grid { grid-template-columns: 1fr 1fr; gap: 4px; }
+  .typo-card-value { font-size: 10px; }
+
+  /* Результат — одна колонка */
+  .result-grid { grid-template-columns: 1fr; }
+  .result-role { font-size: 18px; }
+
+  /* Таблица — прячем статус */
+  .th-status, .p-status { display: none; }
+
+  /* Имя досье */
+  .dossier-name { font-size: 14px; }
+
+  /* Вопрос */
+  .q-text { font-size: 13px; }
+  .bar-label { min-width: 80px; font-size: 8px; }
+
+  /* Паддинг страницы */
+  .page { padding: 10px 8px; }
+
+  /* Кнопки навигации квиза */
+  .q-nav { gap: 8px; }
+  .btn-nav { font-size: 10px; padding: 6px 12px; }
+
+  /* Кнопка "Начать" — полная ширина */
+  .btn-start { width: 100%; justify-content: center; }
+}
+
+
+/* ─────────────────────────────────────────────────────────
+   ≤ 360px  —  маленькие телефоны
+───────────────────────────────────────────────────────── */
+@media (max-width: 360px) {
+
+  .th-id, .p-id { width: 70px; font-size: 8px; }
+  .btn-view      { font-size: 7px; padding: 2px 5px; }
+  .th-actions, .p-view { width: 40px; }
+
+  .p-name { font-size: 9px; }
+
+  .topbar-title { font-size: 10px; }
+
+  .result-role { font-size: 15px; }
+
+  .typo-card { padding: 8px 6px; }
+  .typo-card-label { font-size: 7px; }
+  .typo-card-value { font-size: 9px; }
+  .typo-card-sub   { font-size: 7px; }
+
+  .psych-label { width: 75px; }
+
+  .section-body { padding: 10px 8px; }
+  .bio-text     { font-size: 9px; }
+  .page         { padding: 8px 6px; }
+}
+
 /* ───────────────────────────────────────────────
    RESET & BASE
 ─────────────────────────────────────────────── */
