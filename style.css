@@ -16,8 +16,8 @@
   /* ── Green accent ── */
   --accent:       #b2e528;
   --accent2:      #c8f03a;
-  --accent-glow:  rgba(178, 229, 40, 0.12);
-  --accent-dim:   rgba(178, 229, 40, 0.08);
+  --accent-glow:  #040404;
+  --accent-dim:   #;
 
   /* ── Cyan kept as muted grey-green ── */
   --cyan:         #b2e528;
