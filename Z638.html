@@ -7,6 +7,406 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
 <link href="style.css" rel="stylesheet">
+<style>
+
+
+.ob-svg-header {
+  display: flex;
+  align-items: stretch;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 18px;
+  position: relative;
+}
+
+/* Left: rotating rings */
+.ob-svg-rings {
+  flex-shrink: 0;
+  width: 170px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  border-right: 1px solid var(--border);
+  padding: 18px;
+  position: relative;
+  overflow: hidden;
+}
+
+.ob-svg-rings::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(178,229,40,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(178,229,40,0.04) 1px, transparent 1px);
+  background-size: 14px 14px;
+}
+
+.ob-rings-svg {
+  width: 118px;
+  height: 118px;
+  position: relative;
+  z-index: 1;
+}
+
+.ob-ring-outer {
+  animation: ob-spin-slow 20s linear infinite;
+  transform-origin: 59px 59px;
+}
+.ob-ring-mid {
+  animation: ob-spin-rev 13s linear infinite;
+  transform-origin: 59px 59px;
+}
+
+@keyframes ob-spin-slow {
+  to { transform: rotate(360deg); }
+}
+@keyframes ob-spin-rev {
+  to { transform: rotate(-360deg); }
+}
+
+/* Right: text block */
+.ob-svg-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 20px 26px;
+  gap: 8px;
+}
+
+/* Accent vertical bar on the far right edge */
+.ob-svg-bar {
+  width: 7px;
+  flex-shrink: 0;
+  background: var(--bar-color, var(--accent));
+  position: relative;
+  overflow: hidden;
+}
+.ob-svg-bar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent, transparent 5px,
+    rgba(0,0,0,0.22) 5px, rgba(0,0,0,0.22) 6px
+  );
+}
+
+/* Info rows */
+.ob-info-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  line-height: 1.25;
+  flex-wrap: wrap;
+}
+
+.ob-info-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9px;
+  color: var(--text-dim);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.ob-info-value {
+  font-family: 'Orbitron', monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-bright);
+  letter-spacing: 0.04em;
+}
+
+.ob-info-value.strikethrough {
+  text-decoration: line-through;
+  color: var(--text-dim);
+  font-size: 11px;
+}
+
+/* Big threat number */
+.ob-threat-num {
+  font-family: 'Orbitron', monospace;
+  font-size: 30px;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--text-bright);
+}
+.ob-threat-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  color: var(--text-dim);
+  letter-spacing: 0.08em;
+}
+
+.ob-info-divider {
+  height: 1px;
+  background: linear-gradient(90deg, var(--border), transparent);
+  margin: 2px 0;
+}
+
+/* Color shortcuts */
+.col-green  { color: var(--green) !important; }
+.col-amber  { color: var(--amber) !important; }
+.col-red    { color: var(--red) !important; }
+.col-purple { color: var(--purple) !important; }
+.col-accent { color: var(--accent2) !important; }
+
+/* ── Notices ──────────────────────────────────────── */
+.ob-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  border-radius: 2px;
+  padding: 10px 14px 10px 16px;
+  margin-bottom: 10px;
+  border: 1px solid;
+  position: relative;
+  overflow: hidden;
+}
+.ob-notice::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; bottom: 0; width: 3px;
+  background: var(--notice-color, var(--accent));
+}
+
+.ob-notice-classified { --notice-color: var(--purple); background: rgba(138,104,204,0.07); border-color: rgba(138,104,204,0.28); }
+.ob-notice-danger     { --notice-color: var(--red);    background: rgba(217,79,92,0.07);   border-color: rgba(217,79,92,0.28); }
+.ob-notice-warning    { --notice-color: var(--amber);  background: rgba(212,146,26,0.07);  border-color: rgba(212,146,26,0.28); }
+.ob-notice-info       { --notice-color: var(--accent); background: rgba(178,229,40,0.04);  border-color: rgba(178,229,40,0.20); }
+
+.ob-notice-icon {
+  width: 26px; height: 26px;
+  border: 1px solid var(--notice-color, var(--accent));
+  border-radius: 2px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Orbitron', monospace;
+  font-size: 11px; font-weight: 900;
+  color: var(--notice-color, var(--accent));
+  flex-shrink: 0;
+}
+.ob-notice-body { flex: 1; }
+.ob-notice-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 9px;
+  color: var(--notice-color, var(--accent));
+  letter-spacing: 0.14em;
+  margin-bottom: 3px;
+  text-transform: uppercase;
+}
+.ob-notice-text {
+  font-size: 10px;
+  color: var(--text);
+  line-height: 1.6;
+  letter-spacing: 0.02em;
+}
+
+/* ── Title block ──────────────────────────────────── */
+.ob-title-block {
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+.ob-title-eyebrow {
+  font-size: 9px;
+  color: var(--text-dim);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+.ob-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--text-bright);
+  letter-spacing: 0.06em;
+  margin-bottom: 3px;
+  line-height: 1.1;
+}
+.ob-title-alias {
+  font-size: 13px;
+  color: var(--text-dim);
+  letter-spacing: 0.05em;
+  font-style: italic;
+}
+.ob-title-alias::before { content: '«'; }
+.ob-title-alias::after  { content: '»'; }
+
+/* ── Document sections ────────────────────────────── */
+.doc-body { display: flex; flex-direction: column; gap: 20px; }
+
+.doc-section {
+  background: var(--bg2);
+  border: 1px solid var(--border-grey);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.doc-section-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 7px 16px;
+  background: var(--bg3);
+  border-bottom: 1px solid var(--accent);
+}
+.doc-section-num {
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent2);
+  letter-spacing: 0.1em;
+  flex-shrink: 0;
+}
+.doc-section-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 9px;
+  color: var(--text-dim);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  flex: 1;
+}
+.doc-section-tag {
+  font-size: 8px;
+  color: var(--text-dim);
+  letter-spacing: 0.06em;
+}
+.doc-section-body { padding: 20px 22px; }
+
+/* Running text */
+.doc-text {
+  font-size: 12px;
+  color: var(--text);
+  line-height: 1.85;
+  letter-spacing: 0.025em;
+}
+.doc-text p { margin-bottom: 13px; }
+.doc-text p:last-child { margin-bottom: 0; }
+.doc-text strong { color: var(--text-bright); font-weight: 400; }
+.doc-text.with-dropcap > p:first-child::first-letter {
+  font-family: 'Orbitron', monospace;
+  font-size: 2.8em;
+  font-weight: 900;
+  color: var(--accent2);
+  float: left;
+  line-height: 0.8;
+  margin-right: 7px;
+  margin-top: 4px;
+}
+
+.redacted {
+  background: var(--text-dim);
+  color: transparent;
+  border-radius: 1px;
+  padding: 0 3px;
+  user-select: none;
+  cursor: not-allowed;
+}
+.doc-clearfix::after { content: ''; display: table; clear: both; }
+.doc-rule { height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent); margin: 16px 0; }
+
+/* Inline image */
+.doc-image-wrap {
+  background: var(--bg);
+  border: 1px solid var(--border-grey);
+  border-radius: 2px;
+  overflow: hidden;
+  margin: 16px 0;
+}
+.doc-image-wrap.float-right { float: right; clear: right; margin: 0 0 14px 18px; width: 240px; }
+.doc-image-wrap.float-left  { float: left;  clear: left;  margin: 0 18px 14px 0; width: 240px; }
+.doc-image-wrap.full        { width: 100%; }
+.doc-image-wrap img { width: 100%; display: block; filter: grayscale(15%) contrast(1.04); }
+
+.doc-image-placeholder {
+  width: 100%; aspect-ratio: 4/3;
+  background:
+    repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(178,229,40,0.03) 8px, rgba(178,229,40,0.03) 9px),
+    var(--bg2);
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 6px;
+  font-size: 9px; color: var(--text-dim);
+  letter-spacing: 0.1em; opacity: 0.7;
+}
+.doc-image-caption {
+  padding: 6px 12px;
+  font-size: 9px; color: var(--text-dim);
+  letter-spacing: 0.04em;
+  border-top: 1px solid var(--border);
+  background: var(--bg3);
+  line-height: 1.5;
+}
+.doc-image-caption strong { color: var(--accent2); font-weight: 400; }
+
+/* Procedure box */
+.ob-procedure {
+  background: var(--bg);
+  border: 1px solid rgba(178,229,40,0.18);
+  border-radius: 2px;
+  padding: 15px 18px;
+  margin-bottom: 16px;
+}
+.ob-procedure-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 9px; color: var(--accent2);
+  letter-spacing: 0.12em;
+  margin-bottom: 10px;
+  padding-bottom: 7px;
+  border-bottom: 1px solid rgba(178,229,40,0.15);
+}
+.ob-procedure ol { padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
+.ob-procedure ol li { font-size: 11px; color: var(--text); line-height: 1.6; }
+.ob-procedure ol li::marker { color: var(--accent2); font-size: 9px; }
+
+/* Experiment log table */
+.doc-log-table { width: 100%; border-collapse: collapse; }
+.doc-log-table th {
+  font-size: 8px; color: var(--text-dim); letter-spacing: 0.12em;
+  text-transform: uppercase; padding: 6px 12px;
+  border-bottom: 1px solid var(--accent);
+  text-align: left; font-weight: 400;
+  font-family: 'Share Tech Mono', monospace;
+}
+.doc-log-table td {
+  font-size: 10px; color: var(--text); padding: 9px 12px;
+  border-bottom: 1px solid rgba(178,229,40,0.07);
+  vertical-align: top; line-height: 1.5;
+}
+.doc-log-table tr:last-child td { border-bottom: none; }
+.doc-log-table tr:hover td { background: rgba(178,229,40,0.02); }
+.col-num  { width: 40px; color: var(--text-dim) !important; font-size: 9px !important; }
+.col-date { width: 130px; color: var(--text-dim) !important; font-size: 9px !important; white-space: nowrap; }
+.col-res  { width: 90px; }
+.result-pos { color: var(--green); }
+.result-neg { color: var(--red); }
+.result-amb { color: var(--amber); }
+
+/* ── Responsive ───────────────────────────────────── */
+@media (max-width: 768px) {
+  .ob-svg-header { flex-direction: column; }
+  .ob-svg-rings  { width: 100%; height: 130px; border-right: none; border-bottom: 1px solid var(--border); }
+  .ob-svg-bar    { width: 100%; height: 6px; }
+  .ob-svg-bar::after { background: repeating-linear-gradient(90deg, transparent, transparent 5px, rgba(0,0,0,0.22) 5px, rgba(0,0,0,0.22) 6px); }
+  .doc-image-wrap.float-right,
+  .doc-image-wrap.float-left { float: none; width: 100%; margin: 14px 0; }
+  .doc-section-body { padding: 14px 14px; }
+  .ob-title { font-size: 18px; }
+}
+@media (max-width: 480px) {
+  .ob-svg-rings { height: 110px; }
+  .ob-rings-svg { width: 88px; height: 88px; }
+  .ob-svg-info { padding: 14px; }
+  .ob-info-value { font-size: 11px; }
+  .ob-threat-num { font-size: 24px; }
+}
+
+</style>
 </head>
 <body>
 
@@ -65,6 +465,7 @@
         <!-- ══════════════════════════════════════════════════════
              SVG CLASSIFICATION HEADER
              ──────────────────────────────────────────────────────
+             Как менять:
 
              КЛАСС объекта:
                <span class="ob-info-value strikethrough">Геннем</span>  ← зачёркнутый старый
@@ -224,12 +625,13 @@
         </div>
 
 
-
+        <!-- ══ ТЕЛО ДОКУМЕНТА ════════════════════════════ -->
         <div class="doc-body">
 
-
+          <!-- §1 Условия содержания -->
           <div class="doc-section">
             <div class="doc-section-header">
+              <span class="doc-section-num">§1</span>
               <span class="doc-section-title">Условия содержания</span>
               <span class="doc-section-tag">ФАЙЛ 01 / ПРОТОКОЛ</span>
             </div>
@@ -250,16 +652,19 @@
             </div>
           </div>
 
-
+          <!-- §2 Описание -->
           <div class="doc-section">
             <div class="doc-section-header">
+              <span class="doc-section-num">§2</span>
               <span class="doc-section-title">Описание объекта</span>
               <span class="doc-section-tag">ФАЙЛ 02 / ДАННЫЕ</span>
             </div>
             <div class="doc-section-body">
               <div class="doc-text with-dropcap doc-clearfix">
 
-
+                <!-- Фото справа.
+                     Замените содержимое .doc-image-placeholder на:
+                     <img src="путь_к_фото.jpg">         -->
                 <div class="doc-image-wrap float-right">
                   <div class="doc-image-placeholder">⬛<br>ИЗОБРАЖЕНИЕ НЕ ЗАГРУЖЕНО</div>
                   <div class="doc-image-caption"><strong>РИС. 1.</strong> Объект Z-638 в камере 6-Б. Снимок через защитное стекло. 2022-03-14.</div>
@@ -285,9 +690,10 @@
             </div>
           </div>
 
-
+          <!-- §3 История -->
           <div class="doc-section">
             <div class="doc-section-header">
+              <span class="doc-section-num">§3</span>
               <span class="doc-section-title">История обнаружения</span>
               <span class="doc-section-tag">ФАЙЛ 03 / АРХИВ</span>
             </div>
@@ -295,7 +701,7 @@
               <div class="doc-text doc-clearfix">
                 <p>Z-638 обнаружен <span class="redacted">██.██.20██</span> в акватории Баренцева моря экипажем судна «Полярная звезда» на глубине <span class="redacted">███</span> м. На момент подъёма находился в состоянии «очевидного сна» — конечности сложены, метаболизм резко снижен.</p>
 
-
+                <!-- Фото на всю ширину -->
                 <div class="doc-image-wrap full">
                   <div class="doc-image-placeholder" style="aspect-ratio:21/9;">⬛<br>ИЗОБРАЖЕНИЕ НЕ ЗАГРУЖЕНО</div>
                   <div class="doc-image-caption"><strong>РИС. 2.</strong> Реконструкция по показаниям экипажа. Оригинальные снимки засекречены. Архив-Дельта, полка 7.</div>
@@ -307,9 +713,10 @@
             </div>
           </div>
 
-
+          <!-- §4 Журнал -->
           <div class="doc-section">
             <div class="doc-section-header">
+              <span class="doc-section-num">§4</span>
               <span class="doc-section-title">Журнал исследований</span>
               <span class="doc-section-tag">ФАЙЛ 04 / ЭКСПЕРИМЕНТЫ</span>
             </div>
@@ -368,9 +775,10 @@
             </div>
           </div>
 
-
+          <!-- §5 Приложение -->
           <div class="doc-section">
             <div class="doc-section-header">
+              <span class="doc-section-num">§5</span>
               <span class="doc-section-title">Приложения и сноски</span>
               <span class="doc-section-tag">ФАЙЛ 05 / СЛУЖЕБНОЕ</span>
             </div>
@@ -383,12 +791,12 @@
             </div>
           </div>
 
-        </div>
+        </div><!-- /doc-body -->
 
-      </div>
-    </div>
-  </div>
-</div>
+      </div><!-- /page -->
+    </div><!-- /content -->
+  </div><!-- /main-window -->
+</div><!-- /os-wrapper -->
 
 </body>
 </html>
