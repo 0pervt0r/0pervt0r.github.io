@@ -257,31 +257,6 @@ body::after {
   position: relative;
 }
 
-/* Слой 1 — логотип */
-.content::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: url('ChroniclesLogo.png');
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: 700px auto;
-  background-blend-mode: luminosity;
-  opacity: 0.08; 
-  pointer-events: none;
-  z-index: 0;
-}
-
-.content::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: var(--panel);
-  opacity: 0.88;
-  pointer-events: none;
-  z-index: 0;
-}
-
 .content > * {
   position: relative;
   z-index: 1;
