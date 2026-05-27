@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hadal Database</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="style.css" rel="stylesheet">
+<style>
+
+/* ════════════════════════════════════
+   SVG CLASSIFICATION HEADER
+════════════════════════════════════ */
+.svgheader-wrap {
+  position:relative;
+  background:var(--bg2);
+  border:1px solid var(--border-grey);
+  border-radius:3px;
+  overflow:hidden;
+  margin-bottom:20px;
+  display:flex;
+  align-items:stretch;
+  min-height:120px;
+}
+
+/* Левая декоративная полоса с цветом угрозы */
+.svgheader-threat-stripe {
+  width:5px;
+  flex-shrink:0;
+}
+.threat-red    { background:var(--red); }
+.threat-amber  { background:var(--amber); }
+.threat-green  { background:var(--green); }
+.threat-purple { background:var(--purple); }
+.threat-grey   { background:var(--text-dim); }
+
+/* SVG круговая иконка */
+.svgheader-icon-col {
+  padding:18px 20px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-right:1px solid var(--border-grey);
+  background: rgba(0,0,0,0.15);
+  flex-shrink:0;
+}
+
+.svgheader-icon {
+  width:80px; height:80px;
+  position:relative;
+}
+
+/* Концентрические кольца (воспроизведение SVG с сайта) */
+.ring-svg { width:100%; height:100%; }
+
+/* Правая часть: метаданные */
+.svgheader-meta {
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  padding:16px 24px;
+  gap:4px;
+}
+
+.svgheader-row {
+  display:flex;
+  align-items:baseline;
+  gap:10px;
+}
+
+.svgheader-key {
+  font-family:'Orbitron',monospace;
+  font-size:9px;
+  color:var(--text-dim);
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  min-width:130px;
+  flex-shrink:0;
+}
+
+.svgheader-val {
+  font-family:'Orbitron',monospace;
+  font-size:13px;
+  font-weight:700;
+  color:var(--text-bright);
+  letter-spacing:0.04em;
+}
+
+.svgheader-val.accent { color:var(--accent2); }
+.svgheader-val.red    { color:var(--red); }
+.svgheader-val.amber  { color:var(--amber); }
+.svgheader-val.green  { color:var(--green); }
+.svgheader-val.purple { color:var(--purple); }
+
+.svgheader-val.strikethrough {
+  text-decoration: line-through;
+  opacity: 0.5;
+  font-size:11px;
+  margin-right:4px;
+}
+
+.svgheader-clearance {
+  margin-top:8px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.clearance-pill {
+  font-family:'Orbitron',monospace;
+  font-size:9px;
+  font-weight:700;
+  padding:3px 10px;
+  border-radius:2px;
+  letter-spacing:0.10em;
+}
+.cp-red    { background:rgba(217,79,92,0.12);  border:1px solid rgba(217,79,92,0.35);  color:var(--red); }
+.cp-amber  { background:rgba(212,146,26,0.12); border:1px solid rgba(212,146,26,0.35); color:var(--amber); }
+.cp-green  { background:var(--green-dim);       border:1px solid rgba(178,229,40,0.30); color:var(--green); }
+.cp-purple { background:rgba(138,104,204,0.10); border:1px solid rgba(138,104,204,0.30);color:var(--purple); }
+.cp-grey   { background:rgba(80,88,96,0.12);    border:1px solid rgba(80,88,96,0.30);   color:var(--text-dim); }
+
+/* Правая колонка: иконки подклассов */
+.svgheader-classes {
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:6px;
+  padding:16px 20px;
+  border-left:1px solid var(--border-grey);
+  background: rgba(0,0,0,0.10);
+  flex-shrink:0;
+  min-width:170px;
+}
+
+.class-row {
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.class-dot {
+  width:8px; height:8px;
+  border-radius:50%;
+  flex-shrink:0;
+}
+
+.class-label-sm {
+  font-size:8px;
+  color:var(--text-dim);
+  letter-spacing:0.10em;
+  text-transform:uppercase;
+  min-width:70px;
+}
+
+.class-val-sm {
+  font-family:'Orbitron',monospace;
+  font-size:9px;
+  color:var(--text-bright);
+  letter-spacing:0.04em;
+}
+
+/* ════════════════════════════════════
+   SECURITY NOTICE BANNERS
+════════════════════════════════════ */
+.notice-banner {
+  display:flex;
+  align-items:flex-start;
+  gap:14px;
+  border-radius:3px;
+  padding:11px 16px;
+  margin-bottom:12px;
+  position:relative;
+  overflow:hidden;
+}
+
+.notice-banner::before {
+  content:'';
+  position:absolute;
+  left:0; top:0; bottom:0; width:3px;
+}
+
+.notice-banner.nb-classified {
+  background:rgba(138,104,204,0.07);
+  border:1px solid rgba(138,104,204,0.28);
+}
+.notice-banner.nb-classified::before { background:var(--purple); }
+
+.notice-banner.nb-warning {
+  background:rgba(212,146,26,0.07);
+  border:1px solid rgba(212,146,26,0.28);
+}
+.notice-banner.nb-warning::before { background:var(--amber); }
+
+.notice-banner.nb-danger {
+  background:rgba(217,79,92,0.07);
+  border:1px solid rgba(217,79,92,0.28);
+}
+.notice-banner.nb-danger::before { background:var(--red); }
+
+.notice-banner.nb-info {
+  background:var(--accent-dim);
+  border:1px solid var(--border);
+}
+.notice-banner.nb-info::before { background:var(--accent2); }
+
+.notice-icon {
+  flex-shrink:0;
+  width:28px; height:28px;
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Orbitron',monospace;
+  font-size:12px; font-weight:900;
+  margin-top:1px;
+}
+.nb-classified .notice-icon { border:1px solid rgba(138,104,204,0.5); color:var(--purple); }
+.nb-warning    .notice-icon { border:1px solid rgba(212,146,26,0.5);  color:var(--amber); }
+.nb-danger     .notice-icon { border:1px solid rgba(217,79,92,0.5);   color:var(--red); }
+.nb-info       .notice-icon { border:1px solid var(--border2);         color:var(--accent2); }
+
+.notice-body { flex:1; }
+.notice-title {
+  font-family:'Orbitron',monospace;
+  font-size:9px;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  margin-bottom:4px;
+}
+.nb-classified .notice-title { color:var(--purple); }
+.nb-warning    .notice-title { color:var(--amber); }
+.nb-danger     .notice-title { color:var(--red); }
+.nb-info       .notice-title { color:var(--accent2); }
+
+.notice-text { font-size:10px; color:var(--text); line-height:1.6; letter-spacing:0.03em; }
+
+/* ════════════════════════════════════
+   DOCUMENT BODY TEXT
+════════════════════════════════════ */
+.doc-body { display:flex; flex-direction:column; gap:16px; }
+
+.doc-section {
+  background:var(--bg2);
+  border:1px solid var(--border-grey);
+  border-radius:3px;
+  overflow:hidden;
+}
+
+.doc-section-header {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:7px 16px;
+  background:var(--accent-dim);
+  border-bottom:1px solid var(--accent);
+}
+
+.doc-section-title {
+  font-family:'Orbitron',monospace;
+  font-size:9px;
+  color:var(--accent2);
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+}
+
+.doc-section-tag {
+  font-size:8px;
+  color:var(--text-dim);
+  letter-spacing:0.06em;
+}
+
+.doc-section-body {
+  padding:18px 20px;
+}
+
+.doc-text {
+  font-size:12px;
+  color:var(--text);
+  line-height:1.85;
+  letter-spacing:0.03em;
+}
+
+.doc-text p { margin-bottom:12px; }
+.doc-text p:last-child { margin-bottom:0; }
+
+.doc-text .redacted {
+  background:var(--text-dim);
+  color:transparent;
+  border-radius:1px;
+  padding:0 2px;
+  user-select:none;
+  cursor:not-allowed;
+}
+
+.doc-text strong {
+  color:var(--text-bright);
+  font-weight:normal;
+}
+
+/* ── INLINE PHOTO ── */
+.doc-photo-wrap {
+  float:right;
+  margin:0 0 16px 24px;
+  max-width:240px;
+  flex-shrink:0;
+}
+
+.doc-photo-wrap.left {
+  float:left;
+  margin:0 24px 16px 0;
+}
+
+.doc-photo-frame {
+  background:var(--bg);
+  border:1px solid var(--border-grey);
+  border-radius:3px;
+  overflow:hidden;
+  position:relative;
+}
+
+.doc-photo-frame::before {
+  content:'';
+  position:absolute; inset:0;
+  background:repeating-linear-gradient(45deg,transparent,transparent 6px,rgba(178,229,40,0.02) 6px,rgba(178,229,40,0.02) 7px);
+  pointer-events:none; z-index:1;
+}
+
+.doc-photo-frame img {
+  width:100%; height:auto;
+  display:block;
+  filter:grayscale(20%) contrast(1.05);
+  position:relative; z-index:0;
+}
+
+/* Placeholder когда нет фото */
+.doc-photo-placeholder {
+  width:100%;
+  aspect-ratio:4/3;
+  display:flex; align-items:center; justify-content:center;
+  flex-direction:column; gap:8px;
+}
+.placeholder-icon { font-size:28px; opacity:0.15; }
+.placeholder-text { font-size:9px; color:var(--text-dim); letter-spacing:0.08em; }
+
+.doc-photo-caption {
+  padding:6px 10px;
+  font-size:9px;
+  color:var(--text-dim);
+  letter-spacing:0.05em;
+  border-top:1px solid var(--border-grey);
+  background:rgba(10,12,15,0.5);
+  line-height:1.5;
+}
+
+.clearfix::after { content:''; display:table; clear:both; }
+
+/* ── SEPARATOR ── */
+.doc-divider {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin:4px 0;
+  opacity:0.4;
+}
+.doc-divider::before,
+.doc-divider::after {
+  content:'';
+  flex:1;
+  height:1px;
+  background:var(--border-grey);
+}
+.doc-divider-text { font-size:9px; color:var(--text-dim); letter-spacing:0.1em; white-space:nowrap; }
+
+/* ── OBJECT NUMBER WATERMARK ── */
+.doc-watermark {
+  position:fixed;
+  bottom:40px; right:40px;
+  font-family:'Orbitron',monospace;
+  font-size:60px; font-weight:900;
+  color:rgba(178,229,40,0.04);
+  letter-spacing:0.1em;
+  pointer-events:none; z-index:0;
+  transform:rotate(-20deg);
+  user-select:none;
+}
+
+/* ════════════════════════════════════
+   MOBILE
+════════════════════════════════════ */
+@media (max-width:768px) {
+  .os-wrapper { padding:0; }
+  .titlebar { border-radius:0; }
+  .titlebar-controls { display:none; }
+  .main-window { flex-direction:column; border-radius:0; border-left:none; border-right:none; }
+  .sidebar { width:100%; min-width:unset; border-right:none; border-bottom:1px solid var(--border); padding:4px 0; flex-direction:row; overflow-x:auto; scrollbar-width:none; }
+  .sidebar::-webkit-scrollbar { display:none; }
+  .sidebar-user,.sidebar-section,.sidebar-bottom { display:none; }
+  .sidebar-item { display:inline-block; padding:8px 14px; font-size:10px; white-space:nowrap; flex-shrink:0; }
+  .topbar { padding:8px 12px; }
+  .topbar-title { font-size:11px; }
+  .page { padding:12px; }
+  .svgheader-wrap { flex-direction:column; min-height:unset; }
+  .svgheader-threat-stripe { width:100%; height:4px; }
+  .svgheader-icon-col { border-right:none; border-bottom:1px solid var(--border-grey); }
+  .svgheader-classes { border-left:none; border-top:1px solid var(--border-grey); min-width:unset; }
+  .svgheader-key { min-width:100px; font-size:8px; }
+  .svgheader-val { font-size:11px; }
+  .doc-photo-wrap, .doc-photo-wrap.left { float:none; margin:0 0 14px 0; max-width:100%; }
+  .doc-watermark { display:none; }
+}
+</style>
+</head>
+<body>
+
+<div class="os-wrapper">
+
+  <!-- TITLEBAR -->
+  <div class="titlebar">
+    <span class="titlebar-title">HADAL DATABASE — OBJECT FILE VIEWER</span>
+    <div class="titlebar-controls">
+      <span class="ctrl-close"></span>
+      <span class="ctrl-min"></span>
+      <span class="ctrl-max"></span>
+    </div>
+  </div>
+
+  <!-- MAIN WINDOW -->
+  <div class="main-window">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sidebar-user">
+        <div class="sidebar-username">ПОЛЬЗОВАТЕЛЬ</div>
+        <div class="sidebar-role">Уровень доступа: 3</div>
+      </div>
+      <div class="sidebar-section">Навигация</div>
+      <div class="sidebar-item" href="index.html">Главная</div>
+      <div class="sidebar-item"><a href="personnel.html">Персоналии</a></div>
+      <div class="sidebar-item"><a href="prisoners.html">Заключённые</a></div>
+      <div class="sidebar-item active"><a href="documents.html">Документация</a></div>
+      <div class="sidebar-section">Дополнительно</div>
+      <div class="sidebar-item" href="map.html">Карта</div>
+      <div class="sidebar-item" href="stories.html">Рассказы</div>
+      <div class="sidebar-item" href="object-classification.html">Классификация объектов</div>
+      <div class="sidebar-item"><a href="https://teletype.in/@yurubolski/GMpdKbCOIMu">Правила</a></div>
+      <div class="sidebar-bottom">
+        <span class="status-dot"></span>
+        <span class="status-text">СИСТЕМА В СЕТИ</span>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- TOPBAR -->
+      <div class="topbar">
+        <div class="topbar-title">ДОКУМЕНТ · Z-367</div>
+      </div>
+
+      <!-- PAGE -->
+      <div class="page">
+        <div class="svgheader-wrap">
+          <div class="svgheader-threat-stripe threat-red"></div>
+          <div class="svgheader-icon-col">
+            <div class="svgheader-icon">
+              <svg class="ring-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="48" fill="none" stroke="rgba(217,79,92,0.80)" stroke-width="2.5"/>
+                <circle cx="50" cy="50" r="41" fill="none" stroke="rgba(217,79,92,0.65)" stroke-width="2"/>
+                <circle cx="50" cy="50" r="34" fill="none" stroke="rgba(217,79,92,0.52)" stroke-width="2"/>
+                <circle cx="50" cy="50" r="27" fill="none" stroke="rgba(217,79,92,0.40)" stroke-width="1.5"/>
+                <circle cx="50" cy="50" r="20" fill="none" stroke="rgba(217,79,92,0.28)" stroke-width="1.5"/>
+                <circle cx="50" cy="50" r="14" fill="none" stroke="rgba(217,79,92,0.18)" stroke-width="1"/>
+                <g transform="translate(50,50)">
+                  <path d="M0,0 L0,-11 A11,11,0,0,1,9.5,-5.5 Z"   fill="rgba(217,79,92,0.7)"/>
+                  <path d="M0,0 L9.5,-5.5 A11,11,0,0,1,9.5,5.5 Z"  fill="rgba(212,146,26,0.7)"/>
+                  <path d="M0,0 L9.5,5.5 A11,11,0,0,1,0,11 Z"      fill="rgba(178,229,40,0.7)"/>
+                  <path d="M0,0 L0,11 A11,11,0,0,1,-9.5,5.5 Z"     fill="rgba(138,104,204,0.7)"/>
+                  <path d="M0,0 L-9.5,5.5 A11,11,0,0,1,-9.5,-5.5 Z" fill="rgba(120,130,140,0.5)"/>
+                  <path d="M0,0 L-9.5,-5.5 A11,11,0,0,1,0,-11 Z"   fill="rgba(120,130,140,0.3)"/>
+                  <circle cx="0" cy="0" r="5" fill="#1c1c1c" stroke="rgba(217,79,92,0.4)" stroke-width="0.8"/>
+                </g>
+                <line x1="50" y1="2"  x2="50" y2="8"   stroke="rgba(217,79,92,0.6)" stroke-width="1"/>
+                <line x1="50" y1="92" x2="50" y2="98"   stroke="rgba(217,79,92,0.6)" stroke-width="1"/>
+                <line x1="2"  y1="50" x2="8"  y2="50"   stroke="rgba(217,79,92,0.6)" stroke-width="1"/>
+                <line x1="92" y1="50" x2="98" y2="50"   stroke="rgba(217,79,92,0.6)" stroke-width="1"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Метаданные объекта -->
+          <div class="svgheader-meta">
+            <div class="svgheader-row">
+              <span class="svgheader-key">Объект №</span>
+              <span class="svgheader-val accent">Z-367</span>
+            </div>
+            <div class="svgheader-row">
+              <span class="svgheader-key">Класс объекта</span>
+              <span class="svgheader-val yellow">Геннем </span>
+            </div>
+            <div class="svgheader-row">
+              <span class="svgheader-key">Происхождение</span>
+              <span class="svgheader-val">Йорд</span>
+            </div>
+          </div>
+
+          <!-- Правая колонка: подклассы -->
+          <div class="svgheader-classes">
+            <div class="class-row">
+              <div class="class-dot" style="background:rgba(217,79,92,0.8)"></div>
+              <span class="class-label-sm">Управляемость</span>
+              <span class="svgheader-val" style="font-size:9px;color:var(--red)">Свайр</span>
+            </div>
+            <div class="class-row">
+              <div class="class-dot" style="background:rgba(212,146,26,0.8)"></div>
+              <span class="class-label-sm">Польза</span>
+              <span class="svgheader-val" style="font-size:9px;color:var(--amber)">Хойд</span>
+            </div>
+            <div class="class-row">
+              <div class="class-dot" style="background:rgba(178,229,40,0.8)"></div>
+              <span class="class-label-sm">Репликативность</span>
+              <span class="svgheader-val" style="font-size:9px;color:var(--green)">Вигеникке</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="notice-banner nb-classified">
+          <div class="notice-icon">S</div>
+          <div class="notice-body">
+            <div class="notice-title">Секретность · Уровень 3 / Для ограниченного пользования</div>
+            <div class="notice-text">Данный файл доступен только сотрудникам с карточкой специализации <strong>S</strong> или <strong>D</strong> и уровнем допуска не ниже 3. Несанкционированный доступ фиксируется автоматически и передаётся в службу безопасности.</div>
+          </div>
+        </div>
+
+        <div class="doc-body">
+
+          <div class="doc-section">
+            <div class="doc-section-header">
+              <span class="doc-section-title">Особые процедуры содержания</span>
+              <span class="doc-section-tag">ФАЙЛ 01</span>
+            </div>
+            <div class="doc-section-body">
+              <div class="doc-text clearfix">
+
+                <!-- Фото справа -->
+                <div class="doc-photo-wrap">
+                  <div class="doc-photo-frame">
+                    <div class="doc-photo-placeholder">
+                      <span class="placeholder-icon">⬛</span>
+                      <span class="placeholder-text">ФОТО ОТСУТСТВУЕТ</span>
+                    </div>
+                  </div>
+                </div>
+
+                <p>Z-367 содержится во внутренней свалке и служит основным средством утилизации отходов Блэксайта. Все отходы, производимые сотрудниками комплекса, должны скармливаться Z-367, чтобы он оставался пассивным и послушным. Отходы, которые Z-367 не может переработать, должны храниться в доке № █ и вывозиться на поверхность раз в месяц.</p>
+                <p>Хотя Z-367 насыщается объедками, он может и будет охотиться, если поблизости есть добыча. Z-367 должен оставаться под наблюдением, содержаться в неволе и быть сытым, так как он более чем способен нанести ущерб на миллионы долларов оборудованию, конструкциям и сотрудникам. Если Z-367 сбежит из внутренней свалки, важнее всего оставаться вне его поля зрения; если он кого-то заметит, бегство бесполезно. Персонал должен как можно скорее переместиться в ближайший бункер или аналогичное бронированное помещение. Инженеры спроектировали шкафчики пуленепробиваемыми и способными выдерживать нагрузку до ███ фунтов; однако они ещё не проверяли их способность выдерживать Z-367. Эти шкафчики следует использовать только в крайнем случае, если не осталось безопасных вариантов.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- ОПИСАНИЕ -->
+          <div class="doc-section">
+            <div class="doc-section-header">
+              <span class="doc-section-title">Описание</span>
+              <span class="doc-section-tag">ФАЙЛ 02</span>
+            </div>
+            <div class="doc-section-body">
+              <div class="doc-text clearfix">
+                <p>Z-367кодовое имя «Пандемониум» ⸺ масса живой неидентифицируемой плоти. Z-367 имеет неопределённое количество функционирующих глаз внутри рта, которые способны улавливать малейшие движения и колебания света на больших расстояниях. Как только Z-367 видит цель, он немедленно начинает преследовать её и не остановится, пока не поглотит её или пока его погоня не будет прервана. Если между ним и целью имеется припятствией, Z-367 использует свою массу, чтобы врезаться в него. Это продолжается в течение неопределённого времени и прекращается только после того, когда Z-367 поймёт, что неспособен преодолеть препятствие. Обнаружив живую цель, Z-367 пытается захватить её пастью, внутри котороый неопознанные химические агенты растворяют тела.</p>
+                <p>Z-367 предпочитает живую пищу, хотя и классифицирован как падальщик и питается в основном отходами. Его рацион включает биологические отходы, такие как падаль, растительный перегной и человеческие останки, а также небиологический детрит, например гравий и соль. Z-367 также может переваривать некоторые синтетические материалы, такие как пластмассы и полимеры. Состав его тела напоминает разлагающуюся органическую ткань, полимеры, идентичные пластику, и прочие различные природные и искусственные материалы. Смотритель Вернер постановил, что уникальная способность к поглощению различных веществ делает Z-367 ценным активом.</p>
+              </div>
+            </div>
+          </div
+            
+          <div class="doc-section">
+            <div class="doc-section-header">
+              <span class="doc-section-title">История обнаружения</span>
+              <span class="doc-section-tag">ФАЙЛ 03</span>
+            </div>
+            <div class="doc-section-body">
+              <div class="doc-text">
+                <p>Z-367 был обнаружен в 1962 году возле гидротермального источника в зоне Лет-Ванд во время первой экспедиции и раскопок возле Хадального Тайного Объекта. Из-за высокого уровня угрозы ранние рекомендации предписывали не трогать Z-367 и советовали персоналу избегать известных районов его обитания</p>
+                <p>К 1965 году в ходе расширения комплекса Urbanshade вторглись в зону обитания Z-367; это привело к нападению на строительную бригаду LR-P, в результате которого более █ LR-P погибли, а ███ получили травмы, сделавших их недееспособными. Чтобы возобновить строительство, тогдашний директор ████ санкционировал операцию по экстренному сдерживанию. Стратегия заключалась в использовании цепочки LR-P, пострадавших в результате несчастных случаев на производстве или погибших во время расширения комплекса, в качестве приманки, чтобы заманить Z-367 в усиленную вольфрамовую клетку. Эта операция увенчалась успехом и Z-367 был заперт внутри и перемещён в специально отведённую камеру содержания.</p>
+              </div>
+            </div>
+          </div>
+            
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
