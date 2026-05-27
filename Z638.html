@@ -3,418 +3,552 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hadal Database — Объект Z-638</title>
+<title>HADAL — Досье объекта</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
-<link href="style.css" rel="stylesheet">
 <style>
-
-
-.ob-svg-header {
-  display: flex;
-  align-items: stretch;
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-radius: 3px;
-  overflow: hidden;
-  margin-bottom: 18px;
-  position: relative;
+/* ── COPY OF SITE ROOT VARIABLES ── */
+:root {
+  --bg:           #141414;
+  --bg2:          #1c1c1c;
+  --bg3:          #222222;
+  --panel:        #191919;
+  --panel2:       #202020;
+  --accent:       #b2e528;
+  --accent2:      #c8f03a;
+  --accent-glow:  #040404;
+  --accent-dim:   rgba(178,229,40,0.06);
+  --cyan:         #b2e528;
+  --cyan-dim:     rgba(178,229,40,0.10);
+  --text:         #b0b8c1;
+  --text-dim:     #525c66;
+  --text-bright:  #dde4ec;
+  --border:       rgba(178,229,40,0.18);
+  --border2:      rgba(178,229,40,0.30);
+  --border-grey:  rgba(120,130,140,0.25);
+  --green:        #b2e528;
+  --green-dim:    rgba(178,229,40,0.08);
+  --red:          #d94f5c;
+  --amber:        #d4921a;
+  --purple:       #8a68cc;
+  --scanline:     rgba(0,0,0,0.18);
 }
 
-/* Left: rotating rings */
-.ob-svg-rings {
-  flex-shrink: 0;
-  width: 170px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
   background: var(--bg);
-  border-right: 1px solid var(--border);
-  padding: 18px;
-  position: relative;
-  overflow: hidden;
-}
-
-.ob-svg-rings::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(178,229,40,0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(178,229,40,0.04) 1px, transparent 1px);
-  background-size: 14px 14px;
-}
-
-.ob-rings-svg {
-  width: 118px;
-  height: 118px;
-  position: relative;
-  z-index: 1;
-}
-
-.ob-ring-outer {
-  animation: ob-spin-slow 20s linear infinite;
-  transform-origin: 59px 59px;
-}
-.ob-ring-mid {
-  animation: ob-spin-rev 13s linear infinite;
-  transform-origin: 59px 59px;
-}
-
-@keyframes ob-spin-slow {
-  to { transform: rotate(360deg); }
-}
-@keyframes ob-spin-rev {
-  to { transform: rotate(-360deg); }
-}
-
-/* Right: text block */
-.ob-svg-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 20px 26px;
-  gap: 8px;
-}
-
-/* Accent vertical bar on the far right edge */
-.ob-svg-bar {
-  width: 7px;
-  flex-shrink: 0;
-  background: var(--bar-color, var(--accent));
-  position: relative;
-  overflow: hidden;
-}
-.ob-svg-bar::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent, transparent 5px,
-    rgba(0,0,0,0.22) 5px, rgba(0,0,0,0.22) 6px
-  );
-}
-
-/* Info rows */
-.ob-info-row {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  line-height: 1.25;
-  flex-wrap: wrap;
-}
-
-.ob-info-label {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 9px;
-  color: var(--text-dim);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.ob-info-value {
-  font-family: 'Orbitron', monospace;
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text-bright);
-  letter-spacing: 0.04em;
-}
-
-.ob-info-value.strikethrough {
-  text-decoration: line-through;
-  color: var(--text-dim);
-  font-size: 11px;
-}
-
-/* Big threat number */
-.ob-threat-num {
-  font-family: 'Orbitron', monospace;
-  font-size: 30px;
-  font-weight: 900;
-  line-height: 1;
-  color: var(--text-bright);
-}
-.ob-threat-label {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 12px;
-  color: var(--text-dim);
-  letter-spacing: 0.08em;
-}
-
-.ob-info-divider {
-  height: 1px;
-  background: linear-gradient(90deg, var(--border), transparent);
-  margin: 2px 0;
-}
-
-/* Color shortcuts */
-.col-green  { color: var(--green) !important; }
-.col-amber  { color: var(--amber) !important; }
-.col-red    { color: var(--red) !important; }
-.col-purple { color: var(--purple) !important; }
-.col-accent { color: var(--accent2) !important; }
-
-/* ── Notices ──────────────────────────────────────── */
-.ob-notice {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  border-radius: 2px;
-  padding: 10px 14px 10px 16px;
-  margin-bottom: 10px;
-  border: 1px solid;
-  position: relative;
-  overflow: hidden;
-}
-.ob-notice::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; bottom: 0; width: 3px;
-  background: var(--notice-color, var(--accent));
-}
-
-.ob-notice-classified { --notice-color: var(--purple); background: rgba(138,104,204,0.07); border-color: rgba(138,104,204,0.28); }
-.ob-notice-danger     { --notice-color: var(--red);    background: rgba(217,79,92,0.07);   border-color: rgba(217,79,92,0.28); }
-.ob-notice-warning    { --notice-color: var(--amber);  background: rgba(212,146,26,0.07);  border-color: rgba(212,146,26,0.28); }
-.ob-notice-info       { --notice-color: var(--accent); background: rgba(178,229,40,0.04);  border-color: rgba(178,229,40,0.20); }
-
-.ob-notice-icon {
-  width: 26px; height: 26px;
-  border: 1px solid var(--notice-color, var(--accent));
-  border-radius: 2px;
-  display: flex; align-items: center; justify-content: center;
-  font-family: 'Orbitron', monospace;
-  font-size: 11px; font-weight: 900;
-  color: var(--notice-color, var(--accent));
-  flex-shrink: 0;
-}
-.ob-notice-body { flex: 1; }
-.ob-notice-title {
-  font-family: 'Orbitron', monospace;
-  font-size: 9px;
-  color: var(--notice-color, var(--accent));
-  letter-spacing: 0.14em;
-  margin-bottom: 3px;
-  text-transform: uppercase;
-}
-.ob-notice-text {
-  font-size: 10px;
   color: var(--text);
-  line-height: 1.6;
-  letter-spacing: 0.02em;
+  font-family: 'Share Tech Mono', monospace;
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
-/* ── Title block ──────────────────────────────────── */
-.ob-title-block {
-  margin-bottom: 18px;
-  padding-bottom: 14px;
-  border-bottom: 1px solid var(--border);
+body::before {
+  content:'';
+  position:fixed; inset:0;
+  background: repeating-linear-gradient(0deg,transparent,transparent 2px,var(--scanline) 2px,var(--scanline) 4px);
+  pointer-events:none; z-index:9999; opacity:0.30;
 }
-.ob-title-eyebrow {
-  font-size: 9px;
-  color: var(--text-dim);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  margin-bottom: 5px;
-}
-.ob-title {
-  font-family: 'Orbitron', monospace;
-  font-size: 24px;
-  font-weight: 900;
-  color: var(--text-bright);
-  letter-spacing: 0.06em;
-  margin-bottom: 3px;
-  line-height: 1.1;
-}
-.ob-title-alias {
-  font-size: 13px;
-  color: var(--text-dim);
-  letter-spacing: 0.05em;
-  font-style: italic;
-}
-.ob-title-alias::before { content: '«'; }
-.ob-title-alias::after  { content: '»'; }
 
-/* ── Document sections ────────────────────────────── */
-.doc-body { display: flex; flex-direction: column; gap: 20px; }
+/* ── TITLEBAR ── */
+.titlebar {
+  background: linear-gradient(90deg,#181818 0%,#111111 100%);
+  border: 1px solid var(--border);
+  border-bottom: none;
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 6px 12px;
+  border-radius: 6px 6px 0 0;
+  position:relative; overflow:hidden;
+}
+.titlebar::before {
+  content:''; position:absolute; left:0; top:0; right:0; height:1px;
+  background: linear-gradient(90deg,transparent,var(--accent2),transparent); opacity:0.7;
+}
+.titlebar-title { font-family:'Orbitron',monospace; font-size:11px; color:var(--text-dim); letter-spacing:0.05em; }
+.titlebar-controls { display:flex; gap:6px; }
+.titlebar-controls span { width:12px; height:12px; border-radius:50%; display:inline-block; }
+.ctrl-close { background:#d94f5c; opacity:0.75; }
+.ctrl-min   { background:#d4921a; opacity:0.75; }
+.ctrl-max   { background:#b2e528; opacity:0.75; }
+
+/* ── WRAPPER ── */
+.os-wrapper {
+  position:relative; z-index:2;
+  max-width:1100px; margin:0 auto; padding:16px;
+  min-height:calc(100vh - 44px);
+  display:flex; flex-direction:column;
+}
+
+/* ── MAIN WINDOW ── */
+.main-window {
+  display:flex; flex:1;
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:0 0 6px 6px;
+  overflow:hidden;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width:200px; min-width:200px;
+  background:var(--bg2);
+  border-right:1px solid var(--border);
+  padding:16px 0;
+  display:flex; flex-direction:column;
+}
+.sidebar-user { padding:12px 16px 16px; border-bottom:1px solid var(--border); margin-bottom:8px; }
+.sidebar-username { font-family:'Orbitron',monospace; font-size:10px; font-weight:700; color:var(--accent2); letter-spacing:0.08em; margin-bottom:2px; }
+.sidebar-role { font-size:9px; color:var(--text-dim); letter-spacing:0.05em; }
+.sidebar-section { padding:10px 16px 4px; font-size:9px; color:var(--text-dim); letter-spacing:0.12em; text-transform:uppercase; }
+.sidebar-item { padding:5px 16px; font-size:11px; color:var(--text-dim); cursor:pointer; transition:all 0.15s; }
+.sidebar-item::before { content:'• '; color:var(--text-dim); }
+.sidebar-item:hover { color:var(--text); background:var(--accent-dim); }
+.sidebar-item.active { color:var(--accent2); }
+.sidebar-item.active::before { color:var(--accent2); }
+.sidebar-bottom { margin-top:auto; padding:12px 16px; border-top:1px solid var(--border); }
+.status-dot { display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--green); margin-right:6px; animation:pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+.status-text { font-size:9px; color:var(--text-dim); }
+
+/* ── CONTENT ── */
+.content { flex:1; display:flex; flex-direction:column; overflow:hidden; position:relative; background:var(--panel); }
+
+/* ── TOPBAR ── */
+.topbar {
+  background:var(--bg3);
+  border-bottom:2px solid var(--accent);
+  padding:8px 20px;
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+}
+.topbar-title { font-family:'Orbitron',monospace; font-size:14px; font-weight:700; color:var(--text-bright); letter-spacing:0.05em; animation:flicker 8s infinite; }
+@keyframes flicker { 0%,95%,100%{opacity:1} 96%{opacity:0.7} 97%{opacity:1} 98%{opacity:0.5} 99%{opacity:1} }
+.topbar-actions { display:flex; gap:8px; }
+.btn-sm {
+  font-family:'Share Tech Mono',monospace; font-size:10px; padding:4px 12px;
+  border:1px solid var(--border-grey); border-radius:2px; color:var(--text-dim);
+  cursor:pointer; background:transparent; transition:all 0.15s; letter-spacing:0.05em;
+  text-decoration:none; display:inline-block;
+}
+.btn-sm:hover { border-color:var(--accent2); color:var(--accent2); }
+.btn-sm.btn-back::before { content:'← '; }
+
+/* ── PAGE SCROLL ── */
+.page { flex:1; padding:24px; overflow-y:auto; }
+.page::-webkit-scrollbar { width:6px; }
+.page::-webkit-scrollbar-track { background:var(--bg2); }
+.page::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+
+/* ════════════════════════════════════
+   SVG CLASSIFICATION HEADER
+   Точная копия scpfoundation.net/component:svgheader1
+════════════════════════════════════ */
+.svgheader-wrap {
+  position:relative;
+  background:var(--bg2);
+  border:1px solid var(--border-grey);
+  border-radius:3px;
+  overflow:hidden;
+  margin-bottom:20px;
+  display:flex;
+  align-items:stretch;
+  min-height:120px;
+}
+
+/* Левая декоративная полоса с цветом угрозы */
+.svgheader-threat-stripe {
+  width:5px;
+  flex-shrink:0;
+}
+.threat-red    { background:var(--red); }
+.threat-amber  { background:var(--amber); }
+.threat-green  { background:var(--green); }
+.threat-purple { background:var(--purple); }
+.threat-grey   { background:var(--text-dim); }
+
+/* SVG круговая иконка */
+.svgheader-icon-col {
+  padding:18px 20px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-right:1px solid var(--border-grey);
+  background: rgba(0,0,0,0.15);
+  flex-shrink:0;
+}
+
+.svgheader-icon {
+  width:80px; height:80px;
+  position:relative;
+}
+
+/* Концентрические кольца (воспроизведение SVG с сайта) */
+.ring-svg { width:100%; height:100%; }
+
+/* Правая часть: метаданные */
+.svgheader-meta {
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  padding:16px 24px;
+  gap:4px;
+}
+
+.svgheader-row {
+  display:flex;
+  align-items:baseline;
+  gap:10px;
+}
+
+.svgheader-key {
+  font-family:'Orbitron',monospace;
+  font-size:9px;
+  color:var(--text-dim);
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  min-width:130px;
+  flex-shrink:0;
+}
+
+.svgheader-val {
+  font-family:'Orbitron',monospace;
+  font-size:13px;
+  font-weight:700;
+  color:var(--text-bright);
+  letter-spacing:0.04em;
+}
+
+.svgheader-val.accent { color:var(--accent2); }
+.svgheader-val.red    { color:var(--red); }
+.svgheader-val.amber  { color:var(--amber); }
+.svgheader-val.green  { color:var(--green); }
+.svgheader-val.purple { color:var(--purple); }
+
+.svgheader-val.strikethrough {
+  text-decoration: line-through;
+  opacity: 0.5;
+  font-size:11px;
+  margin-right:4px;
+}
+
+.svgheader-clearance {
+  margin-top:8px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.clearance-pill {
+  font-family:'Orbitron',monospace;
+  font-size:9px;
+  font-weight:700;
+  padding:3px 10px;
+  border-radius:2px;
+  letter-spacing:0.10em;
+}
+.cp-red    { background:rgba(217,79,92,0.12);  border:1px solid rgba(217,79,92,0.35);  color:var(--red); }
+.cp-amber  { background:rgba(212,146,26,0.12); border:1px solid rgba(212,146,26,0.35); color:var(--amber); }
+.cp-green  { background:var(--green-dim);       border:1px solid rgba(178,229,40,0.30); color:var(--green); }
+.cp-purple { background:rgba(138,104,204,0.10); border:1px solid rgba(138,104,204,0.30);color:var(--purple); }
+.cp-grey   { background:rgba(80,88,96,0.12);    border:1px solid rgba(80,88,96,0.30);   color:var(--text-dim); }
+
+/* Правая колонка: иконки подклассов */
+.svgheader-classes {
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:6px;
+  padding:16px 20px;
+  border-left:1px solid var(--border-grey);
+  background: rgba(0,0,0,0.10);
+  flex-shrink:0;
+  min-width:170px;
+}
+
+.class-row {
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.class-dot {
+  width:8px; height:8px;
+  border-radius:50%;
+  flex-shrink:0;
+}
+
+.class-label-sm {
+  font-size:8px;
+  color:var(--text-dim);
+  letter-spacing:0.10em;
+  text-transform:uppercase;
+  min-width:70px;
+}
+
+.class-val-sm {
+  font-family:'Orbitron',monospace;
+  font-size:9px;
+  color:var(--text-bright);
+  letter-spacing:0.04em;
+}
+
+/* ════════════════════════════════════
+   SECURITY NOTICE BANNERS
+════════════════════════════════════ */
+.notice-banner {
+  display:flex;
+  align-items:flex-start;
+  gap:14px;
+  border-radius:3px;
+  padding:11px 16px;
+  margin-bottom:12px;
+  position:relative;
+  overflow:hidden;
+}
+
+.notice-banner::before {
+  content:'';
+  position:absolute;
+  left:0; top:0; bottom:0; width:3px;
+}
+
+.notice-banner.nb-classified {
+  background:rgba(138,104,204,0.07);
+  border:1px solid rgba(138,104,204,0.28);
+}
+.notice-banner.nb-classified::before { background:var(--purple); }
+
+.notice-banner.nb-warning {
+  background:rgba(212,146,26,0.07);
+  border:1px solid rgba(212,146,26,0.28);
+}
+.notice-banner.nb-warning::before { background:var(--amber); }
+
+.notice-banner.nb-danger {
+  background:rgba(217,79,92,0.07);
+  border:1px solid rgba(217,79,92,0.28);
+}
+.notice-banner.nb-danger::before { background:var(--red); }
+
+.notice-banner.nb-info {
+  background:var(--accent-dim);
+  border:1px solid var(--border);
+}
+.notice-banner.nb-info::before { background:var(--accent2); }
+
+.notice-icon {
+  flex-shrink:0;
+  width:28px; height:28px;
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Orbitron',monospace;
+  font-size:12px; font-weight:900;
+  margin-top:1px;
+}
+.nb-classified .notice-icon { border:1px solid rgba(138,104,204,0.5); color:var(--purple); }
+.nb-warning    .notice-icon { border:1px solid rgba(212,146,26,0.5);  color:var(--amber); }
+.nb-danger     .notice-icon { border:1px solid rgba(217,79,92,0.5);   color:var(--red); }
+.nb-info       .notice-icon { border:1px solid var(--border2);         color:var(--accent2); }
+
+.notice-body { flex:1; }
+.notice-title {
+  font-family:'Orbitron',monospace;
+  font-size:9px;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  margin-bottom:4px;
+}
+.nb-classified .notice-title { color:var(--purple); }
+.nb-warning    .notice-title { color:var(--amber); }
+.nb-danger     .notice-title { color:var(--red); }
+.nb-info       .notice-title { color:var(--accent2); }
+
+.notice-text { font-size:10px; color:var(--text); line-height:1.6; letter-spacing:0.03em; }
+
+/* ════════════════════════════════════
+   DOCUMENT BODY TEXT
+════════════════════════════════════ */
+.doc-body { display:flex; flex-direction:column; gap:16px; }
 
 .doc-section {
-  background: var(--bg2);
-  border: 1px solid var(--border-grey);
-  border-radius: 3px;
-  overflow: hidden;
+  background:var(--bg2);
+  border:1px solid var(--border-grey);
+  border-radius:3px;
+  overflow:hidden;
 }
+
 .doc-section-header {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 7px 16px;
-  background: var(--bg3);
-  border-bottom: 1px solid var(--accent);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:7px 16px;
+  background:var(--accent-dim);
+  border-bottom:1px solid var(--accent);
 }
-.doc-section-num {
-  font-family: 'Orbitron', monospace;
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--accent2);
-  letter-spacing: 0.1em;
-  flex-shrink: 0;
-}
+
 .doc-section-title {
-  font-family: 'Orbitron', monospace;
-  font-size: 9px;
-  color: var(--text-dim);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  flex: 1;
+  font-family:'Orbitron',monospace;
+  font-size:9px;
+  color:var(--accent2);
+  letter-spacing:0.14em;
+  text-transform:uppercase;
 }
+
 .doc-section-tag {
-  font-size: 8px;
-  color: var(--text-dim);
-  letter-spacing: 0.06em;
+  font-size:8px;
+  color:var(--text-dim);
+  letter-spacing:0.06em;
 }
-.doc-section-body { padding: 20px 22px; }
 
-/* Running text */
+.doc-section-body {
+  padding:18px 20px;
+}
+
 .doc-text {
-  font-size: 12px;
-  color: var(--text);
-  line-height: 1.85;
-  letter-spacing: 0.025em;
-}
-.doc-text p { margin-bottom: 13px; }
-.doc-text p:last-child { margin-bottom: 0; }
-.doc-text strong { color: var(--text-bright); font-weight: 400; }
-.doc-text.with-dropcap > p:first-child::first-letter {
-  font-family: 'Orbitron', monospace;
-  font-size: 2.8em;
-  font-weight: 900;
-  color: var(--accent2);
-  float: left;
-  line-height: 0.8;
-  margin-right: 7px;
-  margin-top: 4px;
+  font-size:12px;
+  color:var(--text);
+  line-height:1.85;
+  letter-spacing:0.03em;
 }
 
-.redacted {
-  background: var(--text-dim);
-  color: transparent;
-  border-radius: 1px;
-  padding: 0 3px;
-  user-select: none;
-  cursor: not-allowed;
-}
-.doc-clearfix::after { content: ''; display: table; clear: both; }
-.doc-rule { height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent); margin: 16px 0; }
+.doc-text p { margin-bottom:12px; }
+.doc-text p:last-child { margin-bottom:0; }
 
-/* Inline image */
-.doc-image-wrap {
-  background: var(--bg);
-  border: 1px solid var(--border-grey);
-  border-radius: 2px;
-  overflow: hidden;
-  margin: 16px 0;
-}
-.doc-image-wrap.float-right { float: right; clear: right; margin: 0 0 14px 18px; width: 240px; }
-.doc-image-wrap.float-left  { float: left;  clear: left;  margin: 0 18px 14px 0; width: 240px; }
-.doc-image-wrap.full        { width: 100%; }
-.doc-image-wrap img { width: 100%; display: block; filter: grayscale(15%) contrast(1.04); }
-
-.doc-image-placeholder {
-  width: 100%; aspect-ratio: 4/3;
-  background:
-    repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(178,229,40,0.03) 8px, rgba(178,229,40,0.03) 9px),
-    var(--bg2);
-  display: flex; align-items: center; justify-content: center;
-  flex-direction: column; gap: 6px;
-  font-size: 9px; color: var(--text-dim);
-  letter-spacing: 0.1em; opacity: 0.7;
-}
-.doc-image-caption {
-  padding: 6px 12px;
-  font-size: 9px; color: var(--text-dim);
-  letter-spacing: 0.04em;
-  border-top: 1px solid var(--border);
-  background: var(--bg3);
-  line-height: 1.5;
-}
-.doc-image-caption strong { color: var(--accent2); font-weight: 400; }
-
-/* Procedure box */
-.ob-procedure {
-  background: var(--bg);
-  border: 1px solid rgba(178,229,40,0.18);
-  border-radius: 2px;
-  padding: 15px 18px;
-  margin-bottom: 16px;
-}
-.ob-procedure-title {
-  font-family: 'Orbitron', monospace;
-  font-size: 9px; color: var(--accent2);
-  letter-spacing: 0.12em;
-  margin-bottom: 10px;
-  padding-bottom: 7px;
-  border-bottom: 1px solid rgba(178,229,40,0.15);
-}
-.ob-procedure ol { padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
-.ob-procedure ol li { font-size: 11px; color: var(--text); line-height: 1.6; }
-.ob-procedure ol li::marker { color: var(--accent2); font-size: 9px; }
-
-/* Experiment log table */
-.doc-log-table { width: 100%; border-collapse: collapse; }
-.doc-log-table th {
-  font-size: 8px; color: var(--text-dim); letter-spacing: 0.12em;
-  text-transform: uppercase; padding: 6px 12px;
-  border-bottom: 1px solid var(--accent);
-  text-align: left; font-weight: 400;
-  font-family: 'Share Tech Mono', monospace;
-}
-.doc-log-table td {
-  font-size: 10px; color: var(--text); padding: 9px 12px;
-  border-bottom: 1px solid rgba(178,229,40,0.07);
-  vertical-align: top; line-height: 1.5;
-}
-.doc-log-table tr:last-child td { border-bottom: none; }
-.doc-log-table tr:hover td { background: rgba(178,229,40,0.02); }
-.col-num  { width: 40px; color: var(--text-dim) !important; font-size: 9px !important; }
-.col-date { width: 130px; color: var(--text-dim) !important; font-size: 9px !important; white-space: nowrap; }
-.col-res  { width: 90px; }
-.result-pos { color: var(--green); }
-.result-neg { color: var(--red); }
-.result-amb { color: var(--amber); }
-
-/* ── Responsive ───────────────────────────────────── */
-@media (max-width: 768px) {
-  .ob-svg-header { flex-direction: column; }
-  .ob-svg-rings  { width: 100%; height: 130px; border-right: none; border-bottom: 1px solid var(--border); }
-  .ob-svg-bar    { width: 100%; height: 6px; }
-  .ob-svg-bar::after { background: repeating-linear-gradient(90deg, transparent, transparent 5px, rgba(0,0,0,0.22) 5px, rgba(0,0,0,0.22) 6px); }
-  .doc-image-wrap.float-right,
-  .doc-image-wrap.float-left { float: none; width: 100%; margin: 14px 0; }
-  .doc-section-body { padding: 14px 14px; }
-  .ob-title { font-size: 18px; }
-}
-@media (max-width: 480px) {
-  .ob-svg-rings { height: 110px; }
-  .ob-rings-svg { width: 88px; height: 88px; }
-  .ob-svg-info { padding: 14px; }
-  .ob-info-value { font-size: 11px; }
-  .ob-threat-num { font-size: 24px; }
+.doc-text .redacted {
+  background:var(--text-dim);
+  color:transparent;
+  border-radius:1px;
+  padding:0 2px;
+  user-select:none;
+  cursor:not-allowed;
 }
 
+.doc-text strong {
+  color:var(--text-bright);
+  font-weight:normal;
+}
+
+/* ── INLINE PHOTO ── */
+.doc-photo-wrap {
+  float:right;
+  margin:0 0 16px 24px;
+  max-width:240px;
+  flex-shrink:0;
+}
+
+.doc-photo-wrap.left {
+  float:left;
+  margin:0 24px 16px 0;
+}
+
+.doc-photo-frame {
+  background:var(--bg);
+  border:1px solid var(--border-grey);
+  border-radius:3px;
+  overflow:hidden;
+  position:relative;
+}
+
+.doc-photo-frame::before {
+  content:'';
+  position:absolute; inset:0;
+  background:repeating-linear-gradient(45deg,transparent,transparent 6px,rgba(178,229,40,0.02) 6px,rgba(178,229,40,0.02) 7px);
+  pointer-events:none; z-index:1;
+}
+
+.doc-photo-frame img {
+  width:100%; height:auto;
+  display:block;
+  filter:grayscale(20%) contrast(1.05);
+  position:relative; z-index:0;
+}
+
+/* Placeholder когда нет фото */
+.doc-photo-placeholder {
+  width:100%;
+  aspect-ratio:4/3;
+  display:flex; align-items:center; justify-content:center;
+  flex-direction:column; gap:8px;
+}
+.placeholder-icon { font-size:28px; opacity:0.15; }
+.placeholder-text { font-size:9px; color:var(--text-dim); letter-spacing:0.08em; }
+
+.doc-photo-caption {
+  padding:6px 10px;
+  font-size:9px;
+  color:var(--text-dim);
+  letter-spacing:0.05em;
+  border-top:1px solid var(--border-grey);
+  background:rgba(10,12,15,0.5);
+  line-height:1.5;
+}
+
+.clearfix::after { content:''; display:table; clear:both; }
+
+/* ── SEPARATOR ── */
+.doc-divider {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin:4px 0;
+  opacity:0.4;
+}
+.doc-divider::before,
+.doc-divider::after {
+  content:'';
+  flex:1;
+  height:1px;
+  background:var(--border-grey);
+}
+.doc-divider-text { font-size:9px; color:var(--text-dim); letter-spacing:0.1em; white-space:nowrap; }
+
+/* ── OBJECT NUMBER WATERMARK ── */
+.doc-watermark {
+  position:fixed;
+  bottom:40px; right:40px;
+  font-family:'Orbitron',monospace;
+  font-size:60px; font-weight:900;
+  color:rgba(178,229,40,0.04);
+  letter-spacing:0.1em;
+  pointer-events:none; z-index:0;
+  transform:rotate(-20deg);
+  user-select:none;
+}
+
+/* ════════════════════════════════════
+   MOBILE
+════════════════════════════════════ */
+@media (max-width:768px) {
+  .os-wrapper { padding:0; }
+  .titlebar { border-radius:0; }
+  .titlebar-controls { display:none; }
+  .main-window { flex-direction:column; border-radius:0; border-left:none; border-right:none; }
+  .sidebar { width:100%; min-width:unset; border-right:none; border-bottom:1px solid var(--border); padding:4px 0; flex-direction:row; overflow-x:auto; scrollbar-width:none; }
+  .sidebar::-webkit-scrollbar { display:none; }
+  .sidebar-user,.sidebar-section,.sidebar-bottom { display:none; }
+  .sidebar-item { display:inline-block; padding:8px 14px; font-size:10px; white-space:nowrap; flex-shrink:0; }
+  .topbar { padding:8px 12px; }
+  .topbar-title { font-size:11px; }
+  .page { padding:12px; }
+  .svgheader-wrap { flex-direction:column; min-height:unset; }
+  .svgheader-threat-stripe { width:100%; height:4px; }
+  .svgheader-icon-col { border-right:none; border-bottom:1px solid var(--border-grey); }
+  .svgheader-classes { border-left:none; border-top:1px solid var(--border-grey); min-width:unset; }
+  .svgheader-key { min-width:100px; font-size:8px; }
+  .svgheader-val { font-size:11px; }
+  .doc-photo-wrap, .doc-photo-wrap.left { float:none; margin:0 0 14px 0; max-width:100%; }
+  .doc-watermark { display:none; }
+}
 </style>
 </head>
 <body>
 
-<div class="dossier-watermark">ОБЪЕКТ</div>
-
 <div class="os-wrapper">
+
+  <!-- TITLEBAR -->
   <div class="titlebar">
-    <span class="titlebar-title">HADAL DATABASE — ОБЪЕКТНАЯ ДОКУМЕНТАЦИЯ</span>
+    <span class="titlebar-title">HADAL DATABASE — OBJECT FILE VIEWER v2.4.1</span>
     <div class="titlebar-controls">
       <span class="ctrl-close"></span>
       <span class="ctrl-min"></span>
@@ -422,381 +556,197 @@
     </div>
   </div>
 
+  <!-- MAIN WINDOW -->
   <div class="main-window">
 
     <!-- SIDEBAR -->
     <div class="sidebar">
       <div class="sidebar-user">
-        <div class="sidebar-username">ПОЛЬЗОВАТЕЛЬ</div>
-        <div class="sidebar-role">Уровень доступа: 4</div>
+        <div class="sidebar-username">DR_VOSS</div>
+        <div class="sidebar-role">НАУЧНЫЙ ПЕРСОНАЛ · УД-3</div>
       </div>
       <div class="sidebar-section">Навигация</div>
-      <div class="sidebar-item"><a href="index.html">Главная</a></div>
+      <div class="sidebar-item" href="index.html">Главная</div>
       <div class="sidebar-item"><a href="personnel.html">Персоналии</a></div>
       <div class="sidebar-item"><a href="prisoners.html">Заключённые</a></div>
       <div class="sidebar-item active"><a href="documents.html">Документация</a></div>
       <div class="sidebar-section">Дополнительно</div>
-      <div class="sidebar-item"><a href="object-classification.html">Классификация объектов</a></div>
+      <div class="sidebar-item" href="map.html">Карта</div>
+      <div class="sidebar-item" href="stories.html">Рассказы</div>
+      <div class="sidebar-item" href="object-classification.html">Классификация объектов</div>
       <div class="sidebar-item"><a href="https://teletype.in/@yurubolski/GMpdKbCOIMu">Правила</a></div>
       <div class="sidebar-bottom">
-        <div><span class="status-dot"></span><span class="status-text">ПОЛЬЗОВАТЕЛЬ В СЕТИ</span></div>
+        <span class="status-dot"></span>
+        <span class="status-text">СИСТЕМА В СЕТИ</span>
       </div>
     </div>
 
     <!-- CONTENT -->
     <div class="content">
+
+      <!-- TOPBAR -->
       <div class="topbar">
-        <div class="topbar-title">ДОСЬЕ ОБЪЕКТА</div>
-        <div class="topbar-actions">
-          <a class="btn-sm btn-back" href="documents.html">Назад к реестру</a>
-        </div>
+        <div class="topbar-title">ДОКУМЕНТ · Z-638</div>
       </div>
 
+      <!-- PAGE -->
       <div class="page">
-
-        <!-- ══ TITLE ══ -->
-        <div class="ob-title-block">
-          <div class="ob-title-eyebrow">URBANSHADE CORP — ХАДАЛЬНОЕ ПОДРАЗДЕЛЕНИЕ / АНОМАЛЬНЫЙ ОБЪЕКТ</div>
-          <div class="ob-title">Z-638</div>
-          <div class="ob-title-alias">Восьмиручка</div>
-        </div>
-
-
-        <!-- ══════════════════════════════════════════════════════
-             SVG CLASSIFICATION HEADER
-             ──────────────────────────────────────────────────────
-             Как менять:
-
-             КЛАСС объекта:
-               <span class="ob-info-value strikethrough">Геннем</span>  ← зачёркнутый старый
-               <span class="ob-info-value col-amber">Ванскел</span>     ← текущий
-             Убери .strikethrough-span, если предыдущего класса нет.
-
-             УРОВЕНЬ УГРОЗЫ:
-               ob-threat-num — число (0–6)
-               ob-threat-label — текст («КРАСНЫЙ», «ЖЁЛТЫЙ», etc.)
-               col-green / col-amber / col-red — цвет
-
-             ЦВЕТ БОКОВОЙ ПОЛОСЫ (.ob-svg-bar):
-               style="--bar-color: var(--red)"
-               style="--bar-color: var(--amber)"
-               style="--bar-color: var(--green)"
-               style="--bar-color: var(--purple)"
-               style="--bar-color: var(--accent)"  ← кислотно-зелёный
-
-             СЕГМЕНТЫ ШЕСТИУГОЛЬНИКА — меняй fill у <path> по вкусу.
-        ═══════════════════════════════════════════════════════ -->
-        <div class="ob-svg-header">
-
-          <!-- ❶ SVG кольца слева -->
-          <div class="ob-svg-rings">
-            <svg class="ob-rings-svg" viewBox="0 0 118 118" fill="none" xmlns="http://www.w3.org/2000/svg">
-
-              <!-- Внешняя группа — вращается по часовой -->
-              <g class="ob-ring-outer">
-                <circle cx="59" cy="59" r="56" stroke="rgba(178,229,40,0.16)" stroke-width="1"/>
-                <circle cx="59" cy="59" r="50" stroke="rgba(178,229,40,0.12)" stroke-width="1"/>
-                <circle cx="59" cy="59" r="43" stroke="rgba(178,229,40,0.20)" stroke-width="1.2"/>
-                <!-- Засечки — 4 кардинальных -->
-                <line x1="59"  y1="3"   x2="59"  y2="12"  stroke="rgba(178,229,40,0.55)" stroke-width="1.4"/>
-                <line x1="59"  y1="106" x2="59"  y2="115" stroke="rgba(178,229,40,0.55)" stroke-width="1.4"/>
-                <line x1="3"   y1="59"  x2="12"  y2="59"  stroke="rgba(178,229,40,0.55)" stroke-width="1.4"/>
-                <line x1="106" y1="59"  x2="115" y2="59"  stroke="rgba(178,229,40,0.55)" stroke-width="1.4"/>
-                <!-- Диагональные засечки -->
-                <line x1="20" y1="20" x2="26" y2="26" stroke="rgba(178,229,40,0.28)" stroke-width="1"/>
-                <line x1="98" y1="20" x2="92" y2="26" stroke="rgba(178,229,40,0.28)" stroke-width="1"/>
-                <line x1="20" y1="98" x2="26" y2="92" stroke="rgba(178,229,40,0.28)" stroke-width="1"/>
-                <line x1="98" y1="98" x2="92" y2="92" stroke="rgba(178,229,40,0.28)" stroke-width="1"/>
-              </g>
-
-              <!-- Средняя группа — вращается против часовой -->
-              <g class="ob-ring-mid">
-                <circle cx="59" cy="59" r="36" stroke="rgba(178,229,40,0.22)" stroke-width="1"/>
-                <circle cx="59" cy="59" r="29" stroke="rgba(178,229,40,0.16)" stroke-width="1"/>
-                <circle cx="59" cy="59" r="23"
-                  stroke="rgba(178,229,40,0.32)" stroke-width="1"
-                  stroke-dasharray="3 4"/>
-              </g>
-
-              <!-- Шестиугольные сегменты (статичные) -->
-              <!-- Вершины правильного шестиугольника r=17 от центра 59,59:
-                   Верх:       59, 42
-                   Верх-право: 74.7, 50.5
-                   Низ-право:  74.7, 67.5
-                   Низ:        59, 76
-                   Низ-лево:   43.3, 67.5
-                   Верх-лево:  43.3, 50.5 -->
-
-              <!-- Верхний — зелёный (класс) -->
-              <path d="M59 59 L59 42 L74.7 50.5 Z"        fill="rgba(178,229,40,0.55)"/>
-              <!-- Верх-правый — красный (угроза) -->
-              <path d="M59 59 L74.7 50.5 L74.7 67.5 Z"    fill="rgba(217,79,92,0.48)"/>
-              <!-- Низ-правый — янтарный -->
-              <path d="M59 59 L74.7 67.5 L59 76 Z"        fill="rgba(212,146,26,0.48)"/>
-              <!-- Нижний — серый -->
-              <path d="M59 59 L59 76 L43.3 67.5 Z"        fill="rgba(100,110,120,0.35)"/>
-              <!-- Низ-левый — фиолетовый -->
-              <path d="M59 59 L43.3 67.5 L43.3 50.5 Z"    fill="rgba(138,104,204,0.42)"/>
-              <!-- Верх-левый — акцент dim -->
-              <path d="M59 59 L43.3 50.5 L59 42 Z"        fill="rgba(178,229,40,0.22)"/>
-
-              <!-- Контур шестиугольника -->
-              <polygon points="59,42 74.7,50.5 74.7,67.5 59,76 43.3,67.5 43.3,50.5"
-                fill="none" stroke="rgba(178,229,40,0.65)" stroke-width="1.2"/>
-
-              <!-- Центр -->
-              <circle cx="59" cy="59" r="4" fill="rgba(178,229,40,0.92)"/>
-              <circle cx="59" cy="59" r="7" fill="none" stroke="rgba(178,229,40,0.38)" stroke-width="1"/>
-
-            </svg>
+        <div class="svgheader-wrap">
+          <div class="svgheader-threat-stripe threat-red"></div>
+          <div class="svgheader-icon-col">
+            <div class="svgheader-icon">
+              <svg class="ring-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="48" fill="none" stroke="rgba(217,79,92,0.80)" stroke-width="2.5"/>
+                <circle cx="50" cy="50" r="41" fill="none" stroke="rgba(217,79,92,0.65)" stroke-width="2"/>
+                <circle cx="50" cy="50" r="34" fill="none" stroke="rgba(217,79,92,0.52)" stroke-width="2"/>
+                <circle cx="50" cy="50" r="27" fill="none" stroke="rgba(217,79,92,0.40)" stroke-width="1.5"/>
+                <circle cx="50" cy="50" r="20" fill="none" stroke="rgba(217,79,92,0.28)" stroke-width="1.5"/>
+                <circle cx="50" cy="50" r="14" fill="none" stroke="rgba(217,79,92,0.18)" stroke-width="1"/>
+                <g transform="translate(50,50)">
+                  <path d="M0,0 L0,-11 A11,11,0,0,1,9.5,-5.5 Z"   fill="rgba(217,79,92,0.7)"/>
+                  <path d="M0,0 L9.5,-5.5 A11,11,0,0,1,9.5,5.5 Z"  fill="rgba(212,146,26,0.7)"/>
+                  <path d="M0,0 L9.5,5.5 A11,11,0,0,1,0,11 Z"      fill="rgba(178,229,40,0.7)"/>
+                  <path d="M0,0 L0,11 A11,11,0,0,1,-9.5,5.5 Z"     fill="rgba(138,104,204,0.7)"/>
+                  <path d="M0,0 L-9.5,5.5 A11,11,0,0,1,-9.5,-5.5 Z" fill="rgba(120,130,140,0.5)"/>
+                  <path d="M0,0 L-9.5,-5.5 A11,11,0,0,1,0,-11 Z"   fill="rgba(120,130,140,0.3)"/>
+                  <circle cx="0" cy="0" r="5" fill="#1c1c1c" stroke="rgba(217,79,92,0.4)" stroke-width="0.8"/>
+                </g>
+                <line x1="50" y1="2"  x2="50" y2="8"   stroke="rgba(217,79,92,0.6)" stroke-width="1"/>
+                <line x1="50" y1="92" x2="50" y2="98"   stroke="rgba(217,79,92,0.6)" stroke-width="1"/>
+                <line x1="2"  y1="50" x2="8"  y2="50"   stroke="rgba(217,79,92,0.6)" stroke-width="1"/>
+                <line x1="92" y1="50" x2="98" y2="50"   stroke="rgba(217,79,92,0.6)" stroke-width="1"/>
+              </svg>
+            </div>
           </div>
 
-          <!-- ❷ Текстовый блок -->
-          <div class="ob-svg-info">
-
-            <div class="ob-info-row">
-              <span class="ob-info-label">Объект №:</span>
-              <span class="ob-info-value col-accent">Z-638</span>
+          <!-- Метаданные объекта -->
+          <div class="svgheader-meta">
+            <div class="svgheader-row">
+              <span class="svgheader-key">Объект №</span>
+              <span class="svgheader-val accent">Z-638</span>
             </div>
-
-            <div class="ob-info-divider"></div>
-
-            <!-- Класс: зачёркнутый старый + текущий.
-                 Убери первый span, если менять нечего. -->
-            <div class="ob-info-row">
-              <span class="ob-info-label">Класс объекта:</span>
-              <span class="ob-info-value strikethrough">Геннем</span>
-              <span class="ob-info-value col-amber">Ванскел</span>
+            <div class="svgheader-row">
+              <span class="svgheader-key">Класс объекта</span>
+              <span class="svgheader-val yellow">Геннем</span>
             </div>
-
-            <div class="ob-info-divider"></div>
-
-            <!-- Уровень угрозы: число + слово -->
-            <div class="ob-info-row" style="align-items:baseline; gap:10px;">
-              <span class="ob-info-label">Ур.</span>
-              <span class="ob-threat-num col-red">4</span>
-              <span class="ob-threat-label col-red">/ КРАСНЫЙ</span>
+            <div class="svgheader-row">
+              <span class="svgheader-key">Происхождение</span>
+              <span class="svgheader-val">Йорд</span>
             </div>
-
-            <div class="ob-info-divider"></div>
-
-            <!-- Дополнительная строка — что угодно -->
-            <div class="ob-info-row">
-              <span class="ob-info-label">Допуск:</span>
-              <span class="ob-info-value col-purple">Засекречено — Ур. 4+</span>
-            </div>
-
           </div>
 
-          <!-- ❸ Цветная полоса справа.
-               Меняй --bar-color:
-                 var(--green)   зелёный
-                 var(--amber)   жёлтый
-                 var(--red)     красный
-                 var(--purple)  фиолетовый
-                 var(--accent)  кислотный -->
-          <div class="ob-svg-bar" style="--bar-color: var(--red);"></div>
+          <!-- Правая колонка: подклассы -->
+          <div class="svgheader-classes">
+            <div class="class-row">
+              <div class="class-dot" style="background:rgba(217,79,92,0.8)"></div>
+              <span class="class-label-sm">Управляемость</span>
+              <span class="svgheader-val" style="font-size:9px;color:var(--red)">Вагт</span>
+            </div>
+            <div class="class-row">
+              <div class="class-dot" style="background:rgba(212,146,26,0.8)"></div>
+              <span class="class-label-sm">Польза</span>
+              <span class="svgheader-val" style="font-size:9px;color:var(--amber)">Снит</span>
+            </div>
+            <div class="class-row">
+              <div class="class-dot" style="background:rgba(178,229,40,0.8)"></div>
+              <span class="class-label-sm">Репликативность</span>
+              <span class="svgheader-val" style="font-size:9px;color:var(--green)">Свортег</span>
+            </div>
+          </div>
 
-        </div><!-- /ob-svg-header -->
-
-
-        <!-- ══ УВЕДОМЛЕНИЯ ════════════════════════════════
-             Классы:
-               ob-notice-classified  фиолетовый
-               ob-notice-danger      красный
-               ob-notice-warning     жёлтый
-               ob-notice-info        зелёный
-        ═══════════════════════════════════════════════ -->
-
-        <div class="ob-notice ob-notice-classified">
-          <div class="ob-notice-icon">⬛</div>
-          <div class="ob-notice-body">
-            <div class="ob-notice-title">Ограниченный доступ — уровень 4+</div>
-            <div class="ob-notice-text">Данный файл доступен только сотрудникам с уровнем допуска 4 и выше. Несанкционированное ознакомление с материалами влечёт немедленное дисциплинарное взыскание.</div>
+        <div class="notice-banner nb-classified">
+          <div class="notice-icon">S</div>
+          <div class="notice-body">
+            <div class="notice-title">Секретность · Уровень 2 / Для служебного пользования</div>
+            <div class="notice-text">Данный файл доступен только сотрудникам с карточкой специализации <strong>S</strong> или <strong>A</strong> и уровнем допуска не ниже 2. Несанкционированный доступ фиксируется автоматически и передаётся в службу безопасности.</div>
           </div>
         </div>
 
-        <div class="ob-notice ob-notice-danger">
-          <div class="ob-notice-icon">!</div>
-          <div class="ob-notice-body">
-            <div class="ob-notice-title">Опасный объект — прямой контакт запрещён</div>
-            <div class="ob-notice-text">При нарушении условий содержания немедленно активировать протокол <strong style="color:var(--red)">«ГЛУБИНА-3»</strong> и покинуть зону в течение 90 секунд. Не вступать в вербальный контакт без санкции куратора.</div>
-          </div>
-        </div>
-
-
-        <!-- ══ ТЕЛО ДОКУМЕНТА ════════════════════════════ -->
         <div class="doc-body">
 
-          <!-- §1 Условия содержания -->
           <div class="doc-section">
             <div class="doc-section-header">
-              <span class="doc-section-num">§1</span>
-              <span class="doc-section-title">Условия содержания</span>
-              <span class="doc-section-tag">ФАЙЛ 01 / ПРОТОКОЛ</span>
+              <span class="doc-section-title">Особые процедуры содержания</span>
+              <span class="doc-section-tag">SEC-CONT · REV.09</span>
             </div>
             <div class="doc-section-body">
-              <div class="ob-procedure">
-                <div class="ob-procedure-title">СТАНДАРТНАЯ ПРОЦЕДУРА СОДЕРЖАНИЯ — Z-638</div>
-                <ol>
-                  <li>Объект должен содержаться в камере 6-Б Сектора Дельта, выполненной из армированного стекла толщиной не менее 30 мм с гидравлическими затворами класса «Океан».</li>
-                  <li>Камера заполняется солёной водой (солёность 34‰) и поддерживается при температуре +4 °C круглосуточно.</li>
-                  <li>Ежесуточный доступ разрешён не более чем двум сотрудникам с уровнем допуска 4+, в присутствии вооружённого сопровождения.</li>
-                  <li>Визуальный контакт без защитных линз класса «Антипсихический-2» строго запрещён.</li>
-                  <li>При нарушении герметичности камеры — немедленная активация протокола <strong>«ГЛУБИНА-3»</strong>.</li>
-                </ol>
-              </div>
-              <div class="doc-text">
-                <p>Все переговоры с Z-638 проводятся исключительно через акустический интерфейс камеры. Прямая речь персонала не должна содержать вопросов о природе объекта, его прежнем местонахождении или именах сотрудников.</p>
+              <div class="doc-text clearfix">
+
+                <!-- Фото справа -->
+                <div class="doc-photo-wrap">
+                  <div class="doc-photo-frame">
+                    <div class="doc-photo-placeholder">
+                      <span class="placeholder-icon">⬛</span>
+                      <span class="placeholder-text">ФОТО ОТСУТСТВУЕТ</span>
+                      <span class="placeholder-text" style="font-size:8px;margin-top:2px">Камера вышла из строя</span>
+                    </div>
+                  </div>
+                  <div class="doc-photo-caption">Рис. 1 — Камера содержания HDB-0041 после инцидента 17-Б. Оборудование заменено.</div>
+                </div>
+
+                <p>Объект HDB-0041 содержится в камере усиленного сдерживания на подуровне <span class="redacted">████████</span>-7, оснащённой <strong>тройным слоем диэлектрического экранирования</strong> и системой подавления аномальных сигналов класса «Тихий горизонт». Доступ в камеру возможен только при наличии карточки специализации <strong>S</strong> и личного разрешения действующего директора сектора.</p>
+
+                <p>Персоналу запрещено находиться в камере содержания в одиночестве. При плановом осмотре обязательно присутствие не менее трёх гвардейцев уровня допуска 3 и одного старшего научного сотрудника. Осмотры проводятся не чаще одного раза в <strong>72 часа</strong>.</p>
+
+                <p>В случае если объект демонстрирует <span class="redacted">████████████████████████</span>, персонал обязан немедленно покинуть камеру и активировать протокол <strong>LOCKDOWN-7</strong>, не вступая в вербальный или визуальный контакт.</p>
+
               </div>
             </div>
           </div>
 
-          <!-- §2 Описание -->
+          <!-- ОПИСАНИЕ -->
           <div class="doc-section">
             <div class="doc-section-header">
-              <span class="doc-section-num">§2</span>
-              <span class="doc-section-title">Описание объекта</span>
-              <span class="doc-section-tag">ФАЙЛ 02 / ДАННЫЕ</span>
+              <span class="doc-section-title">Описание</span>
+              <span class="doc-section-tag">DESC · REV.14</span>
             </div>
             <div class="doc-section-body">
-              <div class="doc-text with-dropcap doc-clearfix">
+              <div class="doc-text clearfix">
 
-                <!-- Фото справа.
-                     Замените содержимое .doc-image-placeholder на:
-                     <img src="путь_к_фото.jpg">         -->
-                <div class="doc-image-wrap float-right">
-                  <div class="doc-image-placeholder">⬛<br>ИЗОБРАЖЕНИЕ НЕ ЗАГРУЖЕНО</div>
-                  <div class="doc-image-caption"><strong>РИС. 1.</strong> Объект Z-638 в камере 6-Б. Снимок через защитное стекло. 2022-03-14.</div>
+                <p>HDB-0041 — гуманоидная сущность ростом приблизительно <strong>2,1 метра</strong>, морфология которой нестабильна: фиксированные наблюдения фиксируют постоянное изменение пропорций конечностей в диапазоне от <strong>±12 до ±34%</strong> относительно исходного состояния. Кожный покров объекта имеет текстуру, <span class="redacted">████████████████</span>, с выраженным поглощением видимого спектра.</p>
+
+                <!-- Фото слева -->
+                <div class="doc-photo-wrap left">
+                  <div class="doc-photo-frame">
+                    <div class="doc-photo-placeholder">
+                      <span class="placeholder-icon">👁</span>
+                      <span class="placeholder-text">ИЗОБРАЖЕНИЕ</span>
+                      <span class="placeholder-text" style="font-size:8px;margin-top:2px">УД-4 / ОГРАНИЧЕН ДОСТУП</span>
+                    </div>
+                  </div>
+                  <div class="doc-photo-caption">Рис. 2 — Термограмма HDB-0041. Источник тепла не идентифицирован. Снято через стекло Клерса.</div>
                 </div>
 
-                <p>Z-638, известный под позывным «Восьмиручка», — гуманоидная сущность ростом ≈2,3 м с восемью функциональными верхними конечностями, симметрично расположенными относительно торса. Каждая оканчивается трёхпальцевым хватательным органом с когтями из вещества, биохимически идентичного хитину.</p>
+                <p>Объект демонстрирует устойчивый интерес к <span class="redacted">████</span>-излучению, генерируемому стандартным диагностическим оборудованием. При включении приборов в радиусе 4 метров объект <strong>ориентирует корпус в направлении источника</strong> и в отдельных случаях производит звуки, классифицированные акустическим отделом как «субгармонический резонанс».</p>
 
-                <p>Кожный покров лишён пигмента, полупрозрачен: сквозь него различима сосудистая сеть тёмно-синего цвета. На лицевой части — <strong>шесть мелких глаз</strong> с горизонтальными зрачками. Голос полифоничен: один из тонов всегда находится ниже порога человеческого слуха.</p>
+                <p>Несмотря на принадлежность к категории <strong>Хелведе</strong>, объект не проявляет признаков стандартной атрибутики данного измерения: отсутствует характерная биолюминесценция, температура поверхности соответствует окружающей среде, реакции на <span class="redacted">████████</span>-поля нетипичны. Природа происхождения подтверждена косвенными методами через <strong>спектральный анализ</strong> следовых сигнатур в месте обнаружения.</p>
 
-                <p>Интеллект эквивалентен человеческому. Объект говорит на норвежском, датском и <span class="redacted">████████████████</span> языках.</p>
-
-              </div>
-
-              <div class="doc-rule"></div>
-
-              <div class="ob-notice ob-notice-warning" style="margin-bottom:0;">
-                <div class="ob-notice-icon">⚠</div>
-                <div class="ob-notice-body">
-                  <div class="ob-notice-title">Паракогнитивный эффект</div>
-                  <div class="ob-notice-text">Прямой визуальный контакт более 7 секунд вызывает состояние «ощущения наблюдения изнутри». Все подвергшиеся воздействию прошли психологический скрининг.</div>
-                </div>
               </div>
             </div>
           </div>
 
-          <!-- §3 История -->
+          <!-- РАЗДЕЛИТЕЛЬ -->
+          <div class="doc-divider"><span class="doc-divider-text">· · · ДОПОЛНИТЕЛЬНЫЕ МАТЕРИАЛЫ · · ·</span></div>
+
+          <!-- ПРИЛОЖЕНИЕ: ИСТОРИЯ ОБНАРУЖЕНИЯ -->
           <div class="doc-section">
             <div class="doc-section-header">
-              <span class="doc-section-num">§3</span>
               <span class="doc-section-title">История обнаружения</span>
-              <span class="doc-section-tag">ФАЙЛ 03 / АРХИВ</span>
-            </div>
-            <div class="doc-section-body">
-              <div class="doc-text doc-clearfix">
-                <p>Z-638 обнаружен <span class="redacted">██.██.20██</span> в акватории Баренцева моря экипажем судна «Полярная звезда» на глубине <span class="redacted">███</span> м. На момент подъёма находился в состоянии «очевидного сна» — конечности сложены, метаболизм резко снижен.</p>
-
-                <!-- Фото на всю ширину -->
-                <div class="doc-image-wrap full">
-                  <div class="doc-image-placeholder" style="aspect-ratio:21/9;">⬛<br>ИЗОБРАЖЕНИЕ НЕ ЗАГРУЖЕНО</div>
-                  <div class="doc-image-caption"><strong>РИС. 2.</strong> Реконструкция по показаниям экипажа. Оригинальные снимки засекречены. Архив-Дельта, полка 7.</div>
-                </div>
-
-                <p>После доставки на базу объект активировался через 72 ч. В первые минуты трое сотрудников получили травмы, после чего Z-638 произнёс по-норвежски: <em>«Я знал, что вы меня найдёте»</em>.</p>
-                <p>Персонал транспортной группы переведён. Двое из них <span class="redacted">████████████████████████████████</span>.</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- §4 Журнал -->
-          <div class="doc-section">
-            <div class="doc-section-header">
-              <span class="doc-section-num">§4</span>
-              <span class="doc-section-title">Журнал исследований</span>
-              <span class="doc-section-tag">ФАЙЛ 04 / ЭКСПЕРИМЕНТЫ</span>
-            </div>
-            <div class="doc-section-body">
-
-              <div class="ob-notice ob-notice-info" style="margin-bottom:14px;">
-                <div class="ob-notice-icon">i</div>
-                <div class="ob-notice-body">
-                  <div class="ob-notice-title">Примечание куратора</div>
-                  <div class="ob-notice-text">Серии A–C засекречены. Ниже — открытая часть, серия D.</div>
-                </div>
-              </div>
-
-              <table class="doc-log-table">
-                <thead>
-                  <tr>
-                    <th class="col-num">#</th>
-                    <th class="col-date">Дата / Куратор</th>
-                    <th>Описание</th>
-                    <th class="col-res">Результат</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td class="col-num">D-01</td>
-                    <td class="col-date">2022-03-21<br>д-р Холм</td>
-                    <td>Контакт через письменный текст. Лист с вопросами.</td>
-                    <td class="col-res result-amb">ЧАСТИЧНЫЙ</td>
-                  </tr>
-                  <tr>
-                    <td class="col-num">D-02</td>
-                    <td class="col-date">2022-04-05<br>д-р Холм</td>
-                    <td>Когнитивные способности. Задачи на логику и пространственное мышление.</td>
-                    <td class="col-res result-pos">УСПЕШНО</td>
-                  </tr>
-                  <tr>
-                    <td class="col-num">D-03</td>
-                    <td class="col-date">2022-05-17<br><span class="redacted">████████</span></td>
-                    <td>Попытка взять биообразец. Отказ. Сотрудник <span class="redacted">███████</span> получил травмы.</td>
-                    <td class="col-res result-neg">ПРОВАЛ</td>
-                  </tr>
-                  <tr>
-                    <td class="col-num">D-04</td>
-                    <td class="col-date">2022-08-02<br>д-р Ларсен</td>
-                    <td>Расширенный диалог. Объект говорил о «глубине без дна». Расшифровка частичная.</td>
-                    <td class="col-res result-amb">НЕОДНОЗНАЧНО</td>
-                  </tr>
-                  <tr>
-                    <td class="col-num">D-05</td>
-                    <td class="col-date">2022-12-11<br>д-р Ларсен</td>
-                    <td>Паракогнитивный радиус. Результат превысил расчётный на 340%.</td>
-                    <td class="col-res result-neg">ИНЦИДЕНТ</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <!-- §5 Приложение -->
-          <div class="doc-section">
-            <div class="doc-section-header">
-              <span class="doc-section-num">§5</span>
-              <span class="doc-section-title">Приложения и сноски</span>
-              <span class="doc-section-tag">ФАЙЛ 05 / СЛУЖЕБНОЕ</span>
+              <span class="doc-section-tag">APPENDIX-A</span>
             </div>
             <div class="doc-section-body">
               <div class="doc-text">
-                <p>Транскрипт D-04 — Архив-Дельта, код <strong>XD-638-DLG-04</strong>. Запрос через куратора 5+.</p>
-                <p>Связанные персоналии: <strong>MR-P #1300002313</strong> (Ларсен А., куратор объекта).</p>
-                <p>Серии A–C: <span class="redacted">████████████████████████████████████████████████</span>.</p>
+                <p>Объект был обнаружен <span class="redacted">██.██.████</span> в результате операции реагирования на аномальное событие в районе <span class="redacted">████████████</span>. Первоначальная группа реагирования в составе <strong>шести сотрудников</strong> зафиксировала присутствие объекта при помощи термографических датчиков; визуальный контакт был установлен <strong>через 14 минут</strong> после прибытия.</p>
+                <p>Двое сотрудников группы реагирования были отстранены от службы по медицинским показаниям после контакта. Характер последствий <span class="redacted">████████████████████████████████████████████████████</span>. Их состояние на момент составления данного файла — стабильное.</p>
               </div>
             </div>
           </div>
 
-        </div><!-- /doc-body -->
-
-      </div><!-- /page -->
-    </div><!-- /content -->
-  </div><!-- /main-window -->
-</div><!-- /os-wrapper -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
