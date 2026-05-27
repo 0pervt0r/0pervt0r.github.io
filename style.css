@@ -5,6 +5,10 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap');
 
+.info-col .dossier-section + .dossier-section {
+  margin-top: 14px;
+}
+
 :root {
   /* ── Greyscale palette ── */
   --bg:           #141414;
