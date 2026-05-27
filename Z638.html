@@ -3,145 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HADAL — Досье объекта</title>
+<title>Hadal Database</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="style.css" rel="stylesheet">
 <style>
-/* ── COPY OF SITE ROOT VARIABLES ── */
-:root {
-  --bg:           #141414;
-  --bg2:          #1c1c1c;
-  --bg3:          #222222;
-  --panel:        #191919;
-  --panel2:       #202020;
-  --accent:       #b2e528;
-  --accent2:      #c8f03a;
-  --accent-glow:  #040404;
-  --accent-dim:   rgba(178,229,40,0.06);
-  --cyan:         #b2e528;
-  --cyan-dim:     rgba(178,229,40,0.10);
-  --text:         #b0b8c1;
-  --text-dim:     #525c66;
-  --text-bright:  #dde4ec;
-  --border:       rgba(178,229,40,0.18);
-  --border2:      rgba(178,229,40,0.30);
-  --border-grey:  rgba(120,130,140,0.25);
-  --green:        #b2e528;
-  --green-dim:    rgba(178,229,40,0.08);
-  --red:          #d94f5c;
-  --amber:        #d4921a;
-  --purple:       #8a68cc;
-  --scanline:     rgba(0,0,0,0.18);
-}
-
-* { margin:0; padding:0; box-sizing:border-box; }
-
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'Share Tech Mono', monospace;
-  min-height: 100vh;
-  overflow-x: hidden;
-}
-
-body::before {
-  content:'';
-  position:fixed; inset:0;
-  background: repeating-linear-gradient(0deg,transparent,transparent 2px,var(--scanline) 2px,var(--scanline) 4px);
-  pointer-events:none; z-index:9999; opacity:0.30;
-}
-
-/* ── TITLEBAR ── */
-.titlebar {
-  background: linear-gradient(90deg,#181818 0%,#111111 100%);
-  border: 1px solid var(--border);
-  border-bottom: none;
-  display:flex; align-items:center; justify-content:space-between;
-  padding: 6px 12px;
-  border-radius: 6px 6px 0 0;
-  position:relative; overflow:hidden;
-}
-.titlebar::before {
-  content:''; position:absolute; left:0; top:0; right:0; height:1px;
-  background: linear-gradient(90deg,transparent,var(--accent2),transparent); opacity:0.7;
-}
-.titlebar-title { font-family:'Orbitron',monospace; font-size:11px; color:var(--text-dim); letter-spacing:0.05em; }
-.titlebar-controls { display:flex; gap:6px; }
-.titlebar-controls span { width:12px; height:12px; border-radius:50%; display:inline-block; }
-.ctrl-close { background:#d94f5c; opacity:0.75; }
-.ctrl-min   { background:#d4921a; opacity:0.75; }
-.ctrl-max   { background:#b2e528; opacity:0.75; }
-
-/* ── WRAPPER ── */
-.os-wrapper {
-  position:relative; z-index:2;
-  max-width:1100px; margin:0 auto; padding:16px;
-  min-height:calc(100vh - 44px);
-  display:flex; flex-direction:column;
-}
-
-/* ── MAIN WINDOW ── */
-.main-window {
-  display:flex; flex:1;
-  background:var(--panel);
-  border:1px solid var(--border);
-  border-radius:0 0 6px 6px;
-  overflow:hidden;
-}
-
-/* ── SIDEBAR ── */
-.sidebar {
-  width:200px; min-width:200px;
-  background:var(--bg2);
-  border-right:1px solid var(--border);
-  padding:16px 0;
-  display:flex; flex-direction:column;
-}
-.sidebar-user { padding:12px 16px 16px; border-bottom:1px solid var(--border); margin-bottom:8px; }
-.sidebar-username { font-family:'Orbitron',monospace; font-size:10px; font-weight:700; color:var(--accent2); letter-spacing:0.08em; margin-bottom:2px; }
-.sidebar-role { font-size:9px; color:var(--text-dim); letter-spacing:0.05em; }
-.sidebar-section { padding:10px 16px 4px; font-size:9px; color:var(--text-dim); letter-spacing:0.12em; text-transform:uppercase; }
-.sidebar-item { padding:5px 16px; font-size:11px; color:var(--text-dim); cursor:pointer; transition:all 0.15s; }
-.sidebar-item::before { content:'• '; color:var(--text-dim); }
-.sidebar-item:hover { color:var(--text); background:var(--accent-dim); }
-.sidebar-item.active { color:var(--accent2); }
-.sidebar-item.active::before { color:var(--accent2); }
-.sidebar-bottom { margin-top:auto; padding:12px 16px; border-top:1px solid var(--border); }
-.status-dot { display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--green); margin-right:6px; animation:pulse 2s infinite; }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-.status-text { font-size:9px; color:var(--text-dim); }
-
-/* ── CONTENT ── */
-.content { flex:1; display:flex; flex-direction:column; overflow:hidden; position:relative; background:var(--panel); }
-
-/* ── TOPBAR ── */
-.topbar {
-  background:var(--bg3);
-  border-bottom:2px solid var(--accent);
-  padding:8px 20px;
-  display:flex; align-items:center; justify-content:space-between; gap:12px;
-}
-.topbar-title { font-family:'Orbitron',monospace; font-size:14px; font-weight:700; color:var(--text-bright); letter-spacing:0.05em; animation:flicker 8s infinite; }
-@keyframes flicker { 0%,95%,100%{opacity:1} 96%{opacity:0.7} 97%{opacity:1} 98%{opacity:0.5} 99%{opacity:1} }
-.topbar-actions { display:flex; gap:8px; }
-.btn-sm {
-  font-family:'Share Tech Mono',monospace; font-size:10px; padding:4px 12px;
-  border:1px solid var(--border-grey); border-radius:2px; color:var(--text-dim);
-  cursor:pointer; background:transparent; transition:all 0.15s; letter-spacing:0.05em;
-  text-decoration:none; display:inline-block;
-}
-.btn-sm:hover { border-color:var(--accent2); color:var(--accent2); }
-.btn-sm.btn-back::before { content:'← '; }
-
-/* ── PAGE SCROLL ── */
-.page { flex:1; padding:24px; overflow-y:auto; }
-.page::-webkit-scrollbar { width:6px; }
-.page::-webkit-scrollbar-track { background:var(--bg2); }
-.page::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
 
 /* ════════════════════════════════════
    SVG CLASSIFICATION HEADER
-   Точная копия scpfoundation.net/component:svgheader1
 ════════════════════════════════════ */
 .svgheader-wrap {
   position:relative;
