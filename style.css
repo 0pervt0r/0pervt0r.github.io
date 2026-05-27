@@ -259,8 +259,9 @@ body::after {
   background-image: url('ChroniclesLogo.png');
   background-repeat: no-repeat;
   background-position: center center;
-  background-size: 340px auto;
+  background-size: 700px auto;
   background-blend-mode: luminosity;
+  background-opacity: 0.5;
 }
 
 .content::before {
