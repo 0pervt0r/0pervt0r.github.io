@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hadal Database</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="style.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="os-wrapper">
+  <div class="titlebar">
+    <span class="titlebar-title">HADAL DATABASE ACCESS</span>
+    <div class="titlebar-controls">
+      <span class="ctrl-close"></span>
+      <span class="ctrl-min"></span>
+      <span class="ctrl-max"></span>
+    </div>
+  </div>
+
+  <div class="main-window">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sidebar-user">
+        <div class="sidebar-username">ПОЛЬЗОВАТЕЛЬ</div>
+        <div class="sidebar-role">Уровень доступа: 3</div>
+      </div>
+
+      <div class="sidebar-section">Навигация</div>
+      <div class="sidebar-item" href="index.html">Главная</div>
+      <div class="sidebar-item" active><a href="personnel.html">Персоналии</a></div>
+      <div class="sidebar-item"><a href="prisoners.html">Заключённые</a></div>
+      <div class="sidebar-item"><a href="documents.html">Документация</a></div>
+      <div class="sidebar-section">Дополнительно</div>
+      <div class="sidebar-item" href="map.html">Карта</div>
+      <div class="sidebar-item" href="stories.html">Рассказы</div>
+      <div class="sidebar-item" href="object-classification.html">Классификация объектов</div>
+      <div class="sidebar-item"><a href="https://teletype.in/@yurubolski/GMpdKbCOIMu">Правила</a></div>
+
+      <div class="sidebar-bottom">
+        <div><span class="status-dot"></span><span class="status-text">ПОЛЬЗОВАТЕЛЬ В СЕТИ</span></div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+      <div class="topbar">
+        <div class="topbar-title">ДОСЬЕ СОТРУДНИКА</div>
+        <div class="topbar-actions">
+          <a class="btn-sm btn-back" href="personnel.html">Назад к реестру</a>
+        </div>
+      </div>
+
+      <div class="page">
+
+        <!-- Classified banner -->
+        <div class="classified-banner">
+          <span class="classified-label">⬛ ОГРАНИЧЕННЫЙ ДОСТУП ⸺ УРОВЕНЬ 3+</span>
+          <span class="classified-code">ОБНОВЛЕНО: 2026-10-05</span>
+        </div>
+
+        <!-- Main grid: portrait + info -->
+        <div class="dossier-grid">
+
+          <!-- Portrait column -->
+          <div class="portrait-col">
+
+            <!-- Portrait frame -->
+            <div class="portrait-frame">
+              <div class="corner-mark corner-tl"></div>
+              <div class="corner-mark corner-tr"></div>
+              <div class="corner-mark corner-bl"></div>
+              <div class="corner-mark corner-br"></div>
+              <!-- Replace the svg+text below with an <img> tag for a real portrait -->
+              <div class="portrait-inner">
+                <svg class="portrait-silhouette" viewBox="0 0 100 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <ellipse cx="50" cy="32" rx="22" ry="26" fill="#c8d8f0"/>
+                  <path d="M10 120 Q10 72 50 72 Q90 72 90 120Z" fill="#c8d8f0"/>
+                </svg>
+                <div class="portrait-placeholder-text">ФОТО НЕ ЗАГРУЖЕНО</div>
+              </div>
+              <div class="portrait-stamp">КЕРТ ГЁТЦЕ</div>
+            </div>
+
+            <!-- ID card -->
+            <div class="id-card">
+              <div class="id-card-header">ИДЕНТИФИКАЦИЯ</div>
+              <div class="id-card-body">
+                <div class="id-field">
+                  <span class="id-label">ID</span>
+                  <span class="id-value cyan">ER-G #3955438507</span>
+                </div>
+                <div class="id-field">
+                  <span class="id-label">ПОДРАЗДЕЛЕНИЕ</span>
+                  <span class="id-value">Хадальное, НОСТ</span>
+                </div>
+                <div class="id-field">
+                  <span class="id-label">УРОВЕНЬ ДОСТУПА</span>
+                  <span class="id-value amber">G-3</span>
+                </div>
+                <div class="id-field">
+                  <span class="id-label">СТАТУС</span>
+                  <span class="id-value"><span class="status-badge status-active">НА СЛУЖБЕ</span></span>
+                </div>
+                <div class="id-field">
+                  <span class="id-label">ЗАЧИСЛЕН</span>
+                  <span class="id-value">2017.10.05</span>
+                </div>
+                <div class="id-field">
+                  <span class="id-label">ДОЛЖНОСТЬ</span>
+                  <span class="id-value">Гвардеец</span>
+              </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Info column -->
+          <div class="info-col">
+
+            <!-- Name block -->
+            <div class="name-block">
+              <div class="page-badge">URBANSHADE CORP — ХАДАЛЬНОЕ ПОДРАЗДЕЛЕНИЕ — НОСТ</div>
+              <div class="dossier-name">Керт Гётце</div>
+              <div class="dossier-alias"></div>
+              <div class="dossier-role">Элитный гвардеец</div>
+            </div>
+
+            <!-- Biography -->
+            <div class="dossier-section">
+              <div class="section-header">
+                <span class="section-title">БИОГРАФИЯ</span>
+                <span class="section-tag">ФАЙЛ 01 / ИСТОРИЯ</span>
+              </div>
+              <div class="section-body">
+                <div class="bio-text">
+                  <p>Информация засекречена.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Psychological profile -->
+            <div class="dossier-section">
+              <div class="section-header">
+                <span class="section-title">ПСИХОЛОГИЧЕСКИЙ ПРОФИЛЬ</span>
+                <span class="section-tag">ФАЙЛ 02 / ОЦЕНКА</span>
+              </div>
+              <div class="section-body">
+                <div class="typo-grid">
+
+                  <div class="typo-card">
+                    <div class="typo-card-label">ТЕМПЕРАМЕНТ</div>
+                    <div class="typo-card-value">Sanguine</div>
+                  </div>
+
+                  <div class="typo-card">
+                    <div class="typo-card-label">MBTI</div>
+                    <div class="typo-card-value typo-mbti">
+                      <span class="mbti-letter">I</span><span class="mbti-letter">S</span><span class="mbti-letter">T</span><span class="mbti-letter">J</span>
+                    </div>
+                  </div>
+
+                  <div class="typo-card">
+                    <div class="typo-card-label">ЭННЕАГРАММА</div>
+                    <div class="typo-card-value">w</div>
+                  </div>
+
+                  <div class="typo-card">
+                    <div class="typo-card-label">ИНСТИНКТ</div>
+                    <div class="typo-card-value">s/</div>
+                  </div>
+
+                </div>
+
+                <!-- Trait tags preserved below -->
+                <div class="trait-list" style="margin-top: 14px;">
+                  <span class="trait-tag positive">Доброжелательность</span>
+                  <span class="trait-tag positive">Спокойность</span>
+                  <span class="trait-tag positive">Ответственность</span>
+                  <span class="trait-tag neutral">Упёрность</span>
+                  <span class="trait-tag neutral">Принципиальность</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Gallery row -->
+        <div class="dossier-section dossier-full" style="margin-bottom:14px;">
+          <div class="section-header">
+            <span class="section-title">ГАЛЕРЕЯ / МАТЕРИАЛЫ</span>
+            <span class="section-tag">ФАЙЛ 03 / АРХИВ</span>
+          </div>
+          <div class="section-body">
+            <div class="gallery-grid">
+              <div class="gallery-item">
+                <!-- Replace .gallery-placeholder with <img src="..." style="width:100%;height:100%;object-fit:cover;"> -->
+                <div class="gallery-placeholder">[ ИЗОБРАЖЕНИЕ ]</div>
+                <div class="gallery-caption">Изображение не загружено</div>
+              </div>
+              <div class="gallery-item">
+                <div class="gallery-placeholder">[ ИЗОБРАЖЕНИЕ ]</div>
+                <div class="gallery-caption">Изображение не загружено</div>
+              </div>
+              <div class="gallery-item">
+                <div class="gallery-placeholder">[ ИЗОБРАЖЕНИЕ ]</div>
+                <div class="gallery-caption">Изображение не загружено</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Access log -->
+        <div class="dossier-section dossier-full">
+          <div class="section-header">
+            <span class="section-title">ЖУРНАЛ СОБЫТИЙ</span>
+            <span class="section-tag">ФАЙЛ 04 / СИСТЕМНЫЕ ЗАПИСИ</span>
+          </div>
+          <div class="section-body">
+            <div class="log-rows">
+              <div class="log-row">
+                <span class="log-ts">2287-09-14 · 04:31</span>
+                <span class="log-event">Доступ к наблюдательному посту B-7 подтверждён</span>
+                <span class="log-level info">INFO</span>
+              </div>
+              <div class="log-row">
+                <span class="log-ts">2287-09-11 · 22:17</span>
+                <span class="log-event">Подана заявка на расширение доступа к архиву — <span class="redacted">███████</span></span>
+                <span class="log-level warn">WARN</span>
+              </div>
+              <div class="log-row">
+                <span class="log-ts">2287-08-30 · 09:05</span>
+                <span class="log-event">Плановая психологическая оценка пройдена · результат зафиксирован</span>
+                <span class="log-level info">INFO</span>
+              </div>
+              <div class="log-row">
+                <span class="log-ts">2287-07-02 · 18:44</span>
+                <span class="log-event">Аномальный инцидент № 41 задокументирован · угрозы нет</span>
+                <span class="log-level info">INFO</span>
+              </div>
+              <div class="log-row">
+                <span class="log-ts">2017.10.05 · 08:51</span>
+                <span class="log-event">Прибытие Катрин Иверсен в Тайный Хадальный Объект</span>
+                <span class="log-level info">INFO</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /page -->
+    </div><!-- /content -->
+  </div><!-- /main-window -->
+</div><!-- /os-wrapper -->
+
+</body>
+</html>
