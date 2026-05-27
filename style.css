@@ -261,7 +261,7 @@ body::after {
   background-position: center center;
   background-size: 700px auto;
   background-blend-mode: luminosity;
-  background-opacity: 0.5;
+  opacity: 0.2;
 }
 
 .content::before {
