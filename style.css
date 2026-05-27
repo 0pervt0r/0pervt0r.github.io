@@ -17,7 +17,7 @@
   --accent:       #b2e528;
   --accent2:      #c8f03a;
   --accent-glow:  #040404;
-  --accent-dim:   #;
+  --accent-dim:   rgba(178, 229, 40, 0.06);   /* ИСПРАВЛЕНО: было #; */
 
   /* ── Cyan kept as muted grey-green ── */
   --cyan:         #b2e528;
@@ -42,260 +42,6 @@
 
   /* ── Misc ── */
   --scanline:     rgba(0, 0, 0, 0.18);
-}
-
-/* ═══════════════════════════════════════════════════════════
-   HADAL DATABASE — MOBILE RESPONSIVE PATCH
-   Заменяет существующий блок @media (max-width: 700px)
-   в конце файла стилей.
-   ═══════════════════════════════════════════════════════════ */
-
-
-/* ─────────────────────────────────────────────────────────
-   ≤ 768px  —  планшеты / большие телефоны
-───────────────────────────────────────────────────────── */
-@media (max-width: 768px) {
-
-  /* == Обёртка == */
-  .os-wrapper { padding: 0; }
-
-  /* == Тайтлбар == */
-  .titlebar { padding: 5px 10px; border-radius: 0; }
-  .titlebar-title { font-size: 9px; }
-  .titlebar-controls { display: none; }
-
-  /* == Главное окно — вертикальная колонка == */
-  .main-window {
-    flex-direction: column;
-    border-radius: 0;
-    border-left: none;
-    border-right: none;
-    min-height: calc(100vh - 36px);
-  }
-
-  /* == Сайдбар → горизонтальная навигационная полоса == */
-  .sidebar {
-    width: 100%;
-    min-width: unset;
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-    padding: 4px 0;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-  }
-  .sidebar::-webkit-scrollbar { display: none; }
-
-  .sidebar-user,
-  .sidebar-section,
-  .sidebar-bottom { display: none; }
-
-  .sidebar-item {
-    display: inline-block;
-    padding: 8px 14px;
-    font-size: 10px;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-
-  /* == Топбар == */
-  .topbar { padding: 8px 12px; gap: 8px; }
-  .topbar-title { font-size: 11px; }
-  .topbar-actions { gap: 6px; }
-  .btn-sm { font-size: 9px; padding: 3px 8px; }
-
-  /* == Страница == */
-  .page { padding: 14px 12px; }
-
-  /* == Classified banner == */
-  .classified-banner {
-    flex-direction: column;
-    gap: 4px;
-    align-items: flex-start;
-  }
-
-  /* == Досье: одна колонка == */
-  .dossier-grid {
-    grid-template-columns: 1fr;
-    gap: 14px;
-  }
-
-  /* Портрет + ID-карточка — горизонтально */
-  .portrait-col {
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 12px;
-    align-items: flex-start;
-  }
-  .portrait-frame {
-    width: 120px;
-    aspect-ratio: 3/4;
-    flex-shrink: 0;
-  }
-  .id-card { flex: 1; min-width: 160px; }
-
-  /* Имя */
-  .dossier-name  { font-size: 16px; }
-  .dossier-alias { font-size: 10px; }
-  .dossier-role  { font-size: 10px; }
-
-  /* == Типология: 2 колонки == */
-  .typo-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
-  .typo-card { padding: 10px 8px; }
-  .typo-card-value { font-size: 11px; }
-
-  /* == Галерея: 2 колонки == */
-  .gallery-grid { grid-template-columns: repeat(2, 1fr); }
-
-  /* == Лог доступа: строки сложены вертикально == */
-  .log-row {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 2px;
-    padding: 8px 0;
-  }
-  .log-ts    { width: auto; font-size: 8px; }
-  .log-event { font-size: 10px; }
-  .log-level { width: auto; text-align: left; }
-
-  /* == Psych bars: уже label == */
-  .psych-label { width: 90px; font-size: 8px; }
-
-  /* == Таблица персонала/объектов == */
-
-  /* Скрываем незначимые колонки */
-  .th-class, .p-class,
-  .th-num,   .p-num   { display: none; }
-
-  /* Уменьшаем ширины */
-  .th-id, .p-id       { width: 90px; }
-  .p-id               { font-size: 9px; letter-spacing: 0.04em; }
-  .th-status, .p-status { width: 100px; }
-  .th-actions, .p-view  { width: 52px; }
-  .p-name              { font-size: 11px; }
-
-  /* Паддинги ячеек */
-  .th, .p-id, .p-name, .p-status, .p-view { padding: 9px 8px; }
-
-  .status-badge { font-size: 7px; padding: 1px 5px; }
-
-  /* == Заголовок страницы == */
-  .page-header  { flex-direction: column; align-items: flex-start; gap: 10px; }
-  .page-title   { font-size: 15px; }
-  .page-count   { text-align: left; }
-  .page-count span { font-size: 18px; }
-
-  /* Поиск — на всю ширину */
-  .search-wrap, .search-bar { width: 100%; }
-
-  /* Фильтр-табы */
-  .filter-tabs { gap: 4px; }
-  .filter-tab  { font-size: 9px; padding: 3px 8px; }
-
-  /* == Интро / квиз == */
-  .intro-grid  { grid-template-columns: 1fr; gap: 8px; }
-  .intro-title { font-size: 16px; }
-
-  /* == Вопрос квиза == */
-  .q-text   { font-size: 15px; margin-bottom: 16px; }
-  .q-option { padding: 10px 12px; gap: 10px; }
-  .opt-text { font-size: 11px; }
-  .opt-key  { min-width: 20px; height: 20px; font-size: 8px; }
-  .q-meta   { flex-direction: column; align-items: flex-start; gap: 6px; }
-
-  /* == Экран результата == */
-  .result-grid { grid-template-columns: 1fr 1fr; }
-  .result-role { font-size: 20px; }
-  .bar-label   { min-width: 100px; font-size: 9px; }
-
-  /* == Водяной знак — убираем == */
-  .dossier-watermark { display: none; }
-
-  /* == Инлайн-алёрт == */
-  .inline-alert { flex-direction: column; gap: 8px; }
-  .alert-link   { align-self: flex-start; }
-
-  /* == Прочее == */
-  .info-col      { gap: 10px; }
-  .section-body  { padding: 12px 10px; }
-  .bio-text      { font-size: 10px; }
-  .trait-tag     { font-size: 8px; padding: 2px 8px; }
-  .loading-bar   { width: 90%; }
-
-  /* Сканлайны — снижаем на мобильном для производительности */
-  body::before { opacity: 0.15; }
-}
-
-
-/* ─────────────────────────────────────────────────────────
-   ≤ 480px  —  обычные телефоны
-───────────────────────────────────────────────────────── */
-@media (max-width: 480px) {
-
-  /* Тайтлбар */
-  .titlebar-title { display: none; }
-
-  /* Портрет — стопкой */
-  .portrait-col   { flex-direction: column; }
-  .portrait-frame { width: 100%; max-width: 180px; }
-
-  /* Типология — 2 колонки, компактно */
-  .typo-grid { grid-template-columns: 1fr 1fr; gap: 4px; }
-  .typo-card-value { font-size: 10px; }
-
-  /* Результат — одна колонка */
-  .result-grid { grid-template-columns: 1fr; }
-  .result-role { font-size: 18px; }
-
-  /* Таблица — прячем статус */
-  .th-status, .p-status { display: none; }
-
-  /* Имя досье */
-  .dossier-name { font-size: 14px; }
-
-  /* Вопрос */
-  .q-text { font-size: 13px; }
-  .bar-label { min-width: 80px; font-size: 8px; }
-
-  /* Паддинг страницы */
-  .page { padding: 10px 8px; }
-
-  /* Кнопки навигации квиза */
-  .q-nav { gap: 8px; }
-  .btn-nav { font-size: 10px; padding: 6px 12px; }
-
-  /* Кнопка "Начать" — полная ширина */
-  .btn-start { width: 100%; justify-content: center; }
-}
-
-
-/* ─────────────────────────────────────────────────────────
-   ≤ 360px  —  маленькие телефоны
-───────────────────────────────────────────────────────── */
-@media (max-width: 360px) {
-
-  .th-id, .p-id { width: 70px; font-size: 8px; }
-  .btn-view      { font-size: 7px; padding: 2px 5px; }
-  .th-actions, .p-view { width: 40px; }
-
-  .p-name { font-size: 9px; }
-
-  .topbar-title { font-size: 10px; }
-
-  .result-role { font-size: 15px; }
-
-  .typo-card { padding: 8px 6px; }
-  .typo-card-label { font-size: 7px; }
-  .typo-card-value { font-size: 9px; }
-  .typo-card-sub   { font-size: 7px; }
-
-  .psych-label { width: 75px; }
-
-  .section-body { padding: 10px 8px; }
-  .bio-text     { font-size: 9px; }
-  .page         { padding: 8px 6px; }
 }
 
 /* ───────────────────────────────────────────────
@@ -510,7 +256,6 @@ body::after {
   overflow: hidden;
   position: relative;
 
-  /* Company logo as subtle background */
   background-image: url('UrbanshadeLogo.png');
   background-repeat: no-repeat;
   background-position: center center;
@@ -518,7 +263,6 @@ body::after {
   background-blend-mode: luminosity;
 }
 
-/* Overlay to keep logo very subtle */
 .content::before {
   content: '';
   position: absolute;
@@ -529,7 +273,6 @@ body::after {
   z-index: 0;
 }
 
-/* All direct children need z-index so they appear above the overlay */
 .content > * { position: relative; z-index: 1; }
 
 /* ───────────────────────────────────────────────
@@ -537,7 +280,7 @@ body::after {
 ─────────────────────────────────────────────── */
 .topbar {
   background: var(--bg3);
-  border-bottom: 2px solid var(--accent);    /* green separator */
+  border-bottom: 2px solid var(--accent);
   padding: 8px 20px;
   display: flex;
   align-items: center;
@@ -606,10 +349,74 @@ body::after {
 }
 
 /* ═══════════════════════════════════════════════
+   INLINE ALERT
+═══════════════════════════════════════════════ */
+.inline-alert {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(212, 146, 26, 0.06);
+  border: 1px solid rgba(212, 146, 26, 0.28);
+  border-radius: 3px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+}
+
+.alert-icon {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border: 1px solid rgba(212, 146, 26, 0.50);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.alert-icon-inner {
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--amber);
+  line-height: 1;
+}
+
+.alert-text {
+  flex: 1;
+  font-size: 11px;
+  color: var(--text);
+  line-height: 1.55;
+  letter-spacing: 0.03em;
+}
+
+.alert-text strong {
+  color: var(--amber);
+  font-weight: normal;
+  letter-spacing: 0.05em;
+}
+
+.alert-link {
+  font-size: 10px;
+  color: var(--accent2);
+  text-decoration: none;
+  letter-spacing: 0.06em;
+  border: 1px solid rgba(178, 229, 40, 0.30);
+  padding: 3px 10px;
+  border-radius: 2px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+
+.alert-link:hover {
+  background: var(--accent-dim);
+  border-color: var(--accent2);
+}
+
+/* ═══════════════════════════════════════════════
    DOSSIER LAYOUT
 ═══════════════════════════════════════════════ */
 
-/* Classified banner */
 .classified-banner {
   border: 1px solid rgba(138,104,204,0.35);
   background: rgba(138,104,204,0.06);
@@ -634,7 +441,6 @@ body::after {
   letter-spacing: 0.06em;
 }
 
-/* Main dossier grid */
 .dossier-grid {
   display: grid;
   grid-template-columns: 220px 1fr;
@@ -642,7 +448,6 @@ body::after {
   margin-bottom: 20px;
 }
 
-/* Portrait column */
 .portrait-col { display: flex; flex-direction: column; gap: 12px; }
 
 .portrait-frame {
@@ -684,7 +489,6 @@ body::after {
   letter-spacing: 0.1em;
 }
 
-/* Corner marks inside portrait */
 .portrait-frame::after {
   content: '';
   position: absolute;
@@ -723,7 +527,6 @@ body::after {
   z-index: 3;
 }
 
-/* ID card */
 .id-card {
   background: var(--bg2);
   border: 1px solid var(--border-grey);
@@ -771,7 +574,6 @@ body::after {
 .id-value.red    { color: var(--red); }
 .id-value.purple { color: var(--purple); }
 
-/* Status badges */
 .status-badge {
   display: inline-block;
   font-size: 8px;
@@ -781,15 +583,13 @@ body::after {
   text-transform: uppercase;
 }
 
-.status-active   { background: var(--green-dim);                border: 1px solid rgba(178,229,40,0.30); color: var(--green); }
-.status-inactive { background: rgba(217,79,92,0.08);            border: 1px solid rgba(217,79,92,0.22);  color: var(--red); }
-.status-pending  { background: rgba(212,146,26,0.08);           border: 1px solid rgba(212,146,26,0.22); color: var(--amber); }
-.status-classified { background: rgba(138,104,204,0.08);        border: 1px solid rgba(138,104,204,0.22);color: var(--purple); }
+.status-active     { background: var(--green-dim);                border: 1px solid rgba(178,229,40,0.30); color: var(--green); }
+.status-inactive   { background: rgba(217,79,92,0.08);            border: 1px solid rgba(217,79,92,0.22);  color: var(--red); }
+.status-pending    { background: rgba(212,146,26,0.08);           border: 1px solid rgba(212,146,26,0.22); color: var(--amber); }
+.status-classified { background: rgba(138,104,204,0.08);          border: 1px solid rgba(138,104,204,0.22);color: var(--purple); }
 
-/* Info column */
 .info-col { display: flex; flex-direction: column; gap: 14px; }
 
-/* Name block */
 .name-block {
   border-left: 2px solid var(--accent2);
   padding-left: 14px;
@@ -848,7 +648,7 @@ body::after {
   justify-content: space-between;
   padding: 7px 14px;
   background: var(--accent-dim);
-  border-bottom: 1px solid var(--accent);   /* green separator line */
+  border-bottom: 1px solid var(--accent);
 }
 
 .section-title {
@@ -866,7 +666,6 @@ body::after {
 
 .section-body { padding: 14px; }
 
-/* Bio text */
 .bio-text {
   font-size: 11px;
   color: var(--text);
@@ -876,7 +675,6 @@ body::after {
 .bio-text p { margin-bottom: 10px; }
 .bio-text p:last-child { margin-bottom: 0; }
 
-/* Redacted */
 .redacted {
   background: var(--text-dim);
   color: transparent;
@@ -957,7 +755,7 @@ body::after {
 }
 
 /* ───────────────────────────────────────────────
-   TYPOLOGY CARDS  (centred content)
+   TYPOLOGY CARDS
 ─────────────────────────────────────────────── */
 .typo-grid {
   display: grid;
@@ -973,8 +771,6 @@ body::after {
   position: relative;
   overflow: hidden;
   transition: border-color 0.15s;
-
-  /* Centre all content */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1017,7 +813,6 @@ body::after {
   line-height: 1.4;
 }
 
-/* MBTI letters */
 .typo-mbti {
   display: flex;
   gap: 3px;
@@ -1037,7 +832,6 @@ body::after {
   background: var(--accent-dim);
 }
 
-/* Temperament dots */
 .typo-dots {
   display: flex;
   gap: 4px;
@@ -1055,7 +849,6 @@ body::after {
 .typo-dot.active     { background: var(--accent2);             border-color: var(--accent2); }
 .typo-dot.active.dim { background: rgba(178,229,40,0.38);       border-color: rgba(178,229,40,0.50); }
 
-/* Enneagram labels */
 .typo-enneagram {
   display: flex;
   flex-direction: column;
@@ -1157,68 +950,20 @@ body::after {
 .log-level.alert { color: var(--red); }
 
 /* ───────────────────────────────────────────────
-   INLINE ALERT
+   DOSSIER WATERMARK
 ─────────────────────────────────────────────── */
-.inline-alert {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: rgba(212, 146, 26, 0.06);
-  border: 1px solid rgba(212, 146, 26, 0.28);
-  border-radius: 3px;
-  padding: 10px 14px;
-  margin-bottom: 14px;
-}
-
-.alert-icon {
-  flex-shrink: 0;
-  width: 24px;
-  height: 24px;
-  border: 1px solid rgba(212, 146, 26, 0.50);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.alert-icon-inner {
+.dossier-watermark {
+  position: fixed;
+  bottom: 40px; right: 40px;
   font-family: 'Orbitron', monospace;
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--amber);
-  line-height: 1;
-}
-
-.alert-text {
-  flex: 1;
-  font-size: 11px;
-  color: var(--text);
-  line-height: 1.55;
-  letter-spacing: 0.03em;
-}
-
-.alert-text strong {
-  color: var(--amber);
-  font-weight: normal;
-  letter-spacing: 0.05em;
-}
-
-.alert-link {
-  font-size: 10px;
-  color: var(--accent2);
-  text-decoration: none;
-  letter-spacing: 0.06em;
-  border: 1px solid rgba(178, 229, 40, 0.30);
-  padding: 3px 10px;
-  border-radius: 2px;
-  white-space: nowrap;
-  flex-shrink: 0;
-  transition: all 0.15s;
-}
-
-.alert-link:hover {
-  background: var(--accent-dim);
-  border-color: var(--accent2);
+  font-size: 60px;
+  font-weight: 900;
+  color: rgba(178,229,40,0.04);
+  letter-spacing: 0.1em;
+  pointer-events: none;
+  z-index: 0;
+  transform: rotate(-20deg);
+  user-select: none;
 }
 
 /* ═══════════════════════════════════════════════
@@ -1251,7 +996,6 @@ body::after {
 }
 .search-bar:focus { border-color: var(--accent2); color: var(--text); }
 
-/* Page header */
 .page-header {
   margin-bottom: 20px;
   padding-bottom: 14px;
@@ -1290,7 +1034,6 @@ body::after {
   margin-bottom: 2px;
 }
 
-/* Filter tabs */
 .filter-label {
   font-size: 9px;
   color: var(--text-dim);
@@ -1315,10 +1058,9 @@ body::after {
 .filter-tab:hover  { border-color: var(--accent2); color: var(--accent2); }
 .filter-tab.active { border-color: var(--accent2); color: var(--accent2); background: var(--accent-dim); }
 
-/* Table */
 .table-header {
   display: flex;
-  border-bottom: 2px solid var(--accent);    /* green separator */
+  border-bottom: 2px solid var(--accent);
   margin-bottom: 2px;
   padding-bottom: 6px;
   margin-top: 18px;
@@ -1361,13 +1103,11 @@ body::after {
 .p-status { width: 130px; padding: 11px 12px; flex-shrink: 0; position: relative; z-index: 1; }
 .p-view   { width: 70px;  padding: 11px 12px; flex-shrink: 0; position: relative; z-index: 1; display: flex; justify-content: center; }
 
-/* Object status badges */
 .status-studying    { background: rgba(178,229,40,0.08);  border: 1px solid rgba(178,229,40,0.28); color: var(--accent2); }
 .status-using       { background: var(--green-dim);        border: 1px solid rgba(178,229,40,0.30); color: var(--green); }
 .status-storage     { background: rgba(212,146,26,0.08);   border: 1px solid rgba(212,146,26,0.22); color: var(--amber); }
 .status-neutralized { background: rgba(217,79,92,0.08);    border: 1px solid rgba(217,79,92,0.22);  color: var(--red); }
 
-/* Class badges */
 .class-badge { display: inline-block; font-size: 9px; padding: 2px 8px; border-radius: 2px; letter-spacing: 0.08em; font-family: 'Orbitron', monospace; white-space: nowrap; }
 .class-nemt     { background: var(--green-dim);             border: 1px solid rgba(178,229,40,0.22); color: var(--green); }
 .class-gennem   { background: rgba(178,229,40,0.06);        border: 1px solid rgba(178,229,40,0.22); color: var(--accent2); }
@@ -1376,7 +1116,6 @@ body::after {
 .class-forbud   { background: rgba(138,104,204,0.08);       border: 1px solid rgba(138,104,204,0.22);color: var(--purple); }
 .class-ladhem   { background: rgba(80,88,96,0.10);          border: 1px solid rgba(80,88,96,0.28);   color: var(--text-dim); }
 
-/* View button */
 .btn-view {
   font-size: 9px;
   padding: 2px 10px;
@@ -1411,7 +1150,6 @@ body::after {
 .quiz-state { display: none; }
 .quiz-state.active { display: block; }
 
-/* Intro */
 .intro-header {
   margin-bottom: 24px;
   padding-bottom: 16px;
@@ -1515,7 +1253,6 @@ body::after {
   box-shadow: 0 0 16px rgba(178,229,40,0.18);
 }
 
-/* Progress bar */
 .q-progress-bar {
   background: var(--bg2);
   border: 1px solid var(--border-grey);
@@ -1659,7 +1396,6 @@ body::after {
 .btn-nav.primary { border-color: var(--accent2); color: var(--accent2); background: var(--accent-dim); }
 .btn-nav.primary:hover { background: rgba(178,229,40,0.20); color: var(--text-bright); }
 
-/* Result */
 .result-header {
   text-align: center;
   margin-bottom: 28px;
@@ -1825,7 +1561,6 @@ body::after {
 }
 .btn-restart:hover { border-color: var(--accent2); color: var(--accent2); }
 
-/* Loading */
 .loading-screen { display: none; text-align: center; padding: 60px 20px; }
 .loading-screen.active { display: block; }
 
@@ -1847,3 +1582,213 @@ body::after {
 }
 .loading-text { font-size: 11px; color: var(--text-dim); letter-spacing: 0.08em; }
 
+/* ═══════════════════════════════════════════════
+   MOBILE RESPONSIVE
+═══════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────
+   ≤ 768px  —  планшеты / большие телефоны
+───────────────────────────────────────────── */
+@media (max-width: 768px) {
+
+  .os-wrapper { padding: 0; }
+
+  .titlebar { padding: 5px 10px; border-radius: 0; }
+  .titlebar-title { font-size: 9px; }
+  .titlebar-controls { display: none; }
+
+  .main-window {
+    flex-direction: column;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    min-height: calc(100vh - 36px);
+  }
+
+  .sidebar {
+    width: 100%;
+    min-width: unset;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    padding: 4px 0;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .sidebar::-webkit-scrollbar { display: none; }
+
+  .sidebar-user,
+  .sidebar-section,
+  .sidebar-bottom { display: none; }
+
+  .sidebar-item {
+    display: inline-block;
+    padding: 8px 14px;
+    font-size: 10px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .topbar { padding: 8px 12px; gap: 8px; }
+  .topbar-title { font-size: 11px; }
+  .topbar-actions { gap: 6px; }
+  .btn-sm { font-size: 9px; padding: 3px 8px; }
+
+  .page { padding: 14px 12px; }
+
+  .classified-banner {
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-start;
+  }
+
+  .dossier-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .portrait-col {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .portrait-frame {
+    width: 120px;
+    aspect-ratio: 3/4;
+    flex-shrink: 0;
+  }
+  .id-card { flex: 1; min-width: 160px; }
+
+  .dossier-name  { font-size: 16px; }
+  .dossier-alias { font-size: 10px; }
+  .dossier-role  { font-size: 10px; }
+
+  .typo-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+  .typo-card { padding: 10px 8px; }
+  .typo-card-value { font-size: 11px; }
+
+  .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+
+  .log-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    padding: 8px 0;
+  }
+  .log-ts    { width: auto; font-size: 8px; }
+  .log-event { font-size: 10px; }
+  .log-level { width: auto; text-align: left; }
+
+  .psych-label { width: 90px; font-size: 8px; }
+
+  .th-class, .p-class,
+  .th-num,   .p-num   { display: none; }
+
+  .th-id, .p-id       { width: 90px; }
+  .p-id               { font-size: 9px; letter-spacing: 0.04em; }
+  .th-status, .p-status { width: 100px; }
+  .th-actions, .p-view  { width: 52px; }
+  .p-name              { font-size: 11px; }
+
+  .th, .p-id, .p-name, .p-status, .p-view { padding: 9px 8px; }
+
+  .status-badge { font-size: 7px; padding: 1px 5px; }
+
+  .page-header  { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .page-title   { font-size: 15px; }
+  .page-count   { text-align: left; }
+  .page-count span { font-size: 18px; }
+
+  .search-wrap, .search-bar { width: 100%; }
+
+  .filter-tabs { gap: 4px; }
+  .filter-tab  { font-size: 9px; padding: 3px 8px; }
+
+  .intro-grid  { grid-template-columns: 1fr; gap: 8px; }
+  .intro-title { font-size: 16px; }
+
+  .q-text   { font-size: 15px; margin-bottom: 16px; }
+  .q-option { padding: 10px 12px; gap: 10px; }
+  .opt-text { font-size: 11px; }
+  .opt-key  { min-width: 20px; height: 20px; font-size: 8px; }
+  .q-meta   { flex-direction: column; align-items: flex-start; gap: 6px; }
+
+  .result-grid { grid-template-columns: 1fr 1fr; }
+  .result-role { font-size: 20px; }
+  .bar-label   { min-width: 100px; font-size: 9px; }
+
+  .dossier-watermark { display: none; }
+
+  /* inline-alert на планшете — вертикально */
+  .inline-alert { flex-direction: column; gap: 8px; }
+  .alert-link   { align-self: flex-start; }
+
+  .info-col      { gap: 10px; }
+  .section-body  { padding: 12px 10px; }
+  .bio-text      { font-size: 10px; }
+  .trait-tag     { font-size: 8px; padding: 2px 8px; }
+  .loading-bar   { width: 90%; }
+
+  body::before { opacity: 0.15; }
+}
+
+/* ─────────────────────────────────────────────
+   ≤ 480px  —  обычные телефоны
+───────────────────────────────────────────── */
+@media (max-width: 480px) {
+
+  .titlebar-title { display: none; }
+
+  .portrait-col   { flex-direction: column; }
+  .portrait-frame { width: 100%; max-width: 180px; }
+
+  .typo-grid { grid-template-columns: 1fr 1fr; gap: 4px; }
+  .typo-card-value { font-size: 10px; }
+
+  .result-grid { grid-template-columns: 1fr; }
+  .result-role { font-size: 18px; }
+
+  .th-status, .p-status { display: none; }
+
+  .dossier-name { font-size: 14px; }
+
+  .q-text { font-size: 13px; }
+  .bar-label { min-width: 80px; font-size: 8px; }
+
+  .page { padding: 10px 8px; }
+
+  .q-nav { gap: 8px; }
+  .btn-nav { font-size: 10px; padding: 6px 12px; }
+
+  .btn-start { width: 100%; justify-content: center; }
+}
+
+/* ─────────────────────────────────────────────
+   ≤ 360px  —  маленькие телефоны
+───────────────────────────────────────────── */
+@media (max-width: 360px) {
+
+  .th-id, .p-id { width: 70px; font-size: 8px; }
+  .btn-view      { font-size: 7px; padding: 2px 5px; }
+  .th-actions, .p-view { width: 40px; }
+
+  .p-name { font-size: 9px; }
+
+  .topbar-title { font-size: 10px; }
+
+  .result-role { font-size: 15px; }
+
+  .typo-card { padding: 8px 6px; }
+  .typo-card-label { font-size: 7px; }
+  .typo-card-value { font-size: 9px; }
+  .typo-card-sub   { font-size: 7px; }
+
+  .psych-label { width: 75px; }
+
+  .section-body { padding: 10px 8px; }
+  .bio-text     { font-size: 9px; }
+  .page         { padding: 8px 6px; }
+}
