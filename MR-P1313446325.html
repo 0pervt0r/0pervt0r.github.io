@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hadal Database</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+  <link href="style.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="os-wrapper">
+  <div class="titlebar">
+    <span class="titlebar-title">HADAL DATABASE ACCESS</span>
+    <div class="titlebar-controls">
+      <span class="ctrl-close"></span>
+      <span class="ctrl-min"></span>
+      <span class="ctrl-max"></span>
+    </div>
+  </div>
+
+  <div class="main-window">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sidebar-user">
+        <div class="sidebar-username">ПОЛЬЗОВАТЕЛЬ</div>
+        <div class="sidebar-role">Уровень доступа: 3</div>
+      </div>
+
+      <div class="sidebar-section">Навигация</div>
+      <div class="sidebar-item" href="index.html">Главная</div>
+      <div class="sidebar-item"><a href="personnel.html">Персоналии</a></div>
+      <div class="sidebar-item" active><a href="prisoners.html">Заключённые</a></div>
+      <div class="sidebar-item"><a href="documents.html">Документация</a></div>
+      <div class="sidebar-section">Дополнительно</div>
+      <div class="sidebar-item" href="map.html">Карта</div>
+      <div class="sidebar-item" href="stories.html">Рассказы</div>
+      <div class="sidebar-item" href="object-classification.html">Классификация объектов</div>
+      <div class="sidebar-item"><a href="https://teletype.in/@yurubolski/GMpdKbCOIMu">Правила</a></div>
+      <div class="sidebar-item"><a href="https://teletype.in/@yurubolski/GMpdKbCOIMu" style="color:inherit;text-decoration:none;">Правила</a></div>
+
+      <div class="sidebar-bottom">
+        <div><span class="status-dot"></span><span class="status-text">ПОЛЬЗОВАТЕЛЬ В СЕТИ</span></div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+      <div class="topbar">
+        <div class="topbar-title">ДОСЬЕ СОТРУДНИКА</div>
+        <div class="topbar-actions">
+          <a class="btn-sm btn-back" href="personnel.html">Назад к реестру</a>
+        </div>
+      </div>
+
+      <div class="page">
+
+        <!-- Classified banner -->
+        <div class="classified-banner">
+          <span class="classified-label">⬛ ОГРАНИЧЕННЫЙ ДОСТУП ⸺ УРОВЕНЬ 3+</span>
+          <span class="classified-code">ОБНОВЛЕНО: 2021-08-02</span>
+        </div>
+
+        <!-- Main grid: portrait + info -->
+        <div class="dossier-grid">
+
+          <!-- Portrait column -->
+          <div class="portrait-col">
+
+            <!-- Portrait frame -->
+            <div class="portrait-frame">
+              <div class="corner-mark corner-tl"></div>
+              <div class="corner-mark corner-tr"></div>
+              <div class="corner-mark corner-bl"></div>
+              <div class="corner-mark corner-br"></div>
+              <!-- Replace the svg+text below with an <img> tag for a real portrait -->
+              <div class="portrait-inner">
+                <svg class="portrait-silhouette" viewBox="0 0 100 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <ellipse cx="50" cy="32" rx="22" ry="26" fill="#c8d8f0"/>
+                  <path d="M10 120 Q10 72 50 72 Q90 72 90 120Z" fill="#c8d8f0"/>
+                </svg>
+                <div class="portrait-placeholder-text">ФОТО НЕ ЗАГРУЖЕНО</div>
+              </div>
+              <div class="portrait-stamp">СЕБАСТЬЯН СОЛАС</div>
+            </div>
+
+            <!-- ID card -->
+            <div class="id-card">
+              <div class="id-card-header">ИДЕНТИФИКАЦИЯ</div>
+              <div class="id-card-body">
+                <div class="id-field">
+                  <span class="id-label">ID</span>
+                  <span class="id-value cyan">MR-P #1313446325</span>
+                </div>
+                <div class="id-field">
+                  <span class="id-label">СТАТУС</span>
+                  <span class="id-value"><span class="status-badge status-active">ЖИВ</span></span>
+                </div>
+                <div class="id-field">
+                  <span class="id-label">ДОЛЖНОСТЬ</span>
+                  <span class="id-value">разнорабочий</span>
+              </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Info column -->
+          <div class="info-col">
+
+            <!-- Name block -->
+            <div class="name-block">
+              <div class="page-badge">URBANSHADE CORP — ХАДАЛЬНОЕ ПОДРАЗДЕЛЕНИЕ</div>
+              <div class="dossier-name">Себастьян Солас</div>
+              <div class="dossier-alias">«Умелец»</div>
+              <div class="dossier-role">Мужчина – 33 года – 177 см – 77 кг</div>
+            </div>
+
+            <!-- Biography -->
+            <div class="dossier-section">
+              <div class="section-header">
+                <span class="section-title">БИОГРАФИЯ</span>
+                <span class="section-tag">ФАЙЛ 01 / ИСТОРИЯ</span>
+              </div>
+              <div class="section-body">
+                <div class="bio-text">
+                  <p>В 2013 году Себастьян был несправедливо обвинен в убийстве девяти человек и приговорен к смертной казни. Ровно за день до казни Urbanshade перехватили его и инсценировали смерть, предоставив государству поддельное свидетельство о казни.</p>
+                  <p>Затем он был заключен в тюрьму Hadal Blacksite как заключенный категории LR-P.</p>
+                  <p>Семь месяцев спустя Себастьян был признан невиновным. Однако эта информация так и не дошла до него, и он не был освобожден из тюрьмы. Он также был повышен до ранга MR-P, что обеспечило ему лучшие условия жизни, но он остался заключенным.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Psychological profile -->
+            <div class="dossier-section">
+              <div class="section-header">
+                <span class="section-title">ПСИХОЛОГИЧЕСКИЙ ПРОФИЛЬ</span>
+                <span class="section-tag">ФАЙЛ 02 / ОЦЕНКА</span>
+              </div>
+              <div class="section-body">
+                <div class="typo-grid">
+
+                  <div class="typo-card">
+                    <div class="typo-card-label">ТЕМПЕРАМЕНТ</div>
+                    <div class="typo-card-value">Phlegmatic-Sanguine</div>
+                  </div>
+
+                  <div class="typo-card">
+                    <div class="typo-card-label">MBTI</div>
+                    <div class="typo-card-value typo-mbti">
+                      <span class="mbti-letter">I</span><span class="mbti-letter">N</span><span class="mbti-letter">T</span><span class="mbti-letter">J</span>
+                    </div>
+                  </div>
+
+                  <div class="typo-card">
+                    <div class="typo-card-label">ЭННЕАГРАММА</div>
+                    <div class="typo-card-value">3w4</div>
+                  </div>
+
+                  <div class="typo-card">
+                    <div class="typo-card-label">ИНСТИНКТ</div>
+                    <div class="typo-card-value">so/3</div>
+                    </div>
+                  </div>
+
+                </div>
+
+                <div class="trait-list" style="margin-top: 14px;">
+                  <span class="trait-tag positive">Логичность</span>
+                  <span class="trait-tag positive">Наблюдательность</span>
+                  <span class="trait-tag neutral">Склонность к интроверсии и одиночеству</span>
+                  <span class="trait-tag warning">Стремление к независимости и самодостаточности</span>
+                  <span class="trait-tag warning">Импульсивность</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Gallery row -->
+        <div class="dossier-section dossier-full" style="margin-bottom:14px;">
+          <div class="section-header">
+            <span class="section-title">ГАЛЕРЕЯ / МАТЕРИАЛЫ</span>
+            <span class="section-tag">ФАЙЛ 03 / АРХИВ</span>
+          </div>
+          <div class="section-body">
+            <div class="gallery-grid">
+              <div class="gallery-item">
+                <!-- Replace .gallery-placeholder with <img src="..." style="width:100%;height:100%;object-fit:cover;"> -->
+                <div class="gallery-placeholder">[ ИЗОБРАЖЕНИЕ ]</div>
+                <div class="gallery-caption">Изображение не загружено</div>
+              </div>
+              <div class="gallery-item">
+                <div class="gallery-placeholder">[ ИЗОБРАЖЕНИЕ ]</div>
+                <div class="gallery-caption">Изображение не загружено</div>
+              </div>
+              <div class="gallery-item">
+                <div class="gallery-placeholder">[ ИЗОБРАЖЕНИЕ ]</div>
+                <div class="gallery-caption">Изображение не загружено</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Access log -->
+        <div class="dossier-section dossier-full">
+          <div class="section-header">
+            <span class="section-title">ЖУРНАЛ СОБЫТИЙ</span>
+            <span class="section-tag">ФАЙЛ 04 / СИСТЕМНЫЕ ЗАПИСИ</span>
+          </div>
+          <div class="section-body">
+            <div class="log-rows">
+              <div class="log-row">
+              <div class="log-row">
+                <span class="log-ts">2014-05-05 · 10:21</span>
+                <span class="log-event">Повышение с LR-P #1313446325 до MR-P #1313446325.</span>
+                <span class="log-level info">INFO</span>
+              </div>
+              <div class="log-row">
+                <span class="log-ts">2013-19-07 · 6:12</span>
+                <span class="log-event">Прибытие LR-P #1313446325 в тайный Хадальный объект.</span>
+                <span class="log-level info">INFO</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /page -->
+    </div><!-- /content -->
+  </div><!-- /main-window -->
+</div><!-- /os-wrapper -->
+
+</body>
+</html>
