@@ -257,11 +257,6 @@ body::after {
   position: relative;
 }
 
-.content > * {
-  position: relative;
-  z-index: 1;
-}
-
 .content::before {
   content: '';
   position: absolute;
@@ -285,6 +280,11 @@ body::after {
   opacity: 0.33;
   pointer-events: none;
   z-index: 9998;
+}
+
+.content > * {
+  position: relative;
+  z-index: 9999;
 }
 
 /* ───────────────────────────────────────────────
