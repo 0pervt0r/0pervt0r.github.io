@@ -541,6 +541,107 @@
   .hero-title { font-size: 16px; }
 }
 
+    /* ── NAV BUTTONS ── */
+.nav-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  text-decoration: none;
+  border: 1px solid var(--border-grey);
+  border-radius: 3px;
+  background: var(--bg);
+  overflow: hidden;
+  position: relative;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.nav-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--accent-dim);
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.nav-btn:hover {
+  border-color: rgba(178,229,40,0.5);
+  background: rgba(178,229,40,0.03);
+}
+.nav-btn:hover::before { opacity: 1; }
+.nav-btn:hover .nav-btn-label { color: var(--accent2); }
+.nav-btn:hover .nav-btn-arrow { color: var(--accent2); transform: translateX(4px); }
+.nav-btn:hover .nav-btn-icon-wrap { border-right-color: rgba(178,229,40,0.35); }
+
+/* иконка-слот слева */
+.nav-btn-icon-wrap {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid var(--border-grey);
+  background: var(--bg2);
+  transition: border-color 0.15s;
+  position: relative;
+  z-index: 1;
+}
+
+.nav-btn-icon-wrap img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  transition: transform 0.2s cubic-bezier(.34,1.56,.64,1);
+}
+.nav-btn:hover .nav-btn-icon-wrap img {
+  transform: scale(1.18);
+}
+
+/* вертикальная черта-разделитель */
+.nav-btn-divider {
+  width: 1px;
+  height: 28px;
+  background: var(--border-grey);
+  flex-shrink: 0;
+  margin: 0 2px;
+  position: relative;
+  z-index: 1;
+}
+
+.nav-btn-label {
+  flex: 1;
+  font-family: 'Orbitron', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-bright);
+  letter-spacing: 0.1em;
+  padding: 0 16px;
+  position: relative;
+  z-index: 1;
+  transition: color 0.15s;
+}
+
+.nav-btn-arrow {
+  font-size: 13px;
+  color: var(--text-dim);
+  padding-right: 18px;
+  position: relative;
+  z-index: 1;
+  transition: color 0.15s, transform 0.15s;
+}
+
+@media (max-width: 768px) {
+  .nav-btn-label { font-size: 11px; letter-spacing: 0.07em; }
+  .nav-btn-icon-wrap { width: 44px; height: 44px; }
+}
     
   </style>
 </head>
@@ -661,56 +762,38 @@
           </div>
 
           <div class="home-log">
-            <div class="home-section-title">ОБНОВЛЕНИЯ БАЗЫ</div>
-            <div class="update-list">
+  <div class="home-section-title">РАЗДЕЛЫ</div>
+  <div class="nav-buttons">
 
-              <div class="update-item">
-                <div class="update-dot green"></div>
-                <div class="update-body">
-                  <div class="update-date">2024-01-03</div>
-                  <div class="update-text">Добавлено досье Z-638 «Восьмиручка»</div>
-                </div>
-                <span class="update-tag new">НОВОЕ</span>
-              </div>
+    <a class="nav-btn" href="personnel.html">
+      <div class="nav-btn-icon-wrap">
+        <img src="PersonnelIcon.png">
+      </div>
+      <div class="nav-btn-divider"></div>
+      <span class="nav-btn-label">ПЕРСОНАЛИИ</span>
+      <span class="nav-btn-arrow">→</span>
+    </a>
 
-              <div class="update-item">
-                <div class="update-dot amber"></div>
-                <div class="update-body">
-                  <div class="update-date">2023-11-30</div>
-                  <div class="update-text">Обновлён протокол содержания Z-1264</div>
-                </div>
-                <span class="update-tag edit">ПРАВКА</span>
-              </div>
+    <a class="nav-btn" href="prisoners.html">
+      <div class="nav-btn-icon-wrap">
+        <img src="PrisonersIcon.png">
+      </div>
+      <div class="nav-btn-divider"></div>
+      <span class="nav-btn-label">ЗАКЛЮЧЁННЫЕ</span>
+      <span class="nav-btn-arrow">→</span>
+    </a>
 
-              <div class="update-item">
-                <div class="update-dot green"></div>
-                <div class="update-body">
-                  <div class="update-date">2023-11-14</div>
-                  <div class="update-text">Добавлено примечание сотрудника к Z-367</div>
-                </div>
-                <span class="update-tag new">НОВОЕ</span>
-              </div>
+    <a class="nav-btn" href="documents.html">
+      <div class="nav-btn-icon-wrap">
+        <img src="ObjectsIcon.png">
+      </div>
+      <div class="nav-btn-divider"></div>
+      <span class="nav-btn-label">ОБЪЕКТЫ</span>
+      <span class="nav-btn-arrow">→</span>
+    </a>
 
-              <div class="update-item">
-                <div class="update-dot red"></div>
-                <div class="update-body">
-                  <div class="update-date">2023-04-14</div>
-                  <div class="update-text">Инцидент CASE-09 — доступ к материалам ограничен</div>
-                </div>
-                <span class="update-tag alert">ТРЕВОГА</span>
-              </div>
-
-              <div class="update-item">
-                <div class="update-dot amber"></div>
-                <div class="update-body">
-                  <div class="update-date">2023-03-01</div>
-                  <div class="update-text">Z-17 переведён в статус «используется»</div>
-                </div>
-                <span class="update-tag pending">СТАТУС</span>
-              </div>
-
-            </div>
-          </div>
+  </div>
+</div>
 
         </div>
 
