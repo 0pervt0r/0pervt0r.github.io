@@ -92,13 +92,11 @@
 .accordion-body {
   max-height: 0;
   overflow: hidden;
-  transition: max-height 0.3s ease, padding 0.2s ease;
+  transition: max-height 0.4s ease;
   padding: 0 12px;
-  border-top: 0px solid var(--border);
 }
 
 .accordion-item.open .accordion-body {
-  max-height: none;
   padding: 12px 12px 14px;
   border-top: 1px solid rgba(178, 229, 40, 0.12);
 }
