@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hadal Database</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="style.css" rel="stylesheet">
+<style>
+
+/* ════════════════════════════════════
+   SVG CLASSIFICATION HEADER
+════════════════════════════════════ */
+.svgheader-wrap {
+  position:relative;
+  background:var(--bg2);
+  border:1px solid var(--border-grey);
+  border-radius:3px;
+  overflow:hidden;
+  margin-bottom:20px;
+  display:flex;
+  align-items:stretch;
+  min-height:120px;
+}
+
+/* Левая декоративная полоса с цветом угрозы */
+.svgheader-threat-stripe {
+  width:5px;
+  flex-shrink:0;
+}
+.threat-red    { background:var(--red); }
+.threat-amber  { background:var(--amber); }
+.threat-green  { background:var(--green); }
+.threat-purple { background:var(--purple); }
+.threat-grey   { background:var(--text-dim); }
+
+/* SVG круговая иконка */
+.svgheader-icon-col {
+  padding:18px 20px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-right:1px solid var(--border-grey);
+  background: rgba(0,0,0,0.15);
+  flex-shrink:0;
+}
+
+.svgheader-icon {
+  width:80px; height:80px;
+  position:relative;
+}
+
+/* Концентрические кольца (воспроизведение SVG с сайта) */
+.ring-svg { width:100%; height:100%; }
+
+/* Правая часть: метаданные */
+.svgheader-meta {
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  padding:16px 24px;
+  gap:4px;
+}
+
+.svgheader-row {
+  display:flex;
+  align-items:baseline;
+  gap:10px;
+}
+
+.svgheader-key {
+  font-family:'Orbitron',monospace;
+  font-size:9px;
+  color:var(--text-dim);
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  min-width:130px;
+  flex-shrink:0;
+}
+
+.svgheader-val {
+  font-family:'Orbitron',monospace;
+  font-size:13px;
+  font-weight:700;
+  color:var(--text-bright);
+  letter-spacing:0.04em;
+}
+
+.svgheader-val.accent { color:var(--accent2); }
+.svgheader-val.red    { color:var(--red); }
+.svgheader-val.amber  { color:var(--amber); }
+.svgheader-val.green  { color:var(--green); }
+.svgheader-val.purple { color:var(--purple); }
+
+.svgheader-val.strikethrough {
+  text-decoration: line-through;
+  opacity: 0.5;
+  font-size:11px;
+  margin-right:4px;
+}
+
+.svgheader-clearance {
+  margin-top:8px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.clearance-pill {
+  font-family:'Orbitron',monospace;
+  font-size:9px;
+  font-weight:700;
+  padding:3px 10px;
+  border-radius:2px;
+  letter-spacing:0.10em;
+}
+.cp-red    { background:rgba(217,79,92,0.12);  border:1px solid rgba(217,79,92,0.35);  color:var(--red); }
+.cp-amber  { background:rgba(212,146,26,0.12); border:1px solid rgba(212,146,26,0.35); color:var(--amber); }
+.cp-green  { background:var(--green-dim);       border:1px solid rgba(178,229,40,0.30); color:var(--green); }
+.cp-purple { background:rgba(138,104,204,0.10); border:1px solid rgba(138,104,204,0.30);color:var(--purple); }
+.cp-grey   { background:rgba(80,88,96,0.12);    border:1px solid rgba(80,88,96,0.30);   color:var(--text-dim); }
+
+/* Правая колонка: иконки подклассов */
+.svgheader-classes {
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:6px;
+  padding:16px 20px;
+  border-left:1px solid var(--border-grey);
+  background: rgba(0,0,0,0.10);
+  flex-shrink:0;
+  min-width:170px;
+}
+
+.class-row {
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.class-dot {
+  width:8px; height:8px;
+  border-radius:50%;
+  flex-shrink:0;
+}
+
+.class-label-sm {
+  font-size:8px;
+  color:var(--text-dim);
+  letter-spacing:0.10em;
+  text-transform:uppercase;
+  min-width:70px;
+}
+
+.class-val-sm {
+  font-family:'Orbitron',monospace;
+  font-size:9px;
+  color:var(--text-bright);
+  letter-spacing:0.04em;
+}
+
+/* ════════════════════════════════════
+   SECURITY NOTICE BANNERS
+════════════════════════════════════ */
+.notice-banner {
+  display:flex;
+  align-items:flex-start;
+  gap:14px;
+  border-radius:3px;
+  padding:11px 16px;
+  margin-bottom:12px;
+  position:relative;
+  overflow:hidden;
+}
+
+.notice-banner::before {
+  content:'';
+  position:absolute;
+  left:0; top:0; bottom:0; width:3px;
+}
+
+.notice-banner.nb-classified {
+  background:rgba(138,104,204,0.07);
+  border:1px solid rgba(138,104,204,0.28);
+}
+.notice-banner.nb-classified::before { background:var(--purple); }
+
+.notice-banner.nb-warning {
+  background:rgba(212,146,26,0.07);
+  border:1px solid rgba(212,146,26,0.28);
+}
+.notice-banner.nb-warning::before { background:var(--amber); }
+
+.notice-banner.nb-danger {
+  background:rgba(217,79,92,0.07);
+  border:1px solid rgba(217,79,92,0.28);
+}
+.notice-banner.nb-danger::before { background:var(--red); }
+
+.notice-banner.nb-info {
+  background:var(--accent-dim);
+  border:1px solid var(--border);
+}
+.notice-banner.nb-info::before { background:var(--accent2); }
+
+.notice-icon {
+  flex-shrink:0;
+  width:28px; height:28px;
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Orbitron',monospace;
+  font-size:12px; font-weight:900;
+  margin-top:1px;
+}
+.nb-classified .notice-icon { border:1px solid rgba(138,104,204,0.5); color:var(--purple); }
+.nb-warning    .notice-icon { border:1px solid rgba(212,146,26,0.5);  color:var(--amber); }
+.nb-danger     .notice-icon { border:1px solid rgba(217,79,92,0.5);   color:var(--red); }
+.nb-info       .notice-icon { border:1px solid var(--border2);         color:var(--accent2); }
+
+.notice-body { flex:1; }
+.notice-title {
+  font-family:'Orbitron',monospace;
+  font-size:9px;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  margin-bottom:4px;
+}
+.nb-classified .notice-title { color:var(--purple); }
+.nb-warning    .notice-title { color:var(--amber); }
+.nb-danger     .notice-title { color:var(--red); }
+.nb-info       .notice-title { color:var(--accent2); }
+
+.notice-text { font-size:10px; color:var(--text); line-height:1.6; letter-spacing:0.03em; }
+
+/* ════════════════════════════════════
+   DOCUMENT BODY TEXT
+════════════════════════════════════ */
+.doc-body { display:flex; flex-direction:column; gap:16px; }
+
+.doc-section {
+  background:var(--bg2);
+  border:1px solid var(--border-grey);
+  border-radius:3px;
+  overflow:hidden;
+}
+
+.doc-section-header {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:7px 16px;
+  background:var(--accent-dim);
+  border-bottom:1px solid var(--accent);
+}
+
+.doc-section-title {
+  font-family:'Orbitron',monospace;
+  font-size:9px;
+  color:var(--accent2);
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+}
+
+.doc-section-tag {
+  font-size:8px;
+  color:var(--text-dim);
+  letter-spacing:0.06em;
+}
+
+.doc-section-body {
+  padding:18px 20px;
+}
+
+.doc-text {
+  font-size:12px;
+  color:var(--text);
+  line-height:1.85;
+  letter-spacing:0.03em;
+}
+
+.doc-text p { margin-bottom:12px; }
+.doc-text p:last-child { margin-bottom:0; }
+
+.doc-text .redacted {
+  background:var(--text-dim);
+  color:transparent;
+  border-radius:1px;
+  padding:0 2px;
+  user-select:none;
+  cursor:not-allowed;
+}
+
+.doc-text strong {
+  color:var(--text-bright);
+  font-weight:normal;
+}
+
+/* ── INLINE PHOTO ── */
+.doc-photo-wrap {
+  float:right;
+  margin:0 0 16px 24px;
+  max-width:240px;
+  flex-shrink:0;
+}
+
+.doc-photo-wrap.left {
+  float:left;
+  margin:0 24px 16px 0;
+}
+
+.doc-photo-frame {
+  background:var(--bg);
+  border:1px solid var(--border-grey);
+  border-radius:3px;
+  overflow:hidden;
+  position:relative;
+}
+
+.doc-photo-frame::before {
+  content:'';
+  position:absolute; inset:0;
+  background:repeating-linear-gradient(45deg,transparent,transparent 6px,rgba(178,229,40,0.02) 6px,rgba(178,229,40,0.02) 7px);
+  pointer-events:none; z-index:1;
+}
+
+.doc-photo-frame img {
+  width:100%; height:auto;
+  display:block;
+  filter:grayscale(20%) contrast(1.05);
+  position:relative; z-index:0;
+}
+
+/* Placeholder когда нет фото */
+.doc-photo-placeholder {
+  width:100%;
+  aspect-ratio:4/3;
+  display:flex; align-items:center; justify-content:center;
+  flex-direction:column; gap:8px;
+}
+.placeholder-icon { font-size:28px; opacity:0.15; }
+.placeholder-text { font-size:9px; color:var(--text-dim); letter-spacing:0.08em; }
+
+.doc-photo-caption {
+  padding:6px 10px;
+  font-size:9px;
+  color:var(--text-dim);
+  letter-spacing:0.05em;
+  border-top:1px solid var(--border-grey);
+  background:rgba(10,12,15,0.5);
+  line-height:1.5;
+}
+
+.clearfix::after { content:''; display:table; clear:both; }
+
+/* ── SEPARATOR ── */
+.doc-divider {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin:4px 0;
+  opacity:0.4;
+}
+.doc-divider::before,
+.doc-divider::after {
+  content:'';
+  flex:1;
+  height:1px;
+  background:var(--border-grey);
+}
+.doc-divider-text { font-size:9px; color:var(--text-dim); letter-spacing:0.1em; white-space:nowrap; }
+
+/* ── OBJECT NUMBER WATERMARK ── */
+.doc-watermark {
+  position:fixed;
+  bottom:40px; right:40px;
+  font-family:'Orbitron',monospace;
+  font-size:60px; font-weight:900;
+  color:rgba(178,229,40,0.04);
+  letter-spacing:0.1em;
+  pointer-events:none; z-index:0;
+  transform:rotate(-20deg);
+  user-select:none;
+}
+
+/* ════════════════════════════════════
+   MOBILE
+════════════════════════════════════ */
+@media (max-width:768px) {
+  .os-wrapper { padding:0; }
+  .titlebar { border-radius:0; }
+  .titlebar-controls { display:none; }
+  .main-window { flex-direction:column; border-radius:0; border-left:none; border-right:none; }
+  .sidebar { width:100%; min-width:unset; border-right:none; border-bottom:1px solid var(--border); padding:4px 0; flex-direction:row; overflow-x:auto; scrollbar-width:none; }
+  .sidebar::-webkit-scrollbar { display:none; }
+  .sidebar-user,.sidebar-section,.sidebar-bottom { display:none; }
+  .sidebar-item { display:inline-block; padding:8px 14px; font-size:10px; white-space:nowrap; flex-shrink:0; }
+  .topbar { padding:8px 12px; }
+  .topbar-title { font-size:11px; }
+  .page { padding:12px; }
+  .svgheader-wrap { flex-direction:column; min-height:unset; }
+  .svgheader-threat-stripe { width:100%; height:4px; }
+  .svgheader-icon-col { border-right:none; border-bottom:1px solid var(--border-grey); }
+  .svgheader-classes { border-left:none; border-top:1px solid var(--border-grey); min-width:unset; }
+  .svgheader-key { min-width:100px; font-size:8px; }
+  .svgheader-val { font-size:11px; }
+  .doc-photo-wrap, .doc-photo-wrap.left { float:none; margin:0 0 14px 0; max-width:100%; }
+  .doc-watermark { display:none; }
+}
+</style>
+</head>
+<body>
+
+<div class="os-wrapper">
+
+  <!-- TITLEBAR -->
+  <div class="titlebar">
+    <span class="titlebar-title">HADAL DATABASE — OBJECT FILE VIEWER</span>
+    <div class="titlebar-controls">
+      <span class="ctrl-close"></span>
+      <span class="ctrl-min"></span>
+      <span class="ctrl-max"></span>
+    </div>
+  </div>
+
+  <!-- MAIN WINDOW -->
+  <div class="main-window">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sidebar-user">
+        <div class="sidebar-username">ПОЛЬЗОВАТЕЛЬ</div>
+        <div class="sidebar-role">Уровень доступа: 3</div>
+      </div>
+      <div class="sidebar-section">Навигация</div>
+      <div class="sidebar-item"><a href="https://0pervt0r.github.io">Главная</a></div>
+      <div class="sidebar-item"><a href="personnel.html">Персоналии</a></div>
+      <div class="sidebar-item"><a href="prisoners.html">Заключённые</a></div>
+      <div class="sidebar-item active"><a href="documents.html">Документация</a></div>
+      <div class="sidebar-section">Дополнительно</div>
+      <div class="sidebar-item" href="map.html">Карта</div>
+      <div class="sidebar-item" href="stories.html">Рассказы</div>
+      <div class="sidebar-item" href="object-classification.html">Классификация объектов</div>
+      <div class="sidebar-item"><a href="https://teletype.in/@yurubolski/GMpdKbCOIMu">Правила</a></div>
+      <div class="sidebar-bottom">
+        <span class="status-dot"></span>
+        <span class="status-text">СИСТЕМА В СЕТИ</span>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- TOPBAR -->
+      <div class="topbar">
+        <div class="topbar-title">ДОКУМЕНТ · Z-5</div>
+      </div>
+
+      <!-- PAGE -->
+      <div class="page">
+        <div class="svgheader-wrap">
+          <div class="svgheader-threat-stripe threat-red"></div>
+          <div class="svgheader-icon-col">
+            <div class="svgheader-icon">
+              <svg class="ring-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="48" fill="none" stroke="rgba(217,79,92,0.80)" stroke-width="2.5"/>
+                <circle cx="50" cy="50" r="41" fill="none" stroke="rgba(217,79,92,0.65)" stroke-width="2"/>
+                <circle cx="50" cy="50" r="34" fill="none" stroke="rgba(217,79,92,0.52)" stroke-width="2"/>
+                <circle cx="50" cy="50" r="27" fill="none" stroke="rgba(217,79,92,0.40)" stroke-width="1.5"/>
+                <circle cx="50" cy="50" r="20" fill="none" stroke="rgba(217,79,92,0.28)" stroke-width="1.5"/>
+                <circle cx="50" cy="50" r="14" fill="none" stroke="rgba(217,79,92,0.18)" stroke-width="1"/>
+                <g transform="translate(50,50)">
+                  <path d="M0,0 L0,-11 A11,11,0,0,1,9.5,-5.5 Z"   fill="rgba(217,79,92,0.7)"/>
+                  <path d="M0,0 L9.5,-5.5 A11,11,0,0,1,9.5,5.5 Z"  fill="rgba(212,146,26,0.7)"/>
+                  <path d="M0,0 L9.5,5.5 A11,11,0,0,1,0,11 Z"      fill="rgba(178,229,40,0.7)"/>
+                  <path d="M0,0 L0,11 A11,11,0,0,1,-9.5,5.5 Z"     fill="rgba(138,104,204,0.7)"/>
+                  <path d="M0,0 L-9.5,5.5 A11,11,0,0,1,-9.5,-5.5 Z" fill="rgba(120,130,140,0.5)"/>
+                  <path d="M0,0 L-9.5,-5.5 A11,11,0,0,1,0,-11 Z"   fill="rgba(120,130,140,0.3)"/>
+                  <circle cx="0" cy="0" r="5" fill="#1c1c1c" stroke="rgba(217,79,92,0.4)" stroke-width="0.8"/>
+                </g>
+                <line x1="50" y1="2"  x2="50" y2="8"   stroke="rgba(217,79,92,0.6)" stroke-width="1"/>
+                <line x1="50" y1="92" x2="50" y2="98"   stroke="rgba(217,79,92,0.6)" stroke-width="1"/>
+                <line x1="2"  y1="50" x2="8"  y2="50"   stroke="rgba(217,79,92,0.6)" stroke-width="1"/>
+                <line x1="92" y1="50" x2="98" y2="50"   stroke="rgba(217,79,92,0.6)" stroke-width="1"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Метаданные объекта -->
+          <div class="svgheader-meta">
+            <div class="svgheader-row">
+              <span class="svgheader-key">Объект №</span>
+              <span class="svgheader-val accent">Z-5</span>
+            </div>
+            <div class="svgheader-row">
+              <span class="svgheader-key">Класс объекта</span>
+              <span class="svgheader-val yellow">Ванскел</span>
+            </div>
+            <div class="svgheader-row">
+              <span class="svgheader-key">Происхождение</span>
+              <span class="svgheader-val">Укендт</span>
+            </div>
+          </div>
+
+          <!-- Правая колонка: подклассы -->
+          <div class="svgheader-classes">
+            <div class="class-row">
+              <div class="class-dot" style="background:rgba(217,79,92,0.8)"></div>
+              <span class="class-label-sm">Управляемость</span>
+              <span class="svgheader-val" style="font-size:9px;color:var(--red)">Вагт</span>
+            </div>
+            <div class="class-row">
+              <div class="class-dot" style="background:rgba(212,146,26,0.8)"></div>
+              <span class="class-label-sm">Польза</span>
+              <span class="svgheader-val" style="font-size:9px;color:var(--amber)">Хойд</span>
+            </div>
+            <div class="class-row">
+              <div class="class-dot" style="background:rgba(178,229,40,0.8)"></div>
+              <span class="class-label-sm">Репликативность</span>
+              <span class="svgheader-val" style="font-size:9px;color:var(--green)">Вигеникке</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="notice-banner nb-classified">
+          <div class="notice-icon">S</div>
+          <div class="notice-body">
+            <div class="notice-title">Секретность · Уровень 4 / Секретно</div>
+            <div class="notice-text">Данный файл доступен только сотрудникам с карточкой специализации <strong>A</strong> или <strong>D</strong> и уровнем допуска не ниже 4. Несанкционированный доступ фиксируется автоматически и передаётся в службу безопасности.</div>
+          </div>
+        </div>
+
+        <div class="doc-body">
+
+          <!-- ОПИСАНИЕ -->
+          <div class="doc-section">
+            <div class="doc-section-header">
+              <span class="doc-section-title">Описание</span>
+              <span class="doc-section-tag">ФАЙЛ 01</span>
+            </div>
+            <div class="doc-section-body">
+              <div class="doc-text clearfix">
+<p>Z-5, так же известный как Фридлейв ⸺ покровитель Хадального Подразделения и изначальный «владелец» зоны Лет-Ванд, а так же глава и создатель Подразделения Хроник; один из представителей потустороннего мира, принадлежащий к ладнветтирам. Z-5 не имеет истинного облика и физической оболочки. Видевшие Фридлейва сотрудники описывают его как крупного розового лебедя со светящимися белыми глазами и «человеческой улыбкой», нижняя половина тела которого ⸺ рыбий хвост. Некоторые же утверждают, что он выглядит как человек в костюме с головой лебедя.</p>
+                <p>Фридлейв невидим, если только не посмотреть на него очень внимательно в нужном свете и в нужное время. У него имеется зооморфность и способность приходить к людям во сне, покровительствовать их и выполнять некоторых просьбы ⸺ если умилостивить его. Ландветтиров можно умилостивить сексуальными услугами (хотя бы символического характера) либо подношениями в виде угощений.</p>
+                
+              </div>
+            </div>
+          </div>
+
+           <div class="dossier-section" style="margin-top: 14px; margin-bottom: 14px;">
+            <div class="section-header">
+              <span class="section-title">ЗАКЛЮЧЕНИЕ ПСИХИАТРА</span>
+                <span class="section-tag">ФАЙЛ 02 / ЛИЧНОСТЬ</span>
+              </div>
+              <div class="section-body">
+                <div class="bio-text">
+                   <p>По своей натуре Фридлейв хитрый манипулятор и трикстер. Он умен, эгоцентричен, амбициозен и всегда стремится контролировать ситуацию. Его истинные намерения редко бывают очевидны ⸺ он предпочитает оставаться загадкой, скрывая мотивы за очарованием и сарказмом. Кроме того, Фридлейв прирождённый торгаш: он с удовольствием попытается навязать услуги Urbanshade даже тому, кто в них совершенно не заинтересован, и при этом сделает это с таким шармом, что отказать ему почти невозможно.</p>
+                <p>Фридлейв отличается снисходительно-ласковой манерой общения: обожает флирт, подколы и сарказм, избегая прямоты. Он не обсуждает темы, связанные с близкими ему личностями, если его об этом не спросят, да и в целом редко говорит откровенно. Он способен проявлять покровительство и заботу, особенно по отношению к тем, кого считает «своими». Его отношения с окружающими носят собственнический характер: он воспринимает людей как «игрушки» или «предметы», но при этом ревностно оберегает их, считая своей собственностью.</p>
+
+                </div>
+              </div>
+            </div>
+
+                    <div class="doc-section">
+                      <div class="doc-section-header">
+                        <span class="doc-section-title">История обнаружения</span>
+                        <span class="doc-section-tag">ФАЙЛ 03</span>
+                      </div>
+                    <div class="doc-section-body">
+                    <div class="doc-text clearfix">
+                      <p>19██ год, этап подготовительных работ по возведению Хадального Тайного Объекта. На момент описываемых событий Z-5 не был идентифицирован как разумная аномальная сущность; его существование не предполагалось ни в одной из предварительных разведок. Первые признаки аномальной активности были ошибочно списаны на технические неисправности, халатность персонала и неблагоприятные условия глубоководной среды. В течение данного периода у нескольких сотрудников, работавших на глубине, наблюдались схожие психосоматические симптомы: необъяснимое чувство тревоги, зрительные и слуховые галлюцинации, странные сны и кошмары.</p>
+                      <p>Спустя четыре месяца и ██ дней после первого зафиксированного инцидента, в 03:17 по местному времени, Z-5 впервые проявил себя открыто и вступил в вербальный контакт. Инцидент привел к немедленной приостановке всех строительных работ в радиусе ██ километров от эпицентра событий. Дальнейшие попытки возобновления строительства приводили к немедленной эскалации и новым жертвам до момента заключения формального соглашения.</p>
+              </div>
+            </div>
+          </div>
+
+ <div class="dossier-section" style="margin-top: 14px; margin-bottom: 14px;">
+  <div class="section-header">
+    <span class="section-title">СВЯЗАННЫЕ ЛИЧНОСТИ</span>
+    <span class="section-tag">1 ЗАПИСЬ</span>
+  </div>
+  <div class="section-body">
+    <div class="pub-list">
+
+      <a class="pub-item" href="MR-R9223000242.html">
+        <div class="pub-left">
+          <span class="pub-id">Оливия Эриксон</span>
+          <span class="pub-type-badge type-doc">Документ</span>
+        </div>
+        <div class="pub-main">
+          <span class="pub-title">«Лебёдушка»</span>
+        </div>
+        <span class="pub-arrow">→</span>
+      </a>
+      
+    </div>
+  </div>
+</div>
+            
+<div class="dossier-section">
+  <div class="section-header">
+    <span class="section-title">СВЯЗНЫЕ ЭКСПЕРИМЕНТЫ</span>
+    <span class="section-tag">EXPERIMENTS / APPLICATIONS / INTERVIEWS</span>
+  </div>
+  <div class="section-body">
+    <div class="accordion">
+
+      <div class="accordion-item">
+        <div class="accordion-trigger" onclick="toggleAccordion(this)">
+          <span class="accordion-id">Z5-001</span>
+          <span class="accordion-title">Расшифровка аудиозаписи первого контакта с Z-5</span>
+          <span class="accordion-date">████-██-██</span>
+          <span class="accordion-arrow">▶</span>
+        </div>
+        <div class="accordion-body">
+          <div class="accordion-body-inner">
+              <p>Фоновый шум: дыхание спящих людей.</p>
+            <p>Слышен посторонний звук, похожий на шорох крупных перьев.ㅤ Температура в каюте падает на 7°C за 4 секунды.</p>
+            <p>███████: ㅤМ-м-м... кто здесь?..</p>
+            <p>Неизвестный (далее ⸺ Z-5):ㅤ Тише, тише... я всего-то хранитель этой местности. Ничего такого.</p>
+            <p>███: ㅤ███████? Какого чёрта... что за... А-А-А! ███████ СВЕТ! ВКЛЮЧИ СВЕТ!</p>
+            <p>███████: ㅤГОСПОДИ, ЧТО ЭТО?! В углу!</p>
+            <p>Z-5:ㅤ Свет? Ах, извините. Я забыл, что ваши глазки так плохо видят в темноте...</p>
+            <p>Освещение в каюте самопроизвольно включается на полную мощность.</p>
+            <p>███: ㅤ(Неразборчивый крик ужаса).</p>
+            <p>Z-5:ㅤ Ну вот. Уже лучше, правда?</p>
+            <p>███████: ㅤЧ-что тебе нужно?! Мы просто работаем!</p>
+            <p>Z-5: ㅤРаботаете, работаете... роетесь в земле, которой я не давал вам разрешения касаться. Несколько месяцев я развлекал себя, наблюдая за вами... но вы слишком живучие и упрямые, совсем не понимаете намёков! (Смешок). Слушайте внимательно, я повторять не стану...</p>
+            <p>Далее следует 12-секундная неразборчивая речь на неизвестном языке. Анализ записи показал психотронное воздействие, вызывающее дезориентацию и неконтролируемый страх.</p>
+            <p>Z-5: ㅤ...убирайтесь с моей территории.</p>
+            <p>Раздается двойной хруст. Оба инженера падают замертво. </p>
+            <p>Конец записи.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <div class="accordion-trigger" onclick="toggleAccordion(this)">
+          <span class="accordion-id">Z5-002</span>
+          <span class="accordion-title">Договор о заключении мирового соглашения</span>
+          <span class="accordion-date">████-██-██</span>
+          <span class="accordion-arrow">▶</span>
+        </div>
+        <div class="accordion-body">
+          <div class="accordion-body-inner">
+            <p>Предмет соглашения: Урегулирование территориального спора и установление протокола сосуществования между корпорацией Urbanshade и аномальной сущностью Z-5 («Фридлейв», «Ландветте») в пределах географической аномалии, именуемой Зона Лет-Ванд.</p>
+            <P>Стороны соглашения:</P>
+            <p>1. Корпорация Urbanshade, в лице полномочных представителей высшего руководства (имена засекречены, далее ⸺ «Корпорация»).</p>
+            <p>2. Сущность Z-5, самоидентифицирующая себя как «Фридлейв», действующая от своего имени и в статусе единоличного хранителя и распорядителя Зоны Лет-Ванд (далее ⸺ «Хранитель»).</p>
+            <p>Преамбула: Принимая во внимание события, описанные в Z5-001, и признавая нецелесообразность дальнейшей эскалации конфликта, стороны пришли к взаимному соглашению на следующих условиях. Настоящий договор аннулирует любые предыдущие претензии Хранителя к Корпорации по факту несанкционированного вторжения и гибели сотрудников в период с ██.██.19██ по 30.04.19██.</p>
+            <p>▎Статья 1: Территориальные уступки и права на застройку.</p>
+            <p>1.1. Хранитель отзывает свои возражения против строительства и дальнейшей эксплуатации глубоководного научно-исследовательского и промышленного комплекса «Хадальный Тайный Объект» (далее ⸺ Объект «Хадал»).</p>
+            <p>1.2. Корпорация Urbanshade признает верховное право Хранителя Z-5 на всю территорию Зоны Лет-Ванд, включая недра, водную толщу и сам Объект «Хадал».</p>
+            <p>1.3. Корпорация Urbanshade обязуется никогда, ни при каких обстоятельствах, не предпринимать попыток изгнания Хранителя с территории Зоны Лет-Ванд, равно как и не проводить ритуалов, церемоний, научных экспериментов или иных действий, прямо или косвенно направленных на ослабление связи Хранителя с вверенной ему территорией. Данный пункт имеет приоритет над любыми другими внутренними директивами и протоколами безопасности Корпорации.</p>
+            <p>1.4.  Хранитель оставляет за собой право выражать недовольство архитектурным стилем или цветовым решением вновь возводимых построек. Корпорация обязуется рассматривать такие жалобы в приоритетном порядке и, по возможности, вносить коррективы в дизайн-проект, если это не противоречит техническим требованиям безопасности. В случае невозможности изменения дизайна, Корпорация обязуется компенсировать Хранителю ущерб в соответствии со Статьей 3 настоящего Соглашения.</p>
+            <p>▎Статья 2: Статус Хранителя и его взаимодействие с персоналом.</p>
+            <p>2.1. Хранителю присваивается официальный статус «Покровитель Хадального Подразделения».</p>
+            <p>2.2. Хранитель получает право свободного, неограниченного перемещения по всей территории Объекта «Хадал», включая зоны строгого режима и карантинные сектора, при условии соблюдения Статьи 4 настоящего соглашения.</p>
+            <p>2.3. Корпорация признает за Хранителем право создавать и курировать внутреннюю структуру, именуемую «Подразделение Хроник», цели и методы работы которого не подлежат аудиту со стороны службы безопасности Urbanshade, если их деятельность не влечет за собой прямого материального ущерба инфраструктуре Объекта или массовой гибели персонала.</p>
+            <p>2.4. Хранитель обязуется воздерживаться от намеренного причинения физического вреда сотрудникам Корпорации, находящимся при исполнении служебных обязанностей, за исключением случаев самозащиты или грубого нарушения сотрудниками неписаных правил вежливости, установленных Хранителем.</p>
+            <p>▎Статья 3: Порядок умилостивления и компенсации.</p>
+            <p>3.1. Корпорация признает необходимость регулярного умилостивления Хранителя для поддержания стабильной аномальной обстановки в Зоне Лет-Ванд.</p>
+            <p>3.2. В статью бюджета Объекта «Хадал» вводится отдельная строка расходов: «Фонд поддержания расположения Z-5 (Кондитерские изделия и сопутствующие услуги)». Сумма ежемесячных отчислений утверждается в ходе личных встреч Хранителя с финансовым отделом, но не может быть ниже ████ крон в эквиваленте.</p>
+            <p>3.3. Корпорация не препятствует и не регламентирует вступление сотрудников Объекта «Хадал» в личные, в том числе интимные или матримониальные, отношения с Хранителем Z-5. Любые соглашения такого рода считаются частным делом сотрудника и Хранителя и не подлежат рассмотрению в корпоративном суде Urbanshade.</p>
+            <p>3.4. В случае вступления Хранителя в официальный брак с сотрудником Корпорации, Urbanshade обязуется предоставить супругу (супруге) дополнительные дни к отпуску и единовременную выплату в размере █████ крон.</p>
+            <p>3.5. Хранитель имеет право вести «Реестр нанесенных обид и неудобств». За каждую запись в Реестре, признанную представителем Корпорации обоснованной (или не оспоренную в течение ██ часов), Корпорация обязуется предоставить Хранителю компенсацию в виде:</p>
+            <p>ㅤㅤ3.5.1. Личных извинений от начальника смены, зачитанных вслух в пустом помещении.</p>
+            <p>ㅤㅤ3.5.2. Права Хранителя на одну «безобидную шалость» в отношении персонала, не влекущую за собой необратимых физических увечий или массовой гибели.</p>
+            <p>3.6. Сотрудникам Объекта «Хадал» настоятельно рекомендуется оставлять небольшие подношения (сладости, выпечку, блестящие предметы) в специально отведенных местах, помеченных символом «Розовый Лебедь». Игнорирование данной рекомендации не наказуемо, однако может привести к повышенному вниманию со стороны Хранителя к данному конкретному сотруднику.</p>
+            <p>▎Статья 4: Ограничения и особые условия.</p>
+            <p>4.1. Хранитель обязуется воздерживаться от вмешательства в работу систем жизнеобеспечения Объекта «Хадал» с целью развлечения, за исключением предварительно согласованных случаев.</p>
+            <p>4.2. Хранитель сохраняет за собой право в любой момент разорвать настоящее Соглашение в одностороннем порядке. В случае наступления данного события, Корпорация обязуется немедленно приступить к процедуре полной эвакуации и консервации Объекта «Хадал».</p>
+            <p>4.3. Корпорация признает право Хранителя определять круг лиц, которых он считает «своими». Корпорация обязуется не использовать данных сотрудников в качестве «живого щита» или «разменной монеты» в переговорах с Хранителем, а также не подвергать их дискриминации на рабочем месте в связи с их особым статусом.</p>
+            <p>4.4. Корпорация обязуется уведомлять Хранителя о любых плановых сокращениях штата или массовых переводах персонала с Объекта «Хадал» не менее чем за ██ дней до события. Хранитель имеет право наложить вето на перевод или увольнение сотрудников, входящих в круг «своих» или представляющих для него ценность.</p>
+            <p>4.5. Подробности, содержание бесед, темы для разговоров и любые иные детали встречи, состоявшейся 30.04.19██ между представителями высшего руководства Корпорации и Хранителем, являются государственной тайной.</p>
+            <p>4.6. В официальной документации сущность именуется Z-5. В личном общении с сущностью персоналу Объекта «Хадал» предписывается использовать имя «Фридлейв» или обращение «Хранитель». Использование прозвищ «Птичка», «Рыбка», «Гусьрыба», «Утёнок» или «Пернатый» допускается только в случае, если сам Хранитель выразил на это явное согласие.</p>
+            <p>▎Статья 5: Заключительные положения.</p>
+            <p>5.1. Настоящий договор составлен в двух экземплярах на норвежском языке. Один экземпляр хранится в сейфе Директора Объекта «Хадал». Второй экземпляр, со слов Хранителя, помещен «в надежное место, где его никто и никогда не найдет».</p>
+            <p>5.2. Все изменения и дополнения к настоящему договору действительны только в том случае, если они засвидетельствованы личной подписью Хранителя. Факсимиле и цифровые подписи не принимаются.</p>
+            <p>5.3. Настоящий договор заключен на неопределенный срок и действует до момента его расторжения в соответствии со Статьей 4.2.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>           
+              </div>
+            </div>
+          </div>
+            
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="script.js" defer></script>
+</body>
+</html>
