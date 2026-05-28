@@ -18,3 +18,21 @@ function toggleAccordion(trigger) {
     });
   }
 }
+
+(function() {
+  var overlay = document.getElementById('accessOverlay');
+  if (!overlay) return;
+
+  var bar = overlay.querySelector('.access-overlay-bar');
+
+  requestAnimationFrame(function() {
+    bar.style.width = '100%';
+  });
+
+  setTimeout(function() {
+    overlay.classList.add('hiding');
+    setTimeout(function() {
+      overlay.remove();
+    }, 650);
+  }, 5000);
+})();
