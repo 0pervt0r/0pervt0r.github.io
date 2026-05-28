@@ -11,14 +11,22 @@
 }
 
 
-/* ═══════════════════════════════════════════════════════════
-   HADAL DATABASE — ADDITIONS
-   Append to end of style.css
-   ═══════════════════════════════════════════════════════════ */
+.bg-logo {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 520px;
+  height: 520px;
+  background-image: url('ChroniclesLogo.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  opacity: 0.04;
+  pointer-events: none;
+  z-index: 0;
+}
 
-/* ───────────────────────────────────────────────
-   ACCORDION (эксперименты / приложения / интервью)
-─────────────────────────────────────────────── */
 .accordion {
   display: flex;
   flex-direction: column;
