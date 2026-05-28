@@ -9,80 +9,73 @@
 <link href="style.css" rel="stylesheet">
 <style>
 
-/* ══════════════════════════════════════
-   DOCUMENT VIEWER PAGE
-══════════════════════════════════════ */
-
 .doc-viewer-wrap {
   max-width: 760px;
   margin: 0 auto;
   padding: 32px 24px 48px;
 }
-
+ 
 /* ── Листок бумаги ── */
 .paper {
-  background: #f5f0e8;
-  color: #1a1a1a;
-  border-radius: 2px;
-  padding: 52px 60px 60px;
+  background: var(--bg2);
+  color: var(--text);
+  border: 1px solid var(--border-grey);
+  border-radius: 3px;
+  padding: 48px 56px 56px;
   position: relative;
-  box-shadow:
-    0 2px 8px rgba(0,0,0,0.45),
-    0 8px 32px rgba(0,0,0,0.35),
-    inset 0 0 0 1px rgba(0,0,0,0.08);
-  font-family: 'PT Serif', Georgia, serif;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.5);
+  font-family: 'Share Tech Mono', monospace;
 }
-
-/* текстура бумаги */
+ 
+/* верхняя акцентная линия */
 .paper::before {
   content: '';
   position: absolute;
-  inset: 0;
-  background-image:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-  border-radius: 2px;
-  pointer-events: none;
-  opacity: 0.6;
+  top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent2), transparent);
+  opacity: 0.5;
 }
-
-/* чуть пожелтевшие края */
-.paper::after {
-  content: '';
+ 
+/* ── Угловые декорации ── */
+.paper-corner {
   position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse at 0% 0%,   rgba(180,140,60,0.07) 0%, transparent 55%),
-    radial-gradient(ellipse at 100% 100%, rgba(160,120,40,0.05) 0%, transparent 55%);
-  border-radius: 2px;
-  pointer-events: none;
+  width: 14px; height: 14px;
 }
-
+.paper-corner::before,
+.paper-corner::after { content: ''; position: absolute; background: var(--border-grey); }
+.paper-corner::before { width: 14px; height: 1px; }
+.paper-corner::after  { width: 1px;  height: 14px; }
+.paper-corner.tl { top: 10px; left: 10px; }
+.paper-corner.tr { top: 10px; right: 10px; transform: scaleX(-1); }
+.paper-corner.bl { bottom: 10px; left: 10px; transform: scaleY(-1); }
+.paper-corner.br { bottom: 10px; right: 10px; transform: scale(-1); }
+ 
 /* ── Шапка документа ── */
 .paper-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 28px;
+  margin-bottom: 32px;
   position: relative;
   z-index: 1;
 }
-
+ 
 .paper-date {
   font-family: 'Share Tech Mono', monospace;
-  font-size: 11px;
-  color: #555;
-  letter-spacing: 0.06em;
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 0.08em;
   padding-top: 4px;
 }
-
+ 
 .paper-logo {
-  width: 56px;
-  height: 56px;
+  width: 52px;
+  height: 52px;
   object-fit: contain;
-  opacity: 0.18;
-  filter: grayscale(1) contrast(1.5);
+  opacity: 0.25;
+  filter: brightness(0.9) sepia(0.2) hue-rotate(40deg) saturate(2);
 }
-
+ 
 /* ── Заголовок документа ── */
 .paper-title-wrap {
   text-align: center;
@@ -90,124 +83,148 @@
   position: relative;
   z-index: 1;
 }
-
+ 
 .paper-title {
-  font-family: 'PT Serif', Georgia, serif;
-  font-size: 15px;
-  font-weight: 700;
-  color: #1a1a1a;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  text-decoration: underline;
-  text-underline-offset: 4px;
-  text-decoration-thickness: 1px;
-}
-
-/* ── Рамочный блок ── */
-.paper-box {
-  border: 1.5px solid #1a1a1a;
-  padding: 22px 26px 26px;
-  margin-bottom: 0;
-  position: relative;
-  z-index: 1;
-}
-
-.paper-box-title {
-  font-family: 'PT Serif', Georgia, serif;
+  font-family: 'Orbitron', monospace;
   font-size: 13px;
   font-weight: 700;
-  color: #1a1a1a;
-  letter-spacing: 0.08em;
+  color: var(--text-bright);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding-bottom: 10px;
+  position: relative;
+  display: inline-block;
+}
+ 
+.paper-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--text-dim), transparent);
+}
+ 
+/* ── Рамочный блок ── */
+.paper-box {
+  border: 1px solid var(--border-grey);
+  border-radius: 2px;
+  padding: 22px 26px 26px;
+  position: relative;
+  z-index: 1;
+  background: var(--bg);
+}
+ 
+/* уголки рамки */
+.paper-box::before,
+.paper-box::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(178,229,40,0.20), transparent);
+}
+ 
+.paper-box-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-bright);
+  letter-spacing: 0.12em;
   text-align: center;
   text-transform: uppercase;
   margin-bottom: 18px;
   padding-bottom: 14px;
-  border-bottom: 1px solid rgba(0,0,0,0.18);
+  border-bottom: 1px solid var(--border-grey);
 }
-
+ 
 /* ── Текст ── */
 .paper-text {
-  font-size: 12.5px;
-  line-height: 1.82;
-  color: #1c1c1c;
-  text-align: justify;
-  hyphens: auto;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  line-height: 1.85;
+  color: var(--text);
+  letter-spacing: 0.03em;
 }
-
+ 
 .paper-text p {
   margin-bottom: 12px;
+  text-align: justify;
 }
-
+ 
 .paper-text p:last-child {
   margin-bottom: 0;
 }
-
+ 
 /* ── Подпись ── */
 .paper-signature {
-  margin-top: 24px;
+  margin-top: 28px;
   text-align: right;
   position: relative;
   z-index: 1;
+  border-top: 1px solid var(--border-grey);
+  padding-top: 16px;
 }
-
+ 
 .paper-signature-name {
-  font-family: 'PT Serif', Georgia, serif;
-  font-size: 13px;
-  font-style: italic;
-  color: #1a1a1a;
-  margin-bottom: 2px;
+  font-family: 'Orbitron', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-bright);
+  letter-spacing: 0.08em;
+  margin-bottom: 4px;
 }
-
+ 
 .paper-signature-role {
-  font-size: 11px;
-  color: #444;
-  font-style: italic;
-  line-height: 1.5;
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 0.05em;
+  line-height: 1.6;
 }
-
+ 
 /* ── Навигация над документом ── */
 .doc-nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
-
+ 
 .doc-nav-label {
   font-family: 'Orbitron', monospace;
   font-size: 9px;
   color: var(--text-dim);
   letter-spacing: 0.12em;
 }
-
-/* ── Декоративный фоновый водяной знак ── */
+ 
+/* ── Водяной знак ── */
 .paper-watermark {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%) rotate(-30deg);
   font-family: 'Orbitron', monospace;
-  font-size: 80px;
+  font-size: 70px;
   font-weight: 900;
-  color: rgba(0,0,0,0.035);
+  color: rgba(178,229,40,0.03);
   letter-spacing: 0.08em;
   pointer-events: none;
   z-index: 0;
   white-space: nowrap;
   user-select: none;
 }
-
+ 
 /* ── MOBILE ── */
 @media (max-width: 768px) {
-  .doc-viewer-wrap { padding: 16px 8px 32px; }
-  .paper { padding: 28px 20px 36px; }
-  .paper-title { font-size: 12px; letter-spacing: 0.08em; }
+  .doc-viewer-wrap { padding: 12px 8px 32px; }
+  .paper { padding: 28px 18px 32px; }
+  .paper-title { font-size: 11px; letter-spacing: 0.08em; }
   .paper-box { padding: 14px 14px 18px; }
-  .paper-box-title { font-size: 11px; }
-  .paper-text { font-size: 11.5px; }
-  .paper-logo { width: 40px; height: 40px; }
-  .paper-watermark { font-size: 40px; }
+  .paper-box-title { font-size: 10px; }
+  .paper-text { font-size: 10px; }
+  .paper-logo { width: 36px; height: 36px; }
+  .paper-watermark { font-size: 36px; }
 }
+ 
+</style>
 
 </style>
 </head>
@@ -261,14 +278,11 @@
           <!-- навигация / метка -->
           <div class="doc-nav">
             <span class="doc-nav-label">ПРОСМОТР ДОКУМЕНТА</span>
-            <span class="doc-nav-label">УРОВЕНЬ СЕКРЕТНОСТИ: [УРОВЕНЬ]</span>
+            <span class="doc-nav-label">УРОВЕНЬ СЕКРЕТНОСТИ: 4</span>
           </div>
 
           <!-- ══ ЛИСТ БУМАГИ ══ -->
           <div class="paper">
-
-            <!-- водяной знак -->
-            <div class="paper-watermark">URBANSHADE</div>
 
             <!-- шапка -->
             <div class="paper-header">
