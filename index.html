@@ -9,6 +9,117 @@
 <link href="style.css" rel="stylesheet">
 
   <style>
+
+    /* ── NAV ICONS STRIP ── */
+.nav-icons-section {
+  padding: 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-icons-label {
+  font-size: 9px;
+  color: var(--text-dim);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 14px 24px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-icons {
+  display: flex;
+  align-items: stretch;
+}
+
+.nav-icon-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 30px 20px 26px;
+  text-decoration: none;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.2s;
+  overflow: hidden;
+}
+
+/* вертикальные разделители */
+.nav-icon-item + .nav-icon-item::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 15%; bottom: 15%;
+  width: 1px;
+  background: linear-gradient(180deg, transparent, var(--accent2), transparent);
+  opacity: 0.45;
+}
+
+/* свечение при hover */
+.nav-icon-item::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 60%, rgba(178,229,40,0.08) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+
+.nav-icon-item:hover {
+  background: rgba(178,229,40,0.04);
+}
+.nav-icon-item:hover::after { opacity: 1; }
+
+/* картинка */
+.nav-icon-img {
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+  position: relative;
+  z-index: 1;
+  transition: transform 0.25s cubic-bezier(.34,1.56,.64,1), filter 0.25s;
+  filter: drop-shadow(0 0 0px var(--accent2));
+}
+
+.nav-icon-item:hover .nav-icon-img {
+  transform: translateY(-6px) scale(1.07);
+  filter: drop-shadow(0 6px 18px rgba(178,229,40,0.45));
+}
+
+/* подпись */
+.nav-icon-label {
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-dim);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  position: relative;
+  z-index: 1;
+  transition: color 0.2s;
+}
+
+.nav-icon-item:hover .nav-icon-label {
+  color: var(--accent2);
+}
+
+/* нижняя черта-акцент появляется при hover */
+.nav-icon-underline {
+  width: 0;
+  height: 1px;
+  background: var(--accent2);
+  position: relative;
+  z-index: 1;
+  transition: width 0.3s ease;
+  border-radius: 1px;
+}
+.nav-icon-item:hover .nav-icon-underline { width: 40px; }
+
+@media (max-width: 768px) {
+  .nav-icon-img { width: 64px; height: 64px; }
+  .nav-icons-label { padding: 10px 12px 8px; }
+  .nav-icon-item { padding: 20px 10px 18px; }
+}
 /* ── HOME PAGE ONLY ── */
 
 .home-hero {
