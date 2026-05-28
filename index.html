@@ -1,68 +1,702 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Подразделение Хроник — Urbanshade</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hadal Database — Главная</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="style.css" rel="stylesheet">
+<style>
+/* ── HOME PAGE ONLY ── */
+
+.home-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px 36px;
+  position: relative;
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+  overflow: hidden;
+}
+
+/* угловые декорации */
+.home-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(178,229,40,0.07) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.hero-corner {
+  position: absolute;
+  width: 20px; height: 20px;
+}
+.hero-corner::before,
+.hero-corner::after { content: ''; position: absolute; background: var(--accent2); }
+.hero-corner::before { width: 20px; height: 1px; }
+.hero-corner::after  { width: 1px;  height: 20px; }
+.hero-corner.tl { top: 12px; left: 12px; }
+.hero-corner.tr { top: 12px; right: 12px; transform: scaleX(-1); }
+.hero-corner.bl { bottom: 12px; left: 12px; transform: scaleY(-1); }
+.hero-corner.br { bottom: 12px; right: 12px; transform: scale(-1); }
+
+.hero-logo-wrap {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-logo-img {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  filter: brightness(0.9) sepia(0.3) hue-rotate(40deg) saturate(2);
+  opacity: 0.85;
+}
+
+.hero-logo-text {
+  text-align: left;
+}
+
+.hero-corp {
+  font-family: 'Orbitron', monospace;
+  font-size: 9px;
+  color: var(--text-dim);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.hero-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--text-bright);
+  letter-spacing: 0.06em;
+  line-height: 1;
+  animation: flicker 8s infinite;
+}
+
+.hero-title span { color: var(--accent2); }
+
+.hero-divider {
+  width: 280px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent2), transparent);
+  margin: 0 auto 20px;
+  position: relative;
+  z-index: 1;
+  opacity: 0.6;
+}
+
+.hero-desc {
+  font-size: 11px;
+  color: var(--text-dim);
+  line-height: 1.75;
+  max-width: 540px;
+  letter-spacing: 0.04em;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-desc strong {
+  color: var(--text);
+  font-weight: normal;
+}
+
+.hero-access-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+  background: rgba(212,146,26,0.06);
+  border: 1px solid rgba(212,146,26,0.28);
+  border-radius: 2px;
+  padding: 6px 14px;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-access-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--amber);
+  animation: pulse 2s infinite;
+}
+
+.hero-access-text {
+  font-size: 9px;
+  color: var(--amber);
+  letter-spacing: 0.14em;
+}
+
+/* ── STAT STRIP ── */
+.stat-strip {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg2);
+}
+
+.stat-cell {
+  flex: 1;
+  padding: 10px 16px;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.stat-cell:last-child { border-right: none; }
+
+.stat-label {
+  font-size: 8px;
+  color: var(--text-dim);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.stat-value {
+  font-family: 'Orbitron', monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent2);
+  letter-spacing: 0.04em;
+}
+
+/* ── NAV CARDS ── */
+.nav-cards-section {
+  padding: 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-cards-label {
+  font-size: 9px;
+  color: var(--text-dim);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.nav-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.nav-card {
+  background: var(--bg);
+  border: 1px solid var(--border-grey);
+  border-radius: 3px;
+  padding: 16px 14px;
+  text-decoration: none;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.15s, background 0.12s;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.nav-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent2), transparent);
+  opacity: 0.5;
+  transition: opacity 0.15s;
+}
+
+.nav-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--accent-dim);
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.nav-card:hover {
+  border-color: rgba(178,229,40,0.45);
+}
+.nav-card:hover::before { opacity: 1; }
+.nav-card:hover::after  { opacity: 1; }
+.nav-card:hover .nav-card-arrow { color: var(--accent2); transform: translateX(3px); }
+.nav-card:hover .nav-card-id    { color: var(--accent2); }
+
+.nav-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  position: relative;
+  z-index: 1;
+}
+
+.nav-card-icon {
+  width: 32px; height: 32px;
+  border: 1px solid var(--border-grey);
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  background: var(--bg2);
+  flex-shrink: 0;
+}
+
+.nav-card-id {
+  font-family: 'Orbitron', monospace;
+  font-size: 8px;
+  color: var(--text-dim);
+  letter-spacing: 0.1em;
+  transition: color 0.15s;
+}
+
+.nav-card-body {
+  position: relative;
+  z-index: 1;
+}
+
+.nav-card-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-bright);
+  letter-spacing: 0.06em;
+  margin-bottom: 5px;
+}
+
+.nav-card-desc {
+  font-size: 9px;
+  color: var(--text-dim);
+  letter-spacing: 0.03em;
+  line-height: 1.6;
+}
+
+.nav-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  z-index: 1;
+}
+
+.nav-card-count {
+  font-size: 9px;
+  color: var(--text-dim);
+  letter-spacing: 0.06em;
+}
+.nav-card-count span {
+  color: var(--accent2);
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.nav-card-arrow {
+  font-size: 10px;
+  color: var(--text-dim);
+  transition: color 0.15s, transform 0.15s;
+}
+
+/* ── BOTTOM ROW: лор + лог ── */
+.home-bottom {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  flex: 1;
+  min-height: 0;
+}
+
+.home-lore {
+  padding: 20px 24px;
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+}
+
+.home-log {
+  padding: 20px 24px;
+  overflow-y: auto;
+}
+
+.home-section-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 9px;
+  color: var(--accent2);
+  letter-spacing: 0.16em;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.home-section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.lore-text {
+  font-size: 11px;
+  color: var(--text);
+  line-height: 1.8;
+  letter-spacing: 0.03em;
+}
+
+.lore-text p { margin-bottom: 10px; }
+.lore-text p:last-child { margin-bottom: 0; }
+
+/* лог обновлений */
+.update-list { display: flex; flex-direction: column; gap: 0; }
+
+.update-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid rgba(178,229,40,0.08);
+}
+.update-item:first-child { border-top: 1px solid rgba(178,229,40,0.08); }
+
+.update-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+.update-dot.green  { background: var(--green); }
+.update-dot.amber  { background: var(--amber); }
+.update-dot.purple { background: var(--purple); }
+.update-dot.red    { background: var(--red); }
+
+.update-body { flex: 1; }
+
+.update-date {
+  font-size: 8px;
+  color: var(--text-dim);
+  letter-spacing: 0.08em;
+  margin-bottom: 2px;
+}
+
+.update-text {
+  font-size: 10px;
+  color: var(--text);
+  letter-spacing: 0.03em;
+  line-height: 1.5;
+}
+
+.update-tag {
+  font-size: 8px;
+  padding: 1px 6px;
+  border-radius: 2px;
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+  margin-top: 2px;
+  white-space: nowrap;
+}
+.update-tag.new     { background: var(--green-dim); border: 1px solid rgba(178,229,40,0.22); color: var(--green); }
+.update-tag.edit    { background: rgba(178,229,40,0.06); border: 1px solid rgba(178,229,40,0.22); color: var(--accent2); }
+.update-tag.alert   { background: rgba(217,79,92,0.08); border: 1px solid rgba(217,79,92,0.22); color: var(--red); }
+.update-tag.pending { background: rgba(212,146,26,0.08); border: 1px solid rgba(212,146,26,0.22); color: var(--amber); }
+
+/* ── MOBILE ── */
+@media (max-width: 768px) {
+  .hero-title { font-size: 18px; }
+  .hero-logo-img { width: 44px; height: 44px; }
+  .hero-logo-wrap { gap: 12px; }
+
+  .stat-strip { display: none; }
+
+  .nav-cards { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .nav-cards-section { padding: 14px 12px; }
+
+  .home-bottom { grid-template-columns: 1fr; }
+  .home-lore { border-right: none; border-bottom: 1px solid var(--border); padding: 14px 12px; }
+  .home-log  { padding: 14px 12px; }
+}
+
+@media (max-width: 480px) {
+  .nav-cards { grid-template-columns: 1fr; }
+  .hero-logo-wrap { flex-direction: column; text-align: center; }
+  .hero-logo-text { text-align: center; }
+  .hero-title { font-size: 16px; }
+}
+</style>
 </head>
 <body>
-  <body>
-  <div class="window">
-    <div class="corner corner-tl"></div>
-    <div class="corner corner-tr"></div>
-    <div class="corner corner-bl"></div>
-    <div class="corner corner-br"></div>
- 
-    <div class="titlebar">
-      <div class="titlebar-left">
-        <div class="titlebar-icon">U</div>
-        <span class="titlebar-title">URBANSHADE // CHRONICLES DIVISION</span>
-      </div>
-      <div class="win-btns">
-        <div class="win-btn">─</div>
-        <div class="win-btn">□</div>
-        <div class="win-btn">✕</div>
-      </div>
-    </div>
- 
-    <div class="main-layout">
-      <div class="sidebar">
-        <div class="nav-section">
-          <div class="nav-section-title">Навигация</div>
-          <a class="nav-link active" href="#">Главная страница</a>
-          <a class="nav-link" href="#">Летопись</a>
-          <a class="nav-link" href="#">Персонажи</a>
-          <a class="nav-link" href="#">Документы</a>
-          <a class="nav-link" href="#">Карта комплекса</a>
-        </div>
-        <div class="divider"></div>
-        <div class="nav-section">
-          <a class="nav-link" href="#">Правила</a>
-          <a class="nav-link" href="#">Карта взаимоотношений</a>
-        </div>
-      </div>
- 
-      <div class="content">
-        <div class="content-title">Добро пожаловать в Подразделение Хроник!</div>
-        <div class="content-desc">
-          Подразделение Хроник — одно из тайных подразделений Urbanshade, ответственное за документирование истории и событий внутри компании и её подразделений.
-        </div>
-        <div class="info-block">
-          <div class="info-block-title">О проекте</div>
-          <div class="info-block-text">
-            Хроники Urbanshade — фанатская альтернативная вселенная по Roblox игре «PRESSURE», в которой саботаж комплекса не произошло.
-          </div>
-        </div>
-      </div>
+
+<div class="os-wrapper">
+  <div class="titlebar">
+    <span class="titlebar-title">HADAL DATABASE — СИСТЕМА ДОСТУПА v2.4.1</span>
+    <div class="titlebar-controls">
+      <span class="ctrl-close"></span>
+      <span class="ctrl-min"></span>
+      <span class="ctrl-max"></span>
     </div>
   </div>
- 
 
-  <nav class="mobile-nav">
+  <div class="main-window">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sidebar-user">
+        <div class="sidebar-username">ПОЛЬЗОВАТЕЛЬ</div>
+        <div class="sidebar-role">Уровень доступа: 3</div>
+      </div>
+      <div class="sidebar-section">Навигация</div>
+      <div class="sidebar-item active"><a href="index.html">Главная</a></div>
+      <div class="sidebar-item"><a href="personnel.html">Персоналии</a></div>
+      <div class="sidebar-item"><a href="prisoners.html">Заключённые</a></div>
+      <div class="sidebar-item"><a href="documents.html">Документация</a></div>
+      <div class="sidebar-section">Дополнительно</div>
+      <div class="sidebar-item"><a href="map.html">Карта</a></div>
+      <div class="sidebar-item"><a href="stories.html">Рассказы</a></div>
+      <div class="sidebar-item"><a href="object-classification.html">Классификация объектов</a></div>
+      <div class="sidebar-item"><a href="https://teletype.in/@yurubolski/GMpdKbCOIMu">Правила</a></div>
+      <div class="sidebar-bottom">
+        <div><span class="status-dot"></span><span class="status-text">ПОЛЬЗОВАТЕЛЬ В СЕТИ</span></div>
+      </div>
     </div>
-  </nav>
-</body>
-</html>
+
+    <!-- CONTENT -->
+    <div class="content">
+      <div class="topbar">
+        <div class="topbar-title">ГЛАВНАЯ — ХАДАЛЬНЫЙ ТАЙНЫЙ ОБЪЕКТ</div>
+        <div class="topbar-actions">
+          <span class="btn-sm">УРОВЕНЬ 3</span>
+        </div>
+      </div>
+
+      <div class="page" style="padding:0; display:flex; flex-direction:column;">
+
+        <!-- HERO -->
+        <div class="home-hero">
+          <div class="hero-corner tl"></div>
+          <div class="hero-corner tr"></div>
+          <div class="hero-corner bl"></div>
+          <div class="hero-corner br"></div>
+
+          <div class="hero-logo-wrap">
+            <!-- замени src на путь к своему логотипу -->
+            <img class="hero-logo-img" src="ChroniclesLogo.png" alt="Urbanshade Logo">
+            <div class="hero-logo-text">
+              <div class="hero-corp">Urbanshade Corp · Хадальное подразделение</div>
+              <div class="hero-title">HADAL <span>DATABASE</span></div>
+            </div>
+          </div>
+
+          <div class="hero-divider"></div>
+
+          <div class="hero-desc">
+            Добро пожаловать в закрытую базу данных <strong>Хадального Тайного Объекта</strong>.
+            Здесь хранятся сведения о персонале, аномальных объектах на содержании,
+            внутренней документации и текущих исследовательских протоколах.<br><br>
+            Доступ к материалам ограничен в соответствии с уровнем допуска.
+            Несанкционированное копирование данных является нарушением Протокола ИБ-7.
+          </div>
+
+          <div class="hero-access-badge">
+            <div class="hero-access-dot"></div>
+            <span class="hero-access-text">ТЕКУЩИЙ СЕАНС АВТОРИЗОВАН · УРОВЕНЬ 3</span>
+          </div>
+        </div>
+
+        <!-- STAT STRIP -->
+        <div class="stat-strip">
+          <div class="stat-cell">
+            <div class="stat-label">Объектов</div>
+            <div class="stat-value">7</div>
+          </div>
+          <div class="stat-cell">
+            <div class="stat-label">Персонала</div>
+            <div class="stat-value">—</div>
+          </div>
+          <div class="stat-cell">
+            <div class="stat-label">Документов</div>
+            <div class="stat-value">—</div>
+          </div>
+          <div class="stat-cell">
+            <div class="stat-label">Статус объекта</div>
+            <div class="stat-value" style="font-size:10px; color:var(--green);">АКТИВЕН</div>
+          </div>
+        </div>
+
+        <!-- NAV CARDS -->
+        <div class="nav-cards-section">
+          <div class="nav-cards-label">Разделы базы данных</div>
+          <div class="nav-cards">
+
+            <a class="nav-card" href="personnel.html">
+              <div class="nav-card-top">
+                <div class="nav-card-icon">👤</div>
+                <span class="nav-card-id">SYS-01</span>
+              </div>
+              <div class="nav-card-body">
+                <div class="nav-card-title">ПЕРСОНАЛИИ</div>
+                <div class="nav-card-desc">Сотрудники, учёные, охрана и административный состав объекта.</div>
+              </div>
+              <div class="nav-card-footer">
+                <div class="nav-card-count"><span>—</span> записей</div>
+                <span class="nav-card-arrow">→</span>
+              </div>
+            </a>
+
+            <a class="nav-card" href="prisoners.html">
+              <div class="nav-card-top">
+                <div class="nav-card-icon">🔒</div>
+                <span class="nav-card-id">SYS-02</span>
+              </div>
+              <div class="nav-card-body">
+                <div class="nav-card-title">ЗАКЛЮЧЁННЫЕ</div>
+                <div class="nav-card-desc">Лица, находящиеся под стражей и задействованные в протоколах объекта.</div>
+              </div>
+              <div class="nav-card-footer">
+                <div class="nav-card-count"><span>—</span> записей</div>
+                <span class="nav-card-arrow">→</span>
+              </div>
+            </a>
+
+            <a class="nav-card" href="documents.html">
+              <div class="nav-card-top">
+                <div class="nav-card-icon">📄</div>
+                <span class="nav-card-id">SYS-03</span>
+              </div>
+              <div class="nav-card-body">
+                <div class="nav-card-title">ДОКУМЕНТАЦИЯ</div>
+                <div class="nav-card-desc">Аномальные объекты, досье и исследовательская документация.</div>
+              </div>
+              <div class="nav-card-footer">
+                <div class="nav-card-count"><span>7</span> записей</div>
+                <span class="nav-card-arrow">→</span>
+              </div>
+            </a>
+
+            <a class="nav-card" href="map.html">
+              <div class="nav-card-top">
+                <div class="nav-card-icon">🗺</div>
+                <span class="nav-card-id">SYS-04</span>
+              </div>
+              <div class="nav-card-body">
+                <div class="nav-card-title">КАРТА</div>
+                <div class="nav-card-desc">Схема расположения секторов и уровней Хадального объекта.</div>
+              </div>
+              <div class="nav-card-footer">
+                <div class="nav-card-count">интерактивная</div>
+                <span class="nav-card-arrow">→</span>
+              </div>
+            </a>
+
+            <a class="nav-card" href="stories.html">
+              <div class="nav-card-top">
+                <div class="nav-card-icon">📖</div>
+                <span class="nav-card-id">SYS-05</span>
+              </div>
+              <div class="nav-card-body">
+                <div class="nav-card-title">РАССКАЗЫ</div>
+                <div class="nav-card-desc">Художественные и документальные материалы по событиям вселенной.</div>
+              </div>
+              <div class="nav-card-footer">
+                <div class="nav-card-count"><span>—</span> записей</div>
+                <span class="nav-card-arrow">→</span>
+              </div>
+            </a>
+
+            <a class="nav-card" href="object-classification.html">
+              <div class="nav-card-top">
+                <div class="nav-card-icon">⚠</div>
+                <span class="nav-card-id">SYS-06</span>
+              </div>
+              <div class="nav-card-body">
+                <div class="nav-card-title">КЛАССИФИКАЦИЯ</div>
+                <div class="nav-card-desc">Система классификации аномалий: классы, происхождение, управляемость.</div>
+              </div>
+              <div class="nav-card-footer">
+                <div class="nav-card-count">справочник</div>
+                <span class="nav-card-arrow">→</span>
+              </div>
+            </a>
+
+          </div>
+        </div>
+
+        <!-- BOTTOM: лор + лог -->
+        <div class="home-bottom">
+
+          <div class="home-lore">
+            <div class="home-section-title">О ВСЕЛЕННОЙ</div>
+            <div class="lore-text">
+              <p><strong>Urbanshade</strong> — датский многонациональный конгломерат, основанный в начале XX века. Деятельность компании охватывает частную охрану, производство вооружений, добычу полезных ископаемых и сдерживание аномального.</p>
+              <p>Хадальный Тайный Объект расположен на предельных глубинах океанского дна. Здесь содержатся, изучаются и — где возможно — используются аномальные объекты различных классов опасности.</p>
+              <p>Доступ к большинству материалов требует допуска уровня 3 и выше. Ряд досье засекречен полностью и недоступен в данной сети.</p>
+            </div>
+          </div>
+
+          <div class="home-log">
+            <div class="home-section-title">ОБНОВЛЕНИЯ БАЗЫ</div>
+            <div class="update-list">
+
+              <div class="update-item">
+                <div class="update-dot green"></div>
+                <div class="update-body">
+                  <div class="update-date">2024-01-03</div>
+                  <div class="update-text">Добавлено досье Z-638 «Восьмиручка»</div>
+                </div>
+                <span class="update-tag new">НОВОЕ</span>
+              </div>
+
+              <div class="update-item">
+                <div class="update-dot amber"></div>
+                <div class="update-body">
+                  <div class="update-date">2023-11-30</div>
+                  <div class="update-text">Обновлён протокол содержания Z-1264</div>
+                </div>
+                <span class="update-tag edit">ПРАВКА</span>
+              </div>
+
+              <div class="update-item">
+                <div class="update-dot green"></div>
+                <div class="update-body">
+                  <div class="update-date">2023-11-14</div>
+                  <div class="update-text">Добавлено примечание сотрудника к Z-367</div>
+                </div>
+                <span class="update-tag new">НОВОЕ</span>
+              </div>
+
+              <div class="update-item">
+                <div class="update-dot red"></div>
+                <div class="update-body">
+                  <div class="update-date">2023-04-14</div>
+                  <div class="update-text">Инцидент CASE-09 — доступ к материалам ограничен</div>
+                </div>
+                <span class="update-tag alert">ТРЕВОГА</span>
+              </div>
+
+              <div class="update-item">
+                <div class="update-dot amber"></div>
+                <div class="update-body">
+                  <div class="update-date">2023-03-01</div>
+                  <div class="update-text">Z-17 переведён в статус «используется»</div>
+                </div>
+                <span class="update-tag pending">СТАТУС</span>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
 </body>
 </html>
