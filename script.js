@@ -26,7 +26,9 @@ function toggleAccordion(trigger) {
   var bar = overlay.querySelector('.access-overlay-bar');
 
   requestAnimationFrame(function() {
-    bar.style.width = '100%';
+    requestAnimationFrame(function() {
+      bar.style.width = '100%';
+    });
   });
 
   setTimeout(function() {
