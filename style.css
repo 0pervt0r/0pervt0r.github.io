@@ -98,7 +98,7 @@
 }
 
 .accordion-item.open .accordion-body {
-  max-height: 600px;
+  max-height: none;
   padding: 12px 12px 14px;
   border-top: 1px solid rgba(178, 229, 40, 0.12);
 }
