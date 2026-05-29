@@ -11,20 +11,15 @@
 }
 
 
-.bg-logo {
+body::after {
+  content: '';
   position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 520px;
-  height: 520px;
-  background-image: url('ChroniclesLogo.png');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  opacity: 0.04;
+  inset: 0;
+  background: url('ChroniclesLogo.png') center center / 520px no-repeat;
+  opacity: 0.06;
   pointer-events: none;
-  z-index: 0;
+  z-index: 9998;
+  mix-blend-mode: screen;
 }
 
 .accordion {
