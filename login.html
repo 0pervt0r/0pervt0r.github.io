@@ -249,76 +249,53 @@
     if (btnEl)     btnEl.disabled = active;
   }
 
+  /* Если уже залогинен — сразу на главную */
   (async function() {
     const { data: { user } } = await db.auth.getUser();
     if (!user) return;
-    const { data: profile } = await db.from('profiles').select('specialization').eq('id', user.id).single();
-    if (profile?.specialization) {
-      window.location.href = 'index.html';
-    } else {
-      window.location.href = 'personelquiz.html';
-    }
+    window.location.href = 'index.html';
   })();
 
   async function doLogin() {
     var email    = document.getElementById('loginEmail').value.trim();
     var password = document.getElementById('loginPassword').value;
-
     if (!email || !password) {
       showMsg('loginMsg', 'Заполните все поля.', 'error');
       return;
     }
-
     setLoading('login', true);
     const { data, error } = await db.auth.signInWithPassword({ email, password });
     setLoading('login', false);
-
     if (error) {
       showMsg('loginMsg', 'Ошибка: ' + error.message, 'error');
       return;
     }
-
-    /* После входа — проверяем специализацию */
-    const { data: profile } = await db.from('profiles').select('specialization').eq('id', data.user.id).single();
-    if (profile?.specialization) {
-      window.location.href = 'index.html';
-    } else {
-      window.location.href = 'personelquiz.html';
-    }
+    window.location.href = 'index.html';
   }
 
-  /* РЕГИСТРАЦИЯ */
   async function doRegister() {
     var username = document.getElementById('regUsername').value.trim();
     var email    = document.getElementById('regEmail').value.trim();
     var password = document.getElementById('regPassword').value;
-
     if (!username || !email || !password) {
       showMsg('registerMsg', 'Заполните все поля.', 'error');
       return;
     }
-
     if (password.length < 6) {
       showMsg('registerMsg', 'Пароль должен быть минимум 6 символов.', 'error');
       return;
     }
-
     setLoading('register', true);
-
     const { data, error } = await db.auth.signUp({
-  email,
-  password,
-  options: {
-    data: { username: username }
-  }
-});
-
+      email,
+      password,
+      options: { data: { username: username } }
+    });
     if (error) {
       setLoading('register', false);
       showMsg('registerMsg', 'Ошибка: ' + error.message, 'error');
       return;
     }
-
     if (data.user) {
       await db.from('profiles').insert({
         id:             data.user.id,
@@ -329,18 +306,10 @@
         serial_number:  null,
       });
     }
-
     setLoading('register', false);
-
-    /* Если email подтверждение отключено — сразу на квиз */
-    if (data.user) {
-      window.location.href = 'personelquiz.html';
-    } else {
-      window.location.href = 'confirm.html';
-    }
+    window.location.href = 'index.html';
   }
 
-  /* Enter для отправки */
   document.addEventListener('keydown', function(e) {
     if (e.key !== 'Enter') return;
     if (document.getElementById('stateLogin').classList.contains('active')) doLogin();
