@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hadal Database — Подтверждение</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="style.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  .confirm-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    position: relative;
+    z-index: 2;
+  }
+  .confirm-wrapper::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(178,229,40,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(178,229,40,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .confirm-box {
+    width: 100%;
+    max-width: 420px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+    text-align: center;
+  }
+  .confirm-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent2), transparent);
+  }
+  .confirm-header {
+    padding: 32px 28px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+  }
+  .confirm-icon {
+    font-size: 36px;
+    margin-bottom: 12px;
+    display: block;
+    filter: hue-rotate(40deg) saturate(2);
+    opacity: 0.7;
+  }
+  .confirm-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 14px;
+    font-weight: 900;
+    color: var(--text-bright);
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+  .confirm-title span { color: var(--accent2); }
+  .confirm-sub {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    line-height: 1.6;
+  }
+  .confirm-body {
+    padding: 24px 28px 28px;
+  }
+  .confirm-info {
+    background: rgba(178,229,40,0.05);
+    border: 1px solid rgba(178,229,40,0.18);
+    border-radius: 2px;
+    padding: 14px 16px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    line-height: 1.7;
+    margin-bottom: 20px;
+    text-align: left;
+  }
+  .confirm-info strong {
+    color: var(--accent2);
+    font-weight: normal;
+  }
+  .confirm-back {
+    display: inline-block;
+    padding: 10px 24px;
+    background: transparent;
+    border: 1px solid var(--border-grey);
+    border-radius: 2px;
+    font-family: 'Orbitron', monospace;
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.12em;
+    cursor: pointer;
+    text-decoration: none;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .confirm-back:hover {
+    border-color: var(--accent2);
+    color: var(--accent2);
+  }
+  .confirm-pulse {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: var(--accent2);
+    border-radius: 50%;
+    margin-right: 8px;
+    animation: pulse 1.4s infinite;
+    vertical-align: middle;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.2; }
+  }
+</style>
+</head>
+<body>
+
+<div class="confirm-wrapper">
+  <div class="confirm-box">
+
+    <div class="confirm-header">
+      <span class="confirm-icon">✉️</span>
+      <div class="confirm-title">ПОДТВЕРДИ <span>ЛИЧНОСТЬ</span></div>
+      <div class="confirm-sub">Письмо с кодом подтверждения<br>отправлено на твой email</div>
+    </div>
+
+    <div class="confirm-body">
+      <div class="confirm-info">
+        <span class="confirm-pulse"></span>ОЖИДАНИЕ ПОДТВЕРЖДЕНИЯ<br><br>
+        Найди письмо от <strong>noreply@mail.app.supabase.io</strong><br>
+        и перейди по ссылке внутри.<br><br>
+        После подтверждения вернись сюда и выполни вход.<br>
+        Проверь папку <strong>Спам</strong>, если письма нет.
+      </div>
+      <a class="confirm-back" href="login.html">← ВЕРНУТЬСЯ К ВХОДУ</a>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // Если пользователь уже подтверждён и залогинен — сразу на главную
+  const { createClient } = supabase;
+  const db = createClient(
+    'https://ytmwejebzkunzukuztvq.supabase.co',
+    'sb_publishable_gsHGImtWAi7pGLU0vKrwOA_S8r5EHgI'
+  );
+
+  (async function() {
+    const { data: { user } } = await db.auth.getUser();
+    if (user && user.email_confirmed_at) {
+      window.location.href = 'index.html';
+    }
+  })();
+
+  // Слушаем событие подтверждения (если пользователь подтвердил в другой вкладке)
+  db.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN' && session?.user?.email_confirmed_at) {
+      window.location.href = 'index.html';
+    }
+  });
+</script>
+
+</body>
+</html>
