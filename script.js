@@ -18,25 +18,39 @@ async function getProfile(userId) {
 }
 
 async function fillSidebar() {
+  const path = window.location.pathname;
+
+  // На этих страницах sidebar не нужен — выходим
+  if (path.includes('login.html') || path.includes('confirm.html')) return;
+
   const user = await getCurrentUser();
+
   if (!user) {
-    if (!window.location.pathname.includes('login.html')) {
-      window.location.href = 'login.html';
-    }
+    window.location.href = 'login.html';
     return;
   }
+
   if (!user.email_confirmed_at) {
     window.location.href = 'confirm.html';
     return;
   }
+
   const profile = await getProfile(user.id);
   if (!profile) return;
 
-  if (!profile.specialization && !window.location.pathname.includes('personelquiz.html')) {
+  // Если специализации нет и мы не на странице квиза — редиректим на квиз
+  if (!profile.specialization && !path.includes('personelquiz.html')) {
     window.location.href = 'personelquiz.html';
     return;
   }
 
+  // Если специализация уже есть и пользователь зачем-то открыл квиз — на главную
+  if (profile.specialization && path.includes('personelquiz.html')) {
+    window.location.href = 'index.html';
+    return;
+  }
+
+  // Заполняем sidebar
   const nameEl = document.querySelector('.sidebar-username');
   if (nameEl) nameEl.textContent = profile.username || 'СОТРУДНИК';
 
@@ -93,10 +107,7 @@ function showAccessDeniedPermanent(currentLevel, requiredLevel) {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-  if (!window.location.pathname.includes('login.html') &&
-      !window.location.pathname.includes('confirm.html')) {
-    fillSidebar();
-  }
+  fillSidebar();
 });
 
 function toggleAccordion(trigger) {
@@ -123,6 +134,7 @@ function toggleAccordion(trigger) {
   var overlay = document.getElementById('accessOverlay');
   if (!overlay) return;
   var bar = overlay.querySelector('.access-overlay-bar');
+  if (!bar) return;
   requestAnimationFrame(function() {
     requestAnimationFrame(function() {
       bar.style.width = '100%';
