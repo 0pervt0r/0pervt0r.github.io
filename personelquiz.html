@@ -8,9 +8,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
 <link href="style.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<!-- FIX 1: script.js убран отсюда, т.к. он объявляет SUPABASE_URL/KEY повторно.
-     Если script.js нужен для других страниц — оставьте его там, но не здесь.
-     Если он нужен и здесь — вынесите Supabase-инициализацию в отдельный shared файл. -->
 </head>
 <body>
 
@@ -94,7 +91,7 @@
           </button>
         </div>
 
-        <!-- QUESTION STATE -->
+
         <div class="quiz-state" id="state-question">
           <div class="q-progress-bar">
             <div class="q-progress-fill" id="progress-fill"></div>
@@ -111,14 +108,14 @@
           </div>
         </div>
 
-        <!-- LOADING STATE -->
+
         <div class="loading-screen" id="state-loading">
           <div style="font-family:'Orbitron',monospace; font-size:12px; color:var(--accent2); letter-spacing:0.1em; margin-bottom:12px;">ОБРАБОТКА ДАННЫХ</div>
           <div class="loading-bar"><div class="loading-fill" id="load-fill"></div></div>
           <div class="loading-text" id="load-text">Анализ психологического профиля...</div>
         </div>
 
-        <!-- RESULT STATE -->
+
         <div class="quiz-state" id="state-result">
           <div class="result-header">
             <div class="result-clearance">ПРОФИЛЬ СФОРМИРОВАН — ДОПУСК ПРИСВОЕН</div>
@@ -138,13 +135,12 @@
           <div style="font-size:11px; color:var(--text-dim); margin-bottom:16px; letter-spacing:0.05em;">Профиль компетенций</div>
           <div class="profile-bars" id="profile-bars"></div>
 
-          <!-- FIX 5: Статус сохранения — пользователь видит что происходит -->
+
           <div id="save-status" style="text-align:center; margin-top:16px; font-family:'Share Tech Mono',monospace; font-size:12px; letter-spacing:0.08em; color:var(--accent2);">
             Сохранение данных...
           </div>
 
           <div style="text-align:center; margin-top:24px;">
-            <!-- FIX 5: Кнопка редиректа появляется после сохранения -->
             <button class="btn-nav primary" id="btn-proceed" onclick="goToIndex()" style="display:none; margin-bottom:12px;">
               ПЕРЕЙТИ В БАЗУ ДАННЫХ →
             </button>
