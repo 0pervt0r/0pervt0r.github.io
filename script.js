@@ -38,9 +38,12 @@ async function fillSidebar() {
     // не залогинен — редирект на логин
     if (!window.location.pathname.includes('login.html')) {
       window.location.href = 'login.html';
-    }
+  if (!user.email_confirmed_at) {
+    window.location.href = 'confirm.html';
     return;
   }
+
+  // ... остальной код без изменений
 
   const profile = await getProfile(user.id);
   if (!profile) return;
