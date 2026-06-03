@@ -147,6 +147,12 @@
 </div>
 
 <script>
+
+const SUPABASE_URL = 'https://ytmwejebzkunzukuztvq.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl0bXdlamViemt1bnp1a3V6dHZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0ODEzMDksImV4cCI6MjA5NjA1NzMwOX0.nW1zgIFphXNF60p7vRd4hOV39n4my3ljKF9mCBqOH_E';
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+  
 const ROLE_TO_LETTER = {
   admin: 'A', guard: 'G', researcher: 'S',
   dispatcher: 'C', engineer: 'C', medic: 'M', spy: 'A'
@@ -157,13 +163,25 @@ async function saveSpecialization(roleKey) {
     const letter = ROLE_TO_LETTER[roleKey];
     const serial = String(Math.floor(Math.random() * 9000000000) + 1000000000);
     const { data: { user } } = await db.auth.getUser();
-    if (!user) return;
-    await db.from('profiles').update({
+    if (!user) {
+      window.location.href = 'login.html';
+      return;
+    }
+    const { error } = await db.from('profiles').update({
       specialization: letter,
       serial_number: serial
     }).eq('id', user.id);
+
+    if (error) {
+      console.error('Ошибка сохранения:', error);
+      return;
+    }
+
+    // Редирект после успешного сохранения
+    window.location.href = 'index.html';
+
   } catch(e) {
-    console.error('Ошибка сохранения специализации:', e);
+    console.error('Ошибка:', e);
   }
 }
 
@@ -534,18 +552,8 @@ function showResult(roleKey) {
     });
   }, 200);
 
-
-  saveSpecialization(roleKey).then(() => {
-    const wrap = document.querySelector('#state-result [style*="margin-top:24px"]');
-    if (wrap && !wrap.querySelector('.btn-db-link')) {
-      const link = document.createElement('a');
-      link.href = 'index.html';
-      link.className = 'btn-start btn-db-link';
-      link.style.cssText = 'display:inline-block; margin-top:12px; text-decoration:none;';
-      link.textContent = '→ ПЕРЕЙТИ В БАЗУ ДАННЫХ';
-      wrap.appendChild(link);
-    }
-  });
+saveSpecialization(roleKey);
+  
 }
 function restart() {
   showState('intro');
