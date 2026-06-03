@@ -249,7 +249,6 @@
     if (btnEl)     btnEl.disabled = active;
   }
 
-  /* Если уже залогинен — проверяем специализацию */
   (async function() {
     const { data: { user } } = await db.auth.getUser();
     if (!user) return;
@@ -261,7 +260,6 @@
     }
   })();
 
-  /* ВХОД */
   async function doLogin() {
     var email    = document.getElementById('loginEmail').value.trim();
     var password = document.getElementById('loginPassword').value;
@@ -307,7 +305,13 @@
 
     setLoading('register', true);
 
-    const { data, error } = await db.auth.signUp({ email, password });
+    const { data, error } = await db.auth.signUp({
+  email,
+  password,
+  options: {
+    data: { username: username }
+  }
+});
 
     if (error) {
       setLoading('register', false);
