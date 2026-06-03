@@ -493,7 +493,6 @@ function calcResult() {
 }
 
 function showResult(roleKey) {
-  saveSpecialization(roleKey);
 
   const role = ROLES[roleKey];
   document.getElementById('result-icon').textContent = role.icon;
@@ -536,8 +535,12 @@ function showResult(roleKey) {
     });
   }, 200);
 
-  setTimeout(() => { window.location.href = 'index.html'; }, 8000);
-}
+saveSpecialization(roleKey).then(() => {
+  const wrap = document.querySelector('#state-result [style*="margin-top:24px"]');
+  if (wrap) {
+    wrap.innerHTML += `<a href="index.html" class="btn-start" style="display:inline-block; margin-top:12px; text-decoration:none;">→ ПЕРЕЙТИ В БАЗУ ДАННЫХ</a>`;
+  }
+});
 
 function restart() {
   showState('intro');
