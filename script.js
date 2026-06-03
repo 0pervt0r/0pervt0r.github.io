@@ -38,18 +38,6 @@ async function fillSidebar() {
   const profile = await getProfile(user.id);
   if (!profile) return;
 
-  // Если специализации нет и мы не на странице квиза — редиректим на квиз
-  if (!profile.specialization && !path.includes('personelquiz.html')) {
-    window.location.href = 'personelquiz.html';
-    return;
-  }
-
-  // Если специализация уже есть и пользователь зачем-то открыл квиз — на главную
-  if (profile.specialization && path.includes('personelquiz.html')) {
-    window.location.href = 'index.html';
-    return;
-  }
-
   // Заполняем sidebar
   const nameEl = document.querySelector('.sidebar-username');
   if (nameEl) nameEl.textContent = profile.username || 'СОТРУДНИК';
