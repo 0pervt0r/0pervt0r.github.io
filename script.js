@@ -1,24 +1,14 @@
-
-/* ═══════════════════════════════════════════════
-   SUPABASE CONFIG — замени на свои данные
-═══════════════════════════════════════════════ */
 const SUPABASE_URL = 'https://ytmwejebzkunzukuztvq.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_gsHGImtWAi7pGLU0vKrwOA_S8r5EHgI';
 
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-/* ═══════════════════════════════════════════════
-   ПОЛУЧИТЬ ТЕКУЩЕГО ЮЗЕРА
-═══════════════════════════════════════════════ */
 async function getCurrentUser() {
   const { data: { user } } = await db.auth.getUser();
   return user;
 }
 
-/* ═══════════════════════════════════════════════
-   ПОЛУЧИТЬ ПРОФИЛЬ (ник, аватар, уровень допуска)
-═══════════════════════════════════════════════ */
 async function getProfile(userId) {
   const { data, error } = await db
     .from('profiles')
@@ -29,34 +19,29 @@ async function getProfile(userId) {
   return data;
 }
 
-/* ═══════════════════════════════════════════════
-   ЗАПОЛНИТЬ САЙДБАР ДАННЫМИ ЮЗЕРА
-═══════════════════════════════════════════════ */
 async function fillSidebar() {
   const user = await getCurrentUser();
   if (!user) {
-    // не залогинен — редирект на логин
     if (!window.location.pathname.includes('login.html')) {
       window.location.href = 'login.html';
+    }
+    return;
+  }
+
   if (!user.email_confirmed_at) {
     window.location.href = 'confirm.html';
     return;
   }
 
-  // ... остальной код без изменений
-
   const profile = await getProfile(user.id);
   if (!profile) return;
 
-  // имя
   const nameEl = document.querySelector('.sidebar-username');
   if (nameEl) nameEl.textContent = profile.username || 'СОТРУДНИК';
 
-  // уровень допуска
   const roleEl = document.querySelector('.sidebar-role');
-  if (roleEl) roleEl.textContent = `Уровень доступа: ${profile.access_level || 1}`;
+  if (roleEl) roleEl.textContent = `Уровень доступа: ${profile.access_level ?? 0}`;
 
-  // аватарка если есть элемент
   const avatarEl = document.querySelector('.sidebar-avatar');
   if (avatarEl && profile.avatar_url) {
     avatarEl.src = profile.avatar_url;
@@ -64,18 +49,11 @@ async function fillSidebar() {
   }
 }
 
-/* ═══════════════════════════════════════════════
-   ВЫХОД
-═══════════════════════════════════════════════ */
 async function signOut() {
   await db.auth.signOut();
   window.location.href = 'login.html';
 }
 
-/* ═══════════════════════════════════════════════
-   ПРОВЕРКА УРОВНЯ ДОПУСКА ДЛЯ СТРАНИЦЫ
-   Использование: requireAccess(3) — нужен уровень 3+
-═══════════════════════════════════════════════ */
 async function requireAccess(requiredLevel) {
   const user = await getCurrentUser();
   if (!user) {
@@ -83,7 +61,7 @@ async function requireAccess(requiredLevel) {
     return false;
   }
   const profile = await getProfile(user.id);
-  const level = profile?.access_level || 1;
+  const level = profile?.access_level ?? 0;
   if (level < requiredLevel) {
     showAccessDeniedPermanent(level, requiredLevel);
     return false;
@@ -108,30 +86,12 @@ function showAccessDeniedPermanent(currentLevel, requiredLevel) {
   overlay.style.display = 'flex';
 }
 
-/* ═══════════════════════════════════════════════
-   АВТО-ЗАПУСК: заполнить сайдбар на любой странице
-═══════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', function () {
-  // не запускать на странице логина
-  if (!window.location.pathname.includes('login.html')) {
+  if (!window.location.pathname.includes('login.html') &&
+      !window.location.pathname.includes('confirm.html')) {
     fillSidebar();
   }
 });
-
-document.addEventListener('DOMContentLoaded', function () {
-  if (!window.location.pathname.includes('login.html')) {
-    fillSidebar();
-  }
-});
-
-// Если юзер не залогинен — редирект на login.html
-(async function () {
-  if (window.location.pathname.includes('login.html')) return;
-  const { data: { user } } = await db.auth.getUser();
-  if (!user) {
-    window.location.href = 'login.html';
-  }
-})();
 
 function toggleAccordion(trigger) {
   var item = trigger.closest('.accordion-item');
