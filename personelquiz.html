@@ -8,7 +8,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
 <link href="style.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="script.js" defer></script>
+<!-- FIX 1: script.js убран отсюда, т.к. он объявляет SUPABASE_URL/KEY повторно.
+     Если script.js нужен для других страниц — оставьте его там, но не здесь.
+     Если он нужен и здесь — вынесите Supabase-инициализацию в отдельный shared файл. -->
 </head>
 <body>
 
@@ -136,7 +138,16 @@
           <div style="font-size:11px; color:var(--text-dim); margin-bottom:16px; letter-spacing:0.05em;">Профиль компетенций</div>
           <div class="profile-bars" id="profile-bars"></div>
 
+          <!-- FIX 5: Статус сохранения — пользователь видит что происходит -->
+          <div id="save-status" style="text-align:center; margin-top:16px; font-family:'Share Tech Mono',monospace; font-size:12px; letter-spacing:0.08em; color:var(--accent2);">
+            Сохранение данных...
+          </div>
+
           <div style="text-align:center; margin-top:24px;">
+            <!-- FIX 5: Кнопка редиректа появляется после сохранения -->
+            <button class="btn-nav primary" id="btn-proceed" onclick="goToIndex()" style="display:none; margin-bottom:12px;">
+              ПЕРЕЙТИ В БАЗУ ДАННЫХ →
+            </button>
             <button class="btn-restart" onclick="restart()">↺ ПРОЙТИ ПОВТОРНО</button>
           </div>
         </div>
@@ -147,47 +158,95 @@
 </div>
 
 <script>
-
+// ============================================================
+// FIX 1: Supabase инициализируется ТОЛЬКО здесь, script.js
+// не подключён к этой странице. Если script.js нужен — удалите
+// из него объявления SUPABASE_URL / SUPABASE_KEY / db,
+// и инициализируйте Supabase в отдельном shared-файле.
+// ============================================================
 const SUPABASE_URL = 'https://ytmwejebzkunzukuztvq.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl0bXdlamViemt1bnp1a3V6dHZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0ODEzMDksImV4cCI6MjA5NjA1NzMwOX0.nW1zgIFphXNF60p7vRd4hOV39n4my3ljKF9mCBqOH_E';
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
-  
+
 const ROLE_TO_LETTER = {
   admin: 'A', guard: 'G', researcher: 'S',
   dispatcher: 'C', engineer: 'C', medic: 'M', spy: 'A'
 };
 
+// ============================================================
+// FIX 2 + 3 + 4: saveSpecialization полностью переписана.
+//
+// Проблемы оригинала:
+// - upsert({ id, specialization, serial_number }) без onConflict
+//   может не обновить существующую строку → NULL в полях
+// - 403: RLS UPDATE политика по умолчанию в Supabase запрещает
+//   UPDATE если нет явного условия "auth.uid() = id".
+//   Решение: используем .update().eq('id', user.id) вместо upsert.
+//   Это надёжнее и явно соответствует RLS политике вида:
+//   "Users can update own profile" (auth.uid() = id).
+// - serial_number генерировался правильно, но не сохранялся
+//   из-за ошибки выше.
+// - Редирект происходил немедленно, игнорируя ошибку сохранения.
+// ============================================================
 async function saveSpecialization(roleKey) {
+  const saveStatusEl = document.getElementById('save-status');
+  const proceedBtn = document.getElementById('btn-proceed');
+
   try {
-    const letter = ROLE_TO_LETTER[roleKey];
-    const serial = String(Math.floor(Math.random() * 9000000000) + 1000000000);
-    const { data: { user } } = await db.auth.getUser();
-    if (!user) {
+    // Проверяем авторизацию
+    const { data: { user }, error: authError } = await db.auth.getUser();
+
+    if (authError || !user) {
+      console.error('Ошибка авторизации:', authError);
       window.location.href = 'login.html';
       return;
     }
-console.log('Saving:', letter, serial, user.id);
 
-const { error } = await db.from('profiles').upsert({
-  id: user.id,
-  specialization: letter,
-  serial_number: serial
-});
+    const letter = ROLE_TO_LETTER[roleKey];
+    // FIX 4: 10 цифр гарантированно (pad до 10 знаков)
+    const serial = String(Math.floor(Math.random() * 9000000000) + 1000000000);
 
-console.log('Error:', error);
+    console.log('Сохраняем:', { userId: user.id, specialization: letter, serial_number: serial });
+
+    // FIX 2: используем UPDATE вместо upsert — это явно триггерит
+    // RLS политику "auth.uid() = id", которая разрешает UPDATE своей строки.
+    // upsert без явного onConflict('id') иногда падает с 403 на UPDATE-ветке.
+    const { error } = await db
+      .from('profiles')
+      .update({
+        specialization: letter,
+        serial_number: serial
+      })
+      .eq('id', user.id);
 
     if (error) {
       console.error('Ошибка сохранения:', error);
+
+      // FIX 3: Показываем ошибку пользователю и даём кнопку продолжить
+      saveStatusEl.style.color = '#ff4455';
+      saveStatusEl.textContent = `Ошибка сохранения (${error.code}): ${error.message}. Обратитесь к администратору.`;
+      proceedBtn.style.display = 'inline-block';
       return;
     }
 
-    // Редирект после успешного сохранения
-    window.location.href = 'index.html';
+    console.log('Сохранено успешно:', { specialization: letter, serial_number: serial });
+
+    // FIX 3: Показываем успех и кнопку перехода вместо автоматического редиректа
+    saveStatusEl.style.color = '#00ff88';
+    saveStatusEl.textContent = `✓ Данные сохранены. Специализация: ${letter} | Серийный номер: ${serial}`;
+    proceedBtn.style.display = 'inline-block';
 
   } catch(e) {
-    console.error('Ошибка:', e);
+    console.error('Критическая ошибка:', e);
+    saveStatusEl.style.color = '#ff4455';
+    saveStatusEl.textContent = 'Критическая ошибка при сохранении. Попробуйте позже.';
+    proceedBtn.style.display = 'inline-block';
   }
+}
+
+function goToIndex() {
+  window.location.href = 'index.html';
 }
 
 const ROLES = {
@@ -549,6 +608,13 @@ function showResult(roleKey) {
     barsEl.appendChild(row);
   }
 
+  // Сброс статуса перед новым сохранением
+  const saveStatusEl = document.getElementById('save-status');
+  const proceedBtn = document.getElementById('btn-proceed');
+  saveStatusEl.style.color = 'var(--accent2)';
+  saveStatusEl.textContent = 'Сохранение данных...';
+  proceedBtn.style.display = 'none';
+
   showState('result');
 
   setTimeout(() => {
@@ -557,9 +623,11 @@ function showResult(roleKey) {
     });
   }, 200);
 
-saveSpecialization(roleKey);
-  
+  // FIX 5: saveSpecialization вызывается без await — это нормально,
+  // т.к. showResult не async. Функция сама обновит UI по завершении.
+  saveSpecialization(roleKey);
 }
+
 function restart() {
   showState('intro');
 }
