@@ -493,7 +493,6 @@ function calcResult() {
 }
 
 function showResult(roleKey) {
-
   const role = ROLES[roleKey];
   document.getElementById('result-icon').textContent = role.icon;
   document.getElementById('result-role').textContent = role.name;
@@ -535,17 +534,22 @@ function showResult(roleKey) {
     });
   }, 200);
 
-saveSpecialization(roleKey).then(() => {
-  const wrap = document.querySelector('#state-result [style*="margin-top:24px"]');
-  if (wrap) {
-    wrap.innerHTML += `<a href="index.html" class="btn-start" style="display:inline-block; margin-top:12px; text-decoration:none;">→ ПЕРЕЙТИ В БАЗУ ДАННЫХ</a>`;
-  }
-});
 
+  saveSpecialization(roleKey).then(() => {
+    const wrap = document.querySelector('#state-result [style*="margin-top:24px"]');
+    if (wrap && !wrap.querySelector('.btn-db-link')) {
+      const link = document.createElement('a');
+      link.href = 'index.html';
+      link.className = 'btn-start btn-db-link';
+      link.style.cssText = 'display:inline-block; margin-top:12px; text-decoration:none;';
+      link.textContent = '→ ПЕРЕЙТИ В БАЗУ ДАННЫХ';
+      wrap.appendChild(link);
+    }
+  });
+}
 function restart() {
   showState('intro');
 }
-  
 </script>
 </body>
 </html>
