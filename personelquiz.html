@@ -167,10 +167,15 @@ async function saveSpecialization(roleKey) {
       window.location.href = 'login.html';
       return;
     }
-    const { error } = await db.from('profiles').update({
-      specialization: letter,
-      serial_number: serial
-    }).eq('id', user.id);
+console.log('Saving:', letter, serial, user.id);
+
+const { error } = await db.from('profiles').upsert({
+  id: user.id,
+  specialization: letter,
+  serial_number: serial
+});
+
+console.log('Error:', error);
 
     if (error) {
       console.error('Ошибка сохранения:', error);
