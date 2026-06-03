@@ -356,6 +356,364 @@
   </div>
 </div>
 
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hadal Database — Авторизация</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="style.css" rel="stylesheet">
+
+<!-- Supabase CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+/* ══════════════════════════════════════
+   LOGIN PAGE
+══════════════════════════════════════ */
+.login-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  position: relative;
+  z-index: 2;
+}
+
+/* фоновая сетка */
+.login-wrapper::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(178,229,40,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(178,229,40,0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.login-box {
+  width: 100%;
+  max-width: 420px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+/* верхняя акцентная полоса */
+.login-box::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent2), transparent);
+}
+
+/* ── шапка ── */
+.login-header {
+  padding: 28px 28px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg);
+  position: relative;
+}
+
+.login-logo {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+  filter: brightness(0.9) sepia(0.3) hue-rotate(40deg) saturate(2);
+  opacity: 0.8;
+}
+
+.login-corp {
+  font-family: 'Orbitron', monospace;
+  font-size: 8px;
+  color: var(--text-dim);
+  letter-spacing: 0.22em;
+  text-align: center;
+}
+
+.login-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--text-bright);
+  letter-spacing: 0.08em;
+  text-align: center;
+}
+
+.login-title span { color: var(--accent2); }
+
+.login-divider {
+  width: 160px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent2), transparent);
+  opacity: 0.4;
+}
+
+/* ── табы LOGIN / REGISTER ── */
+.login-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+}
+
+.login-tab {
+  flex: 1;
+  padding: 10px;
+  font-family: 'Orbitron', monospace;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: var(--text-dim);
+  text-align: center;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+  position: relative;
+  background: transparent;
+  border: none;
+  outline: none;
+}
+
+.login-tab::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0; height: 2px;
+  background: var(--accent2);
+  transform: scaleX(0);
+  transition: transform 0.2s;
+}
+
+.login-tab.active {
+  color: var(--accent2);
+  background: var(--accent-dim);
+}
+
+.login-tab.active::after {
+  transform: scaleX(1);
+}
+
+/* ── форма ── */
+.login-form-wrap {
+  padding: 24px 28px 28px;
+}
+
+.login-state { display: none; }
+.login-state.active { display: block; }
+
+.login-field {
+  margin-bottom: 14px;
+}
+
+.login-label {
+  display: block;
+  font-family: 'Orbitron', monospace;
+  font-size: 8px;
+  color: var(--text-dim);
+  letter-spacing: 0.14em;
+  margin-bottom: 6px;
+}
+
+.login-input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border-grey);
+  border-radius: 2px;
+  padding: 9px 12px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  color: var(--text-bright);
+  letter-spacing: 0.04em;
+  outline: none;
+  transition: border-color 0.15s;
+  box-sizing: border-box;
+}
+
+.login-input:focus {
+  border-color: var(--accent2);
+}
+
+.login-input::placeholder {
+  color: var(--text-dim);
+  opacity: 0.5;
+}
+
+/* кнопка отправки */
+.login-submit {
+  width: 100%;
+  margin-top: 8px;
+  padding: 11px;
+  background: transparent;
+  border: 1px solid var(--accent2);
+  border-radius: 2px;
+  font-family: 'Orbitron', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent2);
+  letter-spacing: 0.14em;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  position: relative;
+  overflow: hidden;
+}
+
+.login-submit::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--accent-dim);
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.login-submit:hover::before { opacity: 1; }
+.login-submit:hover { color: var(--text-bright); }
+
+.login-submit:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* сообщение об ошибке / успехе */
+.login-msg {
+  margin-top: 12px;
+  padding: 8px 12px;
+  border-radius: 2px;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  line-height: 1.5;
+  display: none;
+}
+
+.login-msg.error {
+  display: block;
+  background: rgba(217,79,92,0.08);
+  border: 1px solid rgba(217,79,92,0.28);
+  color: var(--red);
+}
+
+.login-msg.success {
+  display: block;
+  background: var(--green-dim);
+  border: 1px solid rgba(178,229,40,0.28);
+  color: var(--green);
+}
+
+/* статусная строка внизу */
+.login-footer {
+  padding: 10px 28px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.login-footer-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 9px;
+  color: var(--text-dim);
+  letter-spacing: 0.06em;
+}
+
+.login-footer-code {
+  font-family: 'Orbitron', monospace;
+  font-size: 8px;
+  color: var(--text-dim);
+  letter-spacing: 0.08em;
+}
+
+/* загрузка */
+.login-loading {
+  text-align: center;
+  padding: 16px 0 4px;
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 0.08em;
+  display: none;
+}
+.login-loading.active { display: block; }
+</style>
+</head>
+<body>
+
+<div class="login-wrapper">
+  <div class="login-box">
+
+    <!-- шапка -->
+    <div class="login-header">
+      <img class="login-logo" src="ChroniclesLogo.png">
+      <div class="login-corp">Urbanshade Corp · Хадальное подразделение</div>
+      <div class="login-title">HADAL <span>DATABASE</span></div>
+      <div class="login-divider"></div>
+    </div>
+
+    <!-- табы -->
+    <div class="login-tabs">
+      <button class="login-tab active" id="tabLogin" onclick="switchTab('login')">ВХОД</button>
+      <button class="login-tab" id="tabRegister" onclick="switchTab('register')">РЕГИСТРАЦИЯ</button>
+    </div>
+
+    <!-- формы -->
+    <div class="login-form-wrap">
+
+      <!-- ВХОД -->
+      <div class="login-state active" id="stateLogin">
+        <div class="login-field">
+          <label class="login-label">EMAIL</label>
+          <input class="login-input" id="loginEmail" type="email" placeholder="user@urbanshade.corp" autocomplete="email">
+        </div>
+        <div class="login-field">
+          <label class="login-label">ПАРОЛЬ</label>
+          <input class="login-input" id="loginPassword" type="password" placeholder="••••••••" autocomplete="current-password">
+        </div>
+        <div class="login-loading" id="loginLoading">ПРОВЕРКА ДОПУСКА...</div>
+        <button class="login-submit" id="loginBtn" onclick="doLogin()">ПОДТВЕРДИТЬ ЛИЧНОСТЬ →</button>
+        <div class="login-msg" id="loginMsg"></div>
+      </div>
+
+      <!-- РЕГИСТРАЦИЯ -->
+      <div class="login-state" id="stateRegister">
+        <div class="login-field">
+          <label class="login-label">ПОЗЫВНОЙ / НИК</label>
+          <input class="login-input" id="regUsername" type="text" placeholder="AGENT_NAME" autocomplete="off">
+        </div>
+        <div class="login-field">
+          <label class="login-label">EMAIL</label>
+          <input class="login-input" id="regEmail" type="email" placeholder="user@urbanshade.corp" autocomplete="email">
+        </div>
+        <div class="login-field">
+          <label class="login-label">ПАРОЛЬ</label>
+          <input class="login-input" id="regPassword" type="password" placeholder="Минимум 6 символов" autocomplete="new-password">
+        </div>
+        <div class="login-loading" id="registerLoading">СОЗДАНИЕ ПРОФИЛЯ...</div>
+        <button class="login-submit" id="registerBtn" onclick="doRegister()">ЗАПРОСИТЬ ДОПУСК →</button>
+        <div class="login-msg" id="registerMsg"></div>
+      </div>
+
+    </div>
+
+    <!-- футер -->
+    <div class="login-footer">
+      <div class="login-footer-status">
+        <span class="status-dot"></span>
+        СИСТЕМА В СЕТИ
+      </div>
+      <div class="login-footer-code">CLEARANCE · LVL 1</div>
+    </div>
+
+  </div>
+</div>
+
 <script>
   /* ── Supabase init ── */
   const SUPABASE_URL = 'https://ytmwejebzkunzukuztvq.supabase.co';
@@ -478,6 +836,9 @@ if (data.user) {
     else doRegister();
   });
 </script>
+
+</body>
+</html>
 
 </body>
 </html>
