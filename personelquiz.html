@@ -147,19 +147,39 @@
 </div>
 
 <script>
+const ROLE_TO_LETTER = {
+  admin: 'A', guard: 'G', researcher: 'S',
+  dispatcher: 'C', engineer: 'C', medic: 'M', spy: 'A'
+};
+
+async function saveSpecialization(roleKey) {
+  try {
+    const letter = ROLE_TO_LETTER[roleKey];
+    const serial = String(Math.floor(Math.random() * 9000000000) + 1000000000);
+    const { data: { user } } = await db.auth.getUser();
+    if (!user) return;
+    await db.from('profiles').update({
+      specialization: letter,
+      serial_number: serial
+    }).eq('id', user.id);
+  } catch(e) {
+    console.error('Ошибка сохранения специализации:', e);
+  }
+}
+
 const ROLES = {
   admin: {
     name: 'Администрация Urbanshade',
     en: 'CORPORATE ADMINISTRATION',
     icon: '⬡',
-    desc: 'Вы обладаете стратегическим мышлением, способностью принимать решения не смотря ни на что и редкой устойчивостью перед лицом моральной неоднозначности. Urbanshade нуждается в таких людях, способных сохранять спокойствие и принимать верные решения в условиях неопределенности, сжатых сроков или конфликтов.',
+    desc: 'Вы обладаете стратегическим мышлением, способностью принимать решения не смотря ни на что и редкой устойчивостью перед лицом моральной неоднозначности.',
     stats: {loyalty: 95, analytical: 88, combat: 25, technical: 60, social: 72, secrecy: 90}
   },
   guard: {
     name: 'Гвардеец',
     en: 'HADAL GUARD DIVISION',
     icon: '⚔',
-    desc: 'Дисциплина, сила и преданость ⸺ вот что описывает вас лучше всего. Вы первая и последняя линия между безопасностью внутри комплекса и катастрофой. Именно такой персонал нам нужен.',
+    desc: 'Дисциплина, сила и преданость ⸺ вот что описывает вас лучше всего. Вы первая и последняя линия между безопасностью внутри комплекса и катастрофой.',
     stats: {loyalty: 80, analytical: 40, combat: 95, technical: 35, social: 30, secrecy: 75}
   },
   researcher: {
@@ -173,48 +193,40 @@ const ROLES = {
     name: 'Диспетчер',
     en: 'OPERATIONS DISPATCH',
     icon: '⬡',
-    desc: 'Комплекс это организм, а вы ⸺ его нервная система. Вы обрабатываете потоки информации, координируете смены и сообщаете об инцидентах руководству и гвардейцам. Комплекс неспособен существовать без вас.',
+    desc: 'Комплекс это организм, а вы ⸺ его нервная система. Вы обрабатываете потоки информации, координируете смены и сообщаете об инцидентах руководству.',
     stats: {loyalty: 70, analytical: 82, combat: 15, technical: 65, social: 85, secrecy: 60}
   },
   engineer: {
     name: 'Инженер-строитель',
     en: 'STRUCTURAL ENGINEERING',
     icon: '⚙',
-    desc: 'Без вашего участия мы бы не смогли добиться того, что имеем сейчас. Тяжёлый труд строителей, инженеров и ремонтников не даёт комплексу развалиться во время инцидентов, а так же помогает сдерживать объекты в клетках.',
+    desc: 'Без вашего участия мы бы не смогли добиться того, что имеем сейчас. Тяжёлый труд строителей, инженеров и ремонтников не даёт комплексу развалиться.',
     stats: {loyalty: 60, analytical: 75, combat: 30, technical: 97, social: 40, secrecy: 55}
   },
   medic: {
     name: 'Медик',
     en: 'MEDICAL DIVISION',
     icon: '✚',
-    desc: 'В условиях изоляции здоровье крайне важно, и медицина в Хадальном Подразделении это не только лечение простуд и вправка вывихов, но и умение расставлять приоритеты и принимать решения в критических ситуациях.',
+    desc: 'В условиях изоляции здоровье крайне важно, и медицина в Хадальном Подразделении это не только лечение простуд и вправка вывихов.',
     stats: {loyalty: 65, analytical: 78, combat: 25, technical: 72, social: 78, secrecy: 50}
   },
   spy: {
     name: 'Шпион',
     en: 'INTERNAL INTELLIGENCE',
     icon: '◈',
-    desc: 'Urbanshade работает глубоко в тени и её внутренняя разведка должна быть ещё глубже. Вы знаете, когда нужно солгать, промолчать или исчезнуть. Ни один сотрудник не подозревает о вашей истинной природе... но так и задуманно.',
+    desc: 'Urbanshade работает глубоко в тени и её внутренняя разведка должна быть ещё глубже. Вы знаете, когда нужно солгать, промолчать или исчезнуть.',
     stats: {loyalty: 85, analytical: 88, combat: 60, technical: 45, social: 90, secrecy: 99}
   }
 };
 
 const STAT_LABELS = {
-  loyalty: 'Лояльность',
-  analytical: 'Аналитика',
-  combat: 'Боеготовность',
-  technical: 'Техн. знания',
-  social: 'Коммуникация',
-  secrecy: 'Скрытность'
+  loyalty: 'Лояльность', analytical: 'Аналитика', combat: 'Боеготовность',
+  technical: 'Техн. знания', social: 'Коммуникация', secrecy: 'Скрытность'
 };
 
 const STAT_COLORS = {
-  loyalty: '#1a6bff',
-  analytical: '#00e5ff',
-  combat: '#ff4455',
-  technical: '#ffaa00',
-  social: '#00ff88',
-  secrecy: '#b06fff'
+  loyalty: '#1a6bff', analytical: '#00e5ff', combat: '#ff4455',
+  technical: '#ffaa00', social: '#00ff88', secrecy: '#b06fff'
 };
 
 const QUESTIONS = [
@@ -284,10 +296,10 @@ const QUESTIONS = [
     ]
   },
   {
-    text: 'Вы случайно узнаёте нечто, что компания явно хочет скрыть. Это нечто может навредить работникам комплекса. Что вы предпримете?',
+    text: 'Вы случайно узнаёте нечто, что компания явно хочет скрыть. Это нечто может навредить работникам комплекса.',
     cat: 'ЭТИКА И ЛОЯЛЬНОСТЬ',
     options: [
-      { text: 'Меньше знаешь ⸺ крепче спишь. Сделаю вид, что ничего не знаю', weights: {guard:3, engineer:2} },
+      { text: 'Меньше знаешь ⸺ крепче спишь. Сделаю вид, что ничего не знаю.', weights: {guard:3, engineer:2} },
       { text: 'Задокументирую и спрячу... на всякий случай.', weights: {spy:3, researcher:2} },
       { text: 'Доложу уполномоченному лицу.', weights: {admin:3, dispatcher:2} },
       { text: 'Оценю, насколько это ставит под угрозу персонал комплекса.', weights: {medic:2, engineer:2, researcher:1} },
@@ -304,7 +316,7 @@ const QUESTIONS = [
       { text: 'Испытываю сочувствие, но не буду показывать его.', weights: {medic:2, guard:2} },
       { text: 'Я буду гадать, говорит ли он искренне или нет.', weights: {spy:3, researcher:2} },
       { text: 'Подам рапорт на психологический осмотр.', weights: {medic:3, researcher:1} },
-      { text: 'Буду слушать внимательно, чтобы понять, в каком он состоянии и нужна ли ему помощь.', weights: {medic:2, dispatcher:3} },
+      { text: 'Буду слушать внимательно, чтобы понять, в каком он состоянии.', weights: {medic:2, dispatcher:3} },
       { text: 'Подумаю, как можно использовать его слова.', weights: {admin:3, spy:2} },
       { text: 'Уйду.', weights: {guard:3, admin:1} }
     ]
@@ -315,10 +327,10 @@ const QUESTIONS = [
     options: [
       { text: 'Поищу обходной путь в пределах имеющихся ресурсов.', weights: {engineer:3, researcher:2} },
       { text: 'Сообщаю руководству и жду решения сверху.', weights: {guard:2, dispatcher:3} },
-      { text: 'Оценю, можно ли сдать проект с дефектом и каковы риски этого?', weights: {admin:3, spy:2} },
+      { text: 'Оценю, можно ли сдать проект с дефектом и каковы риски.', weights: {admin:3, spy:2} },
       { text: 'Собираю команду, чтобы исправить дефект как можно скорее.', weights: {admin:2, dispatcher:3} },
-      { text: 'Постараюсь исправить дефект самостоятельно', weights: {spy:2, engineer:2} },
-      { text: 'Провожу диагностику, чтобы понять глубину проблемы, прежде чем действовать.', weights: {researcher:3, engineer:2} },
+      { text: 'Постараюсь исправить дефект самостоятельно.', weights: {spy:2, engineer:2} },
+      { text: 'Провожу диагностику, чтобы понять глубину проблемы.', weights: {researcher:3, engineer:2} },
       { text: 'Готовлю «план Б» по минимизации последствий на случай провала.', weights: {medic:2, dispatcher:2, admin:1} }
     ]
   },
@@ -336,7 +348,7 @@ const QUESTIONS = [
     ]
   },
   {
-    text: 'Вам предлагают повышение, но для этого нужно переложить часть ответственности за ошибку на коллегу, который виноват лишь косвенно.',
+    text: 'Вам предлагают повышение, но для этого нужно переложить часть ответственности на коллегу, который виноват лишь косвенно.',
     cat: 'ЭТИКА И ЛОЯЛЬНОСТЬ',
     options: [
       { text: 'Соглашусь. Выживает сильнейший.', weights: {admin:3, spy:2} },
@@ -349,23 +361,23 @@ const QUESTIONS = [
     ]
   },
   {
-    text: 'Вы замечаете, что структура, которую вы обслуживаете, имеет скрытую уязвимость, о которой никто другой не знает. Что вы делаете?',
+    text: 'Вы замечаете, что структура, которую вы обслуживаете, имеет скрытую уязвимость, о которой никто другой не знает.',
     cat: 'ОТВЕТСТВЕННОСТЬ',
     options: [
       { text: 'Немедленно докладываю о ней и ищу решение.', weights: {engineer:3, admin:2} },
-      { text: 'Исправлю уязвимость сам и никому не сообщу. Зачем создавать панику?', weights: {engineer:2, spy:2} },
+      { text: 'Исправлю уязвимость сам и никому не сообщу.', weights: {engineer:2, spy:2} },
       { text: 'Задокументирую уязвимость и подожду подходящего момента для доклада.', weights: {researcher:3, dispatcher:1} },
       { text: 'Подробнее изучу уязвимость прежде чем доложить о ней.', weights: {researcher:2, engineer:2, medic:1} },
       { text: 'Использую знание о ней в личных целях.', weights: {spy:3, admin:1} },
       { text: 'Я уведомлю медицинский персонал о возможных последствиях.', weights: {medic:3, dispatcher:2} },
-      { text: 'Оценю, не является ли она искусственно созданной, чтобы помочь конкурентам.', weights: {spy:2, admin:2, researcher:1} }
+      { text: 'Оценю, не является ли она искусственно созданной.', weights: {spy:2, admin:2, researcher:1} }
     ]
   },
   {
     text: 'Опишите ваше отношение к правилам, которые кажутся вам нелогичными.',
     cat: 'ХАРАКТЕР',
     options: [
-      { text: 'Правила написаны кровью ⸺ если они есть, значит, были преценденты и мне не интересно их знать.', weights: {guard:3, admin:2} },
+      { text: 'Правила написаны кровью ⸺ если они есть, значит, были прецеденты.', weights: {guard:3, admin:2} },
       { text: 'Я буду их исполнять, но буду пытаться найти причину, почему их ввели.', weights: {researcher:3, admin:1} },
       { text: 'Я не собираюсь их исполнять, но руководству скажу иное.', weights: {spy:3, engineer:1} },
       { text: 'Я ищу лазейку в этих правилах.', weights: {admin:2, engineer:2} },
@@ -404,10 +416,8 @@ function renderQuestion() {
   document.getElementById('q-num').textContent = currentQ + 1;
   document.getElementById('q-cat').textContent = q.cat;
   document.getElementById('q-text').textContent = q.text;
-
   const fill = ((currentQ) / 12) * 100;
   document.getElementById('progress-fill').style.width = fill + '%';
-
   const container = document.getElementById('q-options');
   container.innerHTML = '';
   const letters = ['A','B','C','D','E','F','G'];
@@ -418,7 +428,6 @@ function renderQuestion() {
     div.onclick = () => selectAnswer(i);
     container.appendChild(div);
   });
-
   document.getElementById('btn-prev').disabled = currentQ === 0;
   document.getElementById('btn-next').disabled = answers[currentQ] === null;
   document.getElementById('btn-next').textContent = currentQ === 11 ? 'ЗАВЕРШИТЬ ▶' : 'ДАЛЕЕ →';
@@ -434,19 +443,12 @@ function selectAnswer(idx) {
 
 function nextQ() {
   if (answers[currentQ] === null) return;
-  if (currentQ < 11) {
-    currentQ++;
-    renderQuestion();
-  } else {
-    showLoading();
-  }
+  if (currentQ < 11) { currentQ++; renderQuestion(); }
+  else { showLoading(); }
 }
 
 function prevQ() {
-  if (currentQ > 0) {
-    currentQ--;
-    renderQuestion();
-  }
+  if (currentQ > 0) { currentQ--; renderQuestion(); }
 }
 
 function showLoading() {
@@ -464,7 +466,7 @@ function showLoading() {
   const txt = document.getElementById('load-text');
   const interval = setInterval(() => {
     progress += Math.random() * 8 + 2;
-    if (progress >= 100) { progress = 100; }
+    if (progress >= 100) progress = 100;
     fill.style.width = Math.round(progress) + '%';
     msgIdx = Math.floor((progress / 100) * (messages.length - 1));
     txt.textContent = messages[Math.min(msgIdx, messages.length - 1)];
@@ -491,6 +493,8 @@ function calcResult() {
 }
 
 function showResult(roleKey) {
+  saveSpecialization(roleKey);
+
   const role = ROLES[roleKey];
   document.getElementById('result-icon').textContent = role.icon;
   document.getElementById('result-role').textContent = role.name;
@@ -501,12 +505,8 @@ function showResult(roleKey) {
   const gridEl = document.getElementById('result-grid');
   gridEl.innerHTML = `
     <div class="result-stat">
-      <div class="result-stat-label">Идентификатор</div>
-      <div class="result-stat-val">HR-${Math.floor(Math.random()*9000)+1000}</div>
-    </div>
-    <div class="result-stat">
-      <div class="result-stat-label">Уровень допуска</div>
-      <div class="result-stat-val">${roleKey === 'admin' ? '3' : roleKey === 'spy' ? '3' : roleKey === 'researcher' ? '2' : roleKey === 'guard' ? '2' : '2'} / 2</div>
+      <div class="result-stat-label">Специализация</div>
+      <div class="result-stat-val">${ROLE_TO_LETTER[roleKey]}</div>
     </div>
     <div class="result-stat">
       <div class="result-stat-label">Индекс совместимости</div>
@@ -529,16 +529,20 @@ function showResult(roleKey) {
   }
 
   showState('result');
+
   setTimeout(() => {
     document.querySelectorAll('.bar-fill').forEach(el => {
       el.style.width = el.dataset.target + '%';
     });
   }, 200);
+
+  setTimeout(() => { window.location.href = 'index.html'; }, 8000);
 }
 
 function restart() {
   showState('intro');
 }
+  
 </script>
 </body>
 </html>
