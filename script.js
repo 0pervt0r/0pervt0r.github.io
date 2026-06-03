@@ -118,6 +118,21 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 });
 
+document.addEventListener('DOMContentLoaded', function () {
+  if (!window.location.pathname.includes('login.html')) {
+    fillSidebar();
+  }
+});
+
+// Если юзер не залогинен — редирект на login.html
+(async function () {
+  if (window.location.pathname.includes('login.html')) return;
+  const { data: { user } } = await db.auth.getUser();
+  if (!user) {
+    window.location.href = 'login.html';
+  }
+})();
+
 function toggleAccordion(trigger) {
   var item = trigger.closest('.accordion-item');
   var body = item.querySelector('.accordion-body');
