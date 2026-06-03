@@ -1,5 +1,5 @@
 const SUPABASE_URL = 'https://ytmwejebzkunzukuztvq.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl0bXdlamViemtunzukuztvqiiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcyMTk4MDksImV4cCI6MjA2Mjc5NTgwOX0.nW1zgIFphXNF60p7vRd4hOV39n4my31jKF9mCBqOH_E';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl0bXdlamViemt1bnp1a3V6dHZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0ODEzMDksImV4cCI6MjA5NjA1NzMwOX0.nW1zgIFphXNF60p7vRd4hOV39n4my3ljKF9mCBqOH_E';
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 async function getCurrentUser() {
