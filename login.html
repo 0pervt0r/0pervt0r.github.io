@@ -458,8 +458,7 @@
     }
 
     setLoading('register', false);
-    showMsg('registerMsg', 'Профиль создан. Допуск уровня 1 выдан. Выполните вход.', 'success');
-    setTimeout(function() { switchTab('login'); }, 2000);
+    window.location.href = 'confirm.html';
   }
 
   /* ── Enter для отправки ── */
