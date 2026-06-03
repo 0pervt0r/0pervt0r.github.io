@@ -2,8 +2,8 @@
 /* ═══════════════════════════════════════════════
    SUPABASE CONFIG — замени на свои данные
 ═══════════════════════════════════════════════ */
-const SUPABASE_URL = 'https://ТВОЙ_ПРОЕКТ.supabase.co';
-const SUPABASE_KEY = 'ТВОЙ_ANON_KEY';
+const SUPABASE_URL = 'https://ytmwejebzkunzukuztvq.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_gsHGImtWAi7pGLU0vKrwOA_S8r5EHgI';
 
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
