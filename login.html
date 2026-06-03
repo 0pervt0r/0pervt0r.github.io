@@ -386,10 +386,16 @@
   }
 
   /* ── Если уже залогинен — сразу на главную ── */
-  (async function() {
-    const { data: { user } } = await db.auth.getUser();
-    if (user) window.location.href = 'index.html';
-  })();
+(async function() {
+  const { data: { user } } = await db.auth.getUser();
+  if (!user) return;
+  const { data: profile } = await db.from('profiles').select('specialization').eq('id', user.id).single();
+  if (profile?.specialization) {
+    window.location.href = 'index.html';
+  } else {
+    window.location.href = 'personelquiz.html';
+  }
+})();
 
   /* ══════════════════════════════════
      ВХОД
@@ -447,18 +453,23 @@
       return;
     }
 
-    // создаём профиль в таблице profiles
-    if (data.user) {
-      await db.from('profiles').insert({
-        id:           data.user.id,
-        username:     username,
-        access_level: 1,
-      });
-    }
+if (data.user) {
+  await db.from('profiles').insert({
+    id:             data.user.id,
+    username:       username,
+    access_level:   1,
+    specialization: null,
+    rank:           'LR',
+    serial_number:  null,
+  });
+}
 
-    setLoading('register', false);
-    window.location.href = 'confirm.html';
-  }
+setLoading('register', false);
+if (data.user) {
+  window.location.href = 'personelquiz.html';
+} else {
+  window.location.href = 'confirm.html';
+}
 
   /* ── Enter для отправки ── */
   document.addEventListener('keydown', function(e) {
