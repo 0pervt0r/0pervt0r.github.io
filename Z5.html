@@ -414,33 +414,6 @@
 </style>
 </head>
 <body>
-   <div class="access-overlay" id="accessOverlay">
-  <div class="access-overlay-icon">
-    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-      <!-- треугольник предупреждения -->
-      <polygon
-        points="50,18 88,80 12,80"
-        fill="none"
-        stroke="var(--text-bright)"
-        stroke-width="3.5"
-        stroke-linejoin="round"
-      />
-      <line x1="50" y1="38" x2="50" y2="60" stroke="var(--text-bright)" stroke-width="4" stroke-linecap="round"/>
-      <circle cx="50" cy="70" r="3" fill="var(--text-bright)"/>
-    </svg>
-  </div>
-
-  <div class="access-overlay-title">Доступ запрещён.</div>
-
-  <div class="access-overlay-sub">
-    Вы не имеете доступа к этому документу.<br>
-    Свяжитесь со своим руководителем, если считаете, что это ошибка.
-  </div>
-
-  <div class="access-overlay-bar-wrap">
-    <div class="access-overlay-bar"></div>
-  </div>
-</div>
 
 <div class="os-wrapper">
 
@@ -694,6 +667,12 @@
   document.addEventListener('DOMContentLoaded', function() {
     initRating('Z-5');
   });
+
+  document.addEventListener('DOMContentLoaded', async function() {
+    await requireAccess(3);
+    initRating('Z-5');
+  });
+</script>
 </script>
    
 </script>
