@@ -12,7 +12,7 @@
 
   <style>
 
-    /* ── NAV ICONS STRIP ── */
+
 .nav-icons-section {
   padding: 0;
   border-bottom: 1px solid var(--border);
@@ -47,7 +47,7 @@
   overflow: hidden;
 }
 
-/* вертикальные разделители */
+
 .nav-icon-item + .nav-icon-item::before {
   content: '';
   position: absolute;
@@ -57,7 +57,6 @@
   opacity: 0.45;
 }
 
-/* свечение при hover */
 .nav-icon-item::after {
   content: '';
   position: absolute;
@@ -72,7 +71,7 @@
 }
 .nav-icon-item:hover::after { opacity: 1; }
 
-/* картинка */
+
 .nav-icon-img {
   width: 90px;
   height: 90px;
@@ -88,7 +87,7 @@
   filter: drop-shadow(0 6px 18px rgba(178,229,40,0.45));
 }
 
-/* подпись */
+
 .nav-icon-label {
   font-family: 'Orbitron', monospace;
   font-size: 11px;
@@ -105,7 +104,7 @@
   color: var(--accent2);
 }
 
-/* нижняя черта-акцент появляется при hover */
+
 .nav-icon-underline {
   width: 0;
   height: 1px;
@@ -122,7 +121,7 @@
   .nav-icons-label { padding: 10px 12px 8px; }
   .nav-icon-item { padding: 20px 10px 18px; }
 }
-/* ── HOME PAGE ONLY ── */
+
 
 .home-hero {
   display: flex;
@@ -136,7 +135,7 @@
   overflow: hidden;
 }
 
-/* угловые декорации */
+
 .home-hero::before {
   content: '';
   position: absolute;
@@ -252,7 +251,7 @@
   letter-spacing: 0.14em;
 }
 
-/* ── STAT STRIP ── */
+
 .stat-strip {
   display: flex;
   border-bottom: 1px solid var(--border);
@@ -284,7 +283,7 @@
   letter-spacing: 0.04em;
 }
 
-/* ── NAV CARDS ── */
+
 .nav-cards-section {
   padding: 24px;
   border-bottom: 1px solid var(--border);
@@ -420,7 +419,7 @@
   transition: color 0.15s, transform 0.15s;
 }
 
-/* ── BOTTOM ROW: лор + лог ── */
+
 .home-bottom {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -467,7 +466,7 @@
 .lore-text p { margin-bottom: 10px; }
 .lore-text p:last-child { margin-bottom: 0; }
 
-/* лог обновлений */
+/
 .update-list { display: flex; flex-direction: column; gap: 0; }
 
 .update-item {
@@ -520,7 +519,7 @@
 .update-tag.alert   { background: rgba(217,79,92,0.08); border: 1px solid rgba(217,79,92,0.22); color: var(--red); }
 .update-tag.pending { background: rgba(212,146,26,0.08); border: 1px solid rgba(212,146,26,0.22); color: var(--amber); }
 
-/* ── MOBILE ── */
+
 @media (max-width: 768px) {
   .hero-title { font-size: 18px; }
   .hero-logo-img { width: 44px; height: 44px; }
@@ -543,7 +542,7 @@
   .hero-title { font-size: 16px; }
 }
 
-    /* ── NAV BUTTONS ── */
+
 .nav-buttons {
   display: flex;
   flex-direction: column;
@@ -582,7 +581,7 @@
 .nav-btn:hover .nav-btn-arrow { color: var(--accent2); transform: translateX(4px); }
 .nav-btn:hover .nav-btn-icon-wrap { border-right-color: rgba(178,229,40,0.35); }
 
-/* иконка-слот слева */
+
 .nav-btn-icon-wrap {
   width: 56px;
   height: 56px;
@@ -607,7 +606,7 @@
   transform: scale(1.18);
 }
 
-/* вертикальная черта-разделитель */
+
 .nav-btn-divider {
   width: 1px;
   height: 28px;
@@ -661,7 +660,7 @@
 
   <div class="main-window">
 
-    <!-- SIDEBAR -->
+
     <div class="sidebar">
       <div class="sidebar-user">
         <div class="sidebar-username">ПОЛЬЗОВАТЕЛЬ</div>
@@ -687,7 +686,7 @@
       </div>
     </div>
 
-    <!-- CONTENT -->
+
     <div class="content">
       <div class="topbar">
         <div class="topbar-title">ГЛАВНАЯ</div>
@@ -698,7 +697,7 @@
 
       <div class="page" style="padding:0; display:flex; flex-direction:column;">
 
-        <!-- HERO -->
+
         <div class="home-hero">
           <div class="hero-corner tl"></div>
           <div class="hero-corner tr"></div>
@@ -706,7 +705,7 @@
           <div class="hero-corner br"></div>
 
           <div class="hero-logo-wrap">
-            <!-- замени src на путь к своему логотипу -->
+
             <img class="hero-logo-img" src="ChroniclesLogo.png" alt="Urbanshade Logo">
             <div class="hero-logo-text">
               <div class="hero-corp">Urbanshade Corp · Хадальное подразделение</div>
@@ -730,7 +729,6 @@
 
        
 
-        <!-- NAV ICONS -->
 <div class="nav-icons-section">
   <div class="nav-icons-label">Разделы базы данных</div>
   <div class="nav-icons">
@@ -756,7 +754,7 @@
   </div>
 </div>
 
-        <!-- BOTTOM: лор + лог -->
+
         <div class="home-bottom">
 
           <div class="home-lore">
