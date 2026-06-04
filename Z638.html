@@ -540,6 +540,8 @@
 
         <div class="doc-body">
 
+           
+
           <div class="doc-section">
             <div class="doc-section-header">
               <span class="doc-section-title">Особые процедуры содержания</span>
@@ -666,11 +668,18 @@
   </div>
 </div>
 
+           <div id="ratingWidget"></div>
+
         </div>
       </div>
     </div>
   </div>
 </div>
-<script src="script.js" defer></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    initRating('Z-638'); // уникальный ID статьи
+  });
+</script>
 </body>
 </html>
