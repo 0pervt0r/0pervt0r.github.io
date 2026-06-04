@@ -20,7 +20,7 @@ async function getProfile(userId) {
 async function fillSidebar() {
   const path = window.location.pathname;
 
-  // На этих страницах sidebar не нужен — выходим
+
   if (path.includes('login.html') || path.includes('confirm.html')) return;
 
   const user = await getCurrentUser();
@@ -38,7 +38,7 @@ async function fillSidebar() {
   const profile = await getProfile(user.id);
   if (!profile) return;
 
-  // Заполняем sidebar
+
   const nameEl = document.querySelector('.sidebar-username');
   if (nameEl) nameEl.textContent = profile.username || 'СОТРУДНИК';
 
@@ -135,3 +135,95 @@ function toggleAccordion(trigger) {
     }, 650);
   }, 5000);
 })();
+
+// ════════════════════════════════════
+// RATING SYSTEM
+// ════════════════════════════════════
+
+async function initRating(articleId) {
+  const container = document.getElementById('ratingWidget');
+  if (!container) return;
+
+  const user = await getCurrentUser();
+
+  // Получаем все голоса для статьи
+  const { data: votes } = await db
+    .from('article_votes')
+    .select('vote')
+    .eq('article_id', articleId);
+
+  const total = votes ? votes.reduce((sum, v) => sum + v.vote, 0) : 0;
+
+  // Голос текущего пользователя
+  let userVote = 0;
+  if (user) {
+    const { data: myVote } = await db
+      .from('article_votes')
+      .select('vote')
+      .eq('article_id', articleId)
+      .eq('user_id', user.id)
+      .single();
+    userVote = myVote?.vote ?? 0;
+  }
+
+  renderRating(container, articleId, total, userVote, !!user);
+}
+
+function renderRating(container, articleId, total, userVote, isLoggedIn) {
+  const scoreColor = total > 0 ? 'var(--green)' : total < 0 ? 'var(--red)' : 'var(--text-dim)';
+  const scoreSign = total > 0 ? '+' : '';
+
+  container.innerHTML = `
+    <div class="rating-wrap">
+      <span class="rating-label">Рейтинг статьи</span>
+      <div class="rating-controls">
+        <button class="rating-btn up ${userVote === 1 ? 'active' : ''}"
+          onclick="castVote('${articleId}', 1)"
+          ${!isLoggedIn ? 'disabled title="Войдите для голосования"' : ''}
+        >▲</button>
+        <span class="rating-score" style="color:${scoreColor}">${scoreSign}${total}</span>
+        <button class="rating-btn down ${userVote === -1 ? 'active' : ''}"
+          onclick="castVote('${articleId}', -1)"
+          ${!isLoggedIn ? 'disabled title="Войдите для голосования"' : ''}
+        >▼</button>
+      </div>
+      ${!isLoggedIn ? '<span class="rating-hint">Войдите, чтобы голосовать</span>' : ''}
+    </div>
+  `;
+}
+
+async function castVote(articleId, vote) {
+  const user = await getCurrentUser();
+  if (!user) return;
+
+
+  const { data: existing } = await db
+    .from('article_votes')
+    .select('vote')
+    .eq('article_id', articleId)
+    .eq('user_id', user.id)
+    .single();
+
+  if (existing) {
+    if (existing.vote === vote) {
+
+      await db.from('article_votes')
+        .delete()
+        .eq('article_id', articleId)
+        .eq('user_id', user.id);
+    } else {
+
+      await db.from('article_votes')
+        .update({ vote })
+        .eq('article_id', articleId)
+        .eq('user_id', user.id);
+    }
+  } else {
+
+    await db.from('article_votes')
+      .insert({ article_id: articleId, user_id: user.id, vote });
+  }
+
+
+  initRating(articleId);
+}
