@@ -60,11 +60,8 @@
 
       <div class="page">
 
-        <!-- Classified banner -->
-        <div class="classified-banner">
-          <span class="classified-label">⬛ ОГРАНИЧЕННЫЙ ДОСТУП ⸺ УРОВЕНЬ 3+</span>
-          <span class="classified-code">ОБНОВЛЕНО: 2019-14-07</span>
-        </div>
+
+<div id="ratingWidget"></div>
 
         <!-- Main grid: portrait + info -->
         <div class="dossier-grid">
@@ -325,6 +322,12 @@
     </div><!-- /content -->
   </div><!-- /main-window -->
 </div><!-- /os-wrapper -->
-<script src="script.js" defer></script>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    initRating('HR-R1029043470');
+  });
+</script>
+  
 </body>
 </html>
