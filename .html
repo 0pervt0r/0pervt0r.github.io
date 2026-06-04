@@ -297,6 +297,8 @@
             <span class="doc-nav-label">УРОВЕНЬ СЕКРЕТНОСТИ: 4</span>
           </div>
 
+          <div id="ratingWidget"></div>
+
           <!-- ══ ЛИСТ БУМАГИ ══ -->
           <div class="paper">
 
@@ -366,7 +368,12 @@
 
   </div>
 </div>
-
-<script src="script.js" defer></script>
+  
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    initRating('Z-5-002');
+  });
+</script>
+  
 </body>
 </html>
