@@ -185,7 +185,10 @@ async function castVote(articleId, vote) {
 // ACCESS CONTROL
 // ════════════════════════════════════
 
-const BYPASS_PASSWORD = 'ILoveDrKepler6769';
+const BYPASS_PASSWORDS = {
+  'Z-5':   'ILoveDrKepler6769',
+  'Z5-002':   'ILoveDrKepler6769',
+};
 const BYPASS_DURATION = 30 * 60 * 1000;
 
 function isBypassActive() {
