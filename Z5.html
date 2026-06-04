@@ -491,6 +491,8 @@
         <div class="topbar-title">ДОКУМЕНТ · Z-5</div>
       </div>
 
+       <div id="ratingWidget"></div>
+
       <!-- PAGE -->
       <div class="page">
         <div class="svgheader-wrap">
@@ -694,7 +696,13 @@
     </div>
   </div>
 </div>
-<script src="script.js" defer> 
+
+   <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    initRating('Z-5');
+  });
+</script>
+   
 </script>
 </body>
 </html>
