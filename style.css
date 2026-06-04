@@ -10,6 +10,65 @@
   margin-bottom: 14px;
 }
 
+/* ════ RATING WIDGET ════ */
+.rating-wrap {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 18px;
+  background: var(--bg2);
+  border: 1px solid var(--border-grey);
+  border-radius: 3px;
+  margin-top: 20px;
+}
+
+.rating-label {
+  font-family: 'Orbitron', monospace;
+  font-size: 9px;
+  color: var(--text-dim);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  flex: 1;
+}
+
+.rating-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rating-btn {
+  background: none;
+  border: 1px solid var(--border-grey);
+  color: var(--text-dim);
+  font-size: 11px;
+  width: 28px; height: 28px;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.rating-btn:hover:not(:disabled) { border-color: var(--accent2); color: var(--accent2); }
+.rating-btn.up.active  { border-color: var(--green); color: var(--green); background: rgba(178,229,40,0.08); }
+.rating-btn.down.active{ border-color: var(--red);   color: var(--red);   background: rgba(217,79,92,0.08); }
+.rating-btn:disabled   { opacity: 0.35; cursor: not-allowed; }
+
+.rating-score {
+  font-family: 'Orbitron', monospace;
+  font-size: 16px;
+  font-weight: 700;
+  min-width: 36px;
+  text-align: center;
+}
+
+.rating-hint {
+  font-size: 9px;
+  color: var(--text-dim);
+  letter-spacing: 0.06em;
+  font-style: italic;
+}
+
 .portrait-frame img {
   position: absolute;
   inset: 0;
