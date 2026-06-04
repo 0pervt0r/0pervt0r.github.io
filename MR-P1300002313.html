@@ -59,11 +59,7 @@
 
       <div class="page">
 
-        <!-- Classified banner -->
-        <div class="classified-banner">
-          <span class="classified-label">⬛ ОГРАНИЧЕННЫЙ ДОСТУП ⸺ УРОВЕНЬ 3+</span>
-          <span class="classified-code">ОБНОВЛЕНО: 2019-14-07</span>
-        </div>
+        <div id="ratingWidget"></div>
 
         <div class="inline-alert">
               <div class="alert-icon"><div class="alert-icon-inner">!</div></div>
@@ -339,6 +335,12 @@
     </div><!-- /content -->
   </div><!-- /main-window -->
 </div><!-- /os-wrapper -->
-<script src="script.js" defer></script>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    initRating('MR-P1300002313');
+  });
+</script>
+  
 </body>
 </html>
