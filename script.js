@@ -229,7 +229,7 @@ function showAccessDeniedTimed(currentLevel, requiredLevel) {
   if (sub) sub.innerHTML = `
     Ваш уровень допуска: <strong style="color:var(--red)">${currentLevel}</strong><br>
     Требуется уровень: <strong style="color:var(--accent2)">${requiredLevel}</strong><br><br>
-    <span style="color:var(--text-dim);font-size:9px;">Оверлей закроется через 30 минут.</span>
+    <span style="color:var(--text-dim);font-size:9px;">Вы получите допуск 30 минут.</span>
   `;
 
   
