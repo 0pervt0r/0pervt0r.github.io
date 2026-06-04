@@ -58,13 +58,9 @@
         </div>
       </div>
 
-      <div class="page">
+      <div id="ratingWidget"></div>
 
-        <!-- Classified banner -->
-        <div class="classified-banner">
-          <span class="classified-label">⬛ ОГРАНИЧЕННЫЙ ДОСТУП ⸺ УРОВЕНЬ 3+</span>
-          <span class="classified-code">ОБНОВЛЕНО: 2026-27-05</span>
-        </div>
+      <div class="page">
 
         <!-- Main grid: portrait + info -->
         <div class="dossier-grid">
@@ -253,6 +249,12 @@
     </div><!-- /content -->
   </div><!-- /main-window -->
 </div><!-- /os-wrapper -->
-<script src="script.js" defer></script>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    initRating('ER-G14321571041');
+  });
+</script>
+  
 </body>
 </html>
