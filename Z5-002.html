@@ -333,7 +333,6 @@
             </div>
 
           </div>
-          <!-- конец листа бумаги -->
 
         </div>
       </div>
@@ -345,6 +344,11 @@
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     initRating('Z-5-002');
+  });
+
+  document.addEventListener('DOMContentLoaded', async function() {
+    await requireAccess(4);
+    initRating('Z-5');
   });
 </script>
   
