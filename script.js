@@ -118,24 +118,6 @@ function toggleAccordion(trigger) {
   }
 }
 
-(function() {
-  var overlay = document.getElementById('accessOverlay');
-  if (!overlay) return;
-  var bar = overlay.querySelector('.access-overlay-bar');
-  if (!bar) return;
-  requestAnimationFrame(function() {
-    requestAnimationFrame(function() {
-      bar.style.width = '100%';
-    });
-  });
-  setTimeout(function() {
-    overlay.classList.add('hiding');
-    setTimeout(function() {
-      overlay.remove();
-    }, 650);
-  }, 5000);
-})();
-
 // ════════════════════════════════════
 // RATING SYSTEM
 // ════════════════════════════════════
@@ -226,4 +208,144 @@ async function castVote(articleId, vote) {
 
 
   initRating(articleId);
+}
+
+// ════════════════════════════════════
+// ACCESS CONTROL
+// ════════════════════════════════════
+
+const BYPASS_PASSWORD = 'ILoveDrKepler6769';
+const BYPASS_DURATION = 30 * 60 * 1000;
+
+function isBypassActive() {
+  const ts = localStorage.getItem('access_bypass_ts');
+  if (!ts) return false;
+  return (Date.now() - parseInt(ts)) < BYPASS_DURATION;
+}
+
+function activateBypass() {
+  localStorage.setItem('access_bypass_ts', Date.now().toString());
+}
+
+async function requireAccess(requiredLevel) {
+  if (isBypassActive()) return true;
+
+  const user = await getCurrentUser();
+  if (!user) { window.location.href = 'login.html'; return false; }
+
+  const profile = await getProfile(user.id);
+  const level = profile?.access_level ?? 0;
+
+  if (level >= requiredLevel) return true;
+
+  
+  showAccessDeniedTimed(level, requiredLevel);
+  return false;
+}
+
+function showAccessDeniedTimed(currentLevel, requiredLevel) {
+  const overlay = document.getElementById('accessOverlay');
+  if (!overlay) return;
+
+  overlay.style.display = 'flex';
+
+  const title = overlay.querySelector('.access-overlay-title');
+  const sub   = overlay.querySelector('.access-overlay-sub');
+  const bar   = overlay.querySelector('.access-overlay-bar');
+  const barWrap = overlay.querySelector('.access-overlay-bar-wrap');
+
+  if (title) title.textContent = 'Доступ запрещён.';
+  if (sub) sub.innerHTML = `
+    Ваш уровень допуска: <strong style="color:var(--red)">${currentLevel}</strong><br>
+    Требуется уровень: <strong style="color:var(--accent2)">${requiredLevel}</strong><br><br>
+    <span style="color:var(--text-dim);font-size:9px;">Оверлей закроется через 30 минут.</span>
+  `;
+
+  
+  const TOTAL = 30 * 60 * 1000;
+  const startTime = Date.now();
+
+  if (barWrap) barWrap.style.display = 'block';
+
+ 
+  requestAnimationFrame(function tick() {
+    const elapsed = Date.now() - startTime;
+    const pct = Math.min((elapsed / TOTAL) * 100, 100);
+    if (bar) bar.style.width = pct + '%';
+
+    if (elapsed < TOTAL) {
+      requestAnimationFrame(tick);
+    } else {
+      overlay.classList.add('hiding');
+      setTimeout(() => overlay.remove(), 650);
+    }
+  });
+
+  
+  if (!overlay.querySelector('.bypass-input-wrap')) {
+    const wrap = document.createElement('div');
+    wrap.className = 'bypass-input-wrap';
+    wrap.style.cssText = 'display:flex;gap:8px;align-items:center;margin-top:4px;';
+    wrap.innerHTML = `
+      <input
+        id="bypassInput"
+        type="password"
+        placeholder="Экстренный пароль доступа"
+        style="
+          background:var(--bg2);
+          border:1px solid var(--border-grey);
+          border-radius:2px;
+          padding:5px 12px;
+          font-family:'Share Tech Mono',monospace;
+          font-size:11px;
+          color:var(--text);
+          outline:none;
+          width:220px;
+          letter-spacing:0.05em;
+        "
+      >
+      <button
+        onclick="tryBypass()"
+        style="
+          background:transparent;
+          border:1px solid var(--border2);
+          color:var(--accent2);
+          font-family:'Share Tech Mono',monospace;
+          font-size:10px;
+          padding:5px 14px;
+          border-radius:2px;
+          cursor:pointer;
+          letter-spacing:0.06em;
+          transition:all 0.15s;
+        "
+      >ВВЕСТИ</button>
+    `;
+    overlay.appendChild(wrap);
+
+    // Enter в поле
+    wrap.querySelector('#bypassInput').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') tryBypass();
+    });
+  }
+}
+
+function tryBypass() {
+  const input = document.getElementById('bypassInput');
+  if (!input) return;
+  if (input.value === BYPASS_PASSWORD) {
+    activateBypass();
+    const overlay = document.getElementById('accessOverlay');
+    if (overlay) {
+      overlay.classList.add('hiding');
+      setTimeout(() => overlay.remove(), 650);
+    }
+  } else {
+    input.style.borderColor = 'var(--red)';
+    input.value = '';
+    input.placeholder = 'Неверный пароль. Попробуйте снова.';
+    setTimeout(() => {
+      input.style.borderColor = 'var(--border-grey)';
+      input.placeholder = 'Экстренный пароль доступа';
+    }, 2000);
+  }
 }
