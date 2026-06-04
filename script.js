@@ -65,35 +65,6 @@ async function signOut() {
   window.location.href = 'login.html';
 }
 
-async function requireAccess(requiredLevel) {
-  const user = await getCurrentUser();
-  if (!user) {
-    window.location.href = 'login.html';
-    return false;
-  }
-  const profile = await getProfile(user.id);
-  const level = profile?.access_level ?? 0;
-  if (level < requiredLevel) {
-    showAccessDeniedPermanent(level, requiredLevel);
-    return false;
-  }
-  return true;
-}
-
-function showAccessDeniedPermanent(currentLevel, requiredLevel) {
-  const overlay = document.getElementById('accessOverlay');
-  if (!overlay) return;
-  const title = overlay.querySelector('.access-overlay-title');
-  const sub   = overlay.querySelector('.access-overlay-sub');
-  const bar   = overlay.querySelector('.access-overlay-bar-wrap');
-  if (title) title.textContent = 'Доступ запрещён.';
-  if (sub) sub.innerHTML = `Ваш уровень допуска: <strong style="color:var(--red)">${currentLevel}</strong><br>
-    Для просмотра требуется уровень <strong style="color:var(--accent2)">${requiredLevel}</strong>.<br>
-    Пройдите тест для повышения допуска.`;
-  if (bar) bar.style.display = 'none';
-  overlay.style.display = 'flex';
-}
-
 document.addEventListener('DOMContentLoaded', function () {
   fillSidebar();
 });
