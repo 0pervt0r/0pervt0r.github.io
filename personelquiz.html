@@ -153,18 +153,16 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// БАГ 2 ИСПРАВЛЕН: веса в вопросах используют A/G/S/M/C — маппинг соответствует
 const ROLE_TO_LETTER = {
-  admin: 'A', guard: 'G', researcher: 'S',
-  dispatcher: 'C', engineer: 'C', medic: 'M', spy: 'A'
+  A: 'A', G: 'G', S: 'S', M: 'M', C: 'C'
 };
-
 
 async function saveSpecialization(roleKey) {
   const saveStatusEl = document.getElementById('save-status');
   const proceedBtn = document.getElementById('btn-proceed');
 
   try {
-    
     const { data: { user }, error: authError } = await db.auth.getUser();
 
     if (authError || !user) {
@@ -173,32 +171,20 @@ async function saveSpecialization(roleKey) {
       return;
     }
 
-    const letter = ROLE_TO_LETTER[roleKey];
-
+    const letter = roleKey; // уже буква
     const serial = String(Math.floor(Math.random() * 9000000000) + 1000000000);
-
-    console.log('Сохраняем:', { userId: user.id, specialization: letter, serial_number: serial });
-
 
     const { error } = await db
       .from('profiles')
-      .update({
-        specialization: letter,
-        serial_number: serial
-      })
+      .update({ specialization: letter, serial_number: serial })
       .eq('id', user.id);
 
     if (error) {
-      console.error('Ошибка сохранения:', error);
-
-
       saveStatusEl.style.color = '#ff4455';
       saveStatusEl.textContent = `Ошибка сохранения (${error.code}): ${error.message}. Обратитесь к администратору.`;
       proceedBtn.style.display = 'inline-block';
       return;
     }
-
-    console.log('Сохранено успешно:', { specialization: letter, serial_number: serial });
 
     saveStatusEl.style.color = '#00ff88';
     saveStatusEl.textContent = `✓ Данные сохранены. Специализация: ${letter} | Серийный номер: ${serial}`;
@@ -216,33 +202,40 @@ function goToIndex() {
   window.location.href = 'index.html';
 }
 
+// БАГ 1 ИСПРАВЛЕН: убрана двойная запятая
+// БАГ 4 ИСПРАВЛЕН: добавлено поле en во все роли
 const ROLES = {
   A: {
-    name: 'Управленческий персонал',,
+    name: 'Управленческий персонал',
+    en: 'Administration',
     icon: '⬡',
     desc: 'Описание.',
     stats: {loyalty: 95, analytical: 88, combat: 25, technical: 60, social: 72, secrecy: 90}
   },
   G: {
     name: 'Гвардия',
+    en: 'Guard',
     icon: '⚔',
     desc: 'Описание.',
     stats: {loyalty: 80, analytical: 40, combat: 95, technical: 35, social: 30, secrecy: 75}
   },
   S: {
     name: 'Научный персонал',
+    en: 'Science',
     icon: '⬢',
     desc: 'Описание.',
     stats: {loyalty: 55, analytical: 98, combat: 20, technical: 80, social: 50, secrecy: 70}
   },
   M: {
     name: 'Медицинский персонал',
+    en: 'Medical',
     icon: '⬡',
     desc: 'Описание.',
     stats: {loyalty: 70, analytical: 82, combat: 15, technical: 65, social: 85, secrecy: 60}
   },
   C: {
-    name: 'Технический и вспомогательный, обслуживающий персонал',
+    name: 'Технический и вспомогательный персонал',
+    en: 'Engineering',
     icon: '⚙',
     desc: 'Описание.',
     stats: {loyalty: 60, analytical: 75, combat: 30, technical: 97, social: 40, secrecy: 55}
@@ -420,6 +413,7 @@ const QUESTIONS = [
     ]
   },
   {
+    cat: 'СТРЕССОУСТОЙЧИВОСТЬ',
     text: 'Во время работы вы получили травму, которая пока не мешает работе, но может ухудшиться.',
     options: [
       { text: 'Я продолжу работать.', weights: {G:3, C:1} },
@@ -431,13 +425,15 @@ const QUESTIONS = [
   },
 ];
 
-let answers = new Array(12).fill(null);
+const TOTAL_Q = QUESTIONS.length;
+
+let answers = new Array(TOTAL_Q).fill(null);
 let currentQ = 0;
 let scores = {};
 
 function startQuiz() {
-  scores = {admin:0, guard:0, researcher:0, dispatcher:0, engineer:0, medic:0, spy:0};
-  answers = new Array(12).fill(null);
+  scores = {A:0, G:0, S:0, M:0, C:0};
+  answers = new Array(TOTAL_Q).fill(null);
   currentQ = 0;
   showState('question');
   renderQuestion();
@@ -459,8 +455,10 @@ function renderQuestion() {
   document.getElementById('q-num').textContent = currentQ + 1;
   document.getElementById('q-cat').textContent = q.cat;
   document.getElementById('q-text').textContent = q.text;
-  const fill = ((currentQ) / 12) * 100;
+  const fill = (currentQ / TOTAL_Q) * 100;
   document.getElementById('progress-fill').style.width = fill + '%';
+
+  document.querySelector('.q-counter').innerHTML = `ВОПРОС <span id="q-num">${currentQ + 1}</span> / ${TOTAL_Q}`;
   const container = document.getElementById('q-options');
   container.innerHTML = '';
   const letters = ['A','B','C','D','E','F','G'];
@@ -473,7 +471,7 @@ function renderQuestion() {
   });
   document.getElementById('btn-prev').disabled = currentQ === 0;
   document.getElementById('btn-next').disabled = answers[currentQ] === null;
-  document.getElementById('btn-next').textContent = currentQ === 11 ? 'ЗАВЕРШИТЬ ▶' : 'ДАЛЕЕ →';
+  document.getElementById('btn-next').textContent = currentQ === TOTAL_Q - 1 ? 'ЗАВЕРШИТЬ ▶' : 'ДАЛЕЕ →';
 }
 
 function selectAnswer(idx) {
@@ -486,7 +484,7 @@ function selectAnswer(idx) {
 
 function nextQ() {
   if (answers[currentQ] === null) return;
-  if (currentQ < 11) { currentQ++; renderQuestion(); }
+  if (currentQ < TOTAL_Q - 1) { currentQ++; renderQuestion(); }
   else { showLoading(); }
 }
 
@@ -521,7 +519,7 @@ function showLoading() {
 }
 
 function calcResult() {
-  scores = {admin:0, guard:0, researcher:0, dispatcher:0, engineer:0, medic:0, spy:0};
+  scores = {A:0, G:0, S:0, M:0, C:0};
   QUESTIONS.forEach((q, qi) => {
     const ai = answers[qi];
     if (ai !== null && ai < q.options.length) {
@@ -547,7 +545,7 @@ function showResult(roleKey) {
   gridEl.innerHTML = `
     <div class="result-stat">
       <div class="result-stat-label">Специализация</div>
-      <div class="result-stat-val">${ROLE_TO_LETTER[roleKey]}</div>
+      <div class="result-stat-val">${roleKey}</div>
     </div>
     <div class="result-stat">
       <div class="result-stat-label">Индекс совместимости</div>
@@ -569,7 +567,6 @@ function showResult(roleKey) {
     barsEl.appendChild(row);
   }
 
-  // Сброс статуса перед новым сохранением
   const saveStatusEl = document.getElementById('save-status');
   const proceedBtn = document.getElementById('btn-proceed');
   saveStatusEl.style.color = 'var(--accent2)';
@@ -584,8 +581,6 @@ function showResult(roleKey) {
     });
   }, 200);
 
-  // FIX 5: saveSpecialization вызывается без await — это нормально,
-  // т.к. showResult не async. Функция сама обновит UI по завершении.
   saveSpecialization(roleKey);
 }
 
