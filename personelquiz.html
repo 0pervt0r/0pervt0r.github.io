@@ -57,94 +57,95 @@
         <div class="search-bar">Поиск в базе данных</div>
       </div>
 
-      <div class="page">
+<div class="page">
 
-        <!-- INTRO STATE -->
-        <div class="quiz-state active" id="state-intro">
-          <div class="intro-header">
-            <div class="intro-badge">URBANSHADE CORP — ХАДАЛЬНОЕ ПОДРАЗДЕЛЕНИЕ</div>
-            <div class="intro-title">НАЗНАЧЕНИЕ ДОЛЖНОСТИ</div>
-            <div class="intro-sub">Этот тест проводится Отделом кадров Urbanshade для определения оптимальной позиции нового сотрудника в Хадальном Тайном Объекте. Ваши ответы будут проанализированы NAVI AI и переданы вашему непосредственному руководству.</div>
-          </div>
+  <!-- INTRO STATE -->
+  <div class="quiz-state active" id="state-intro">
+    <div class="intro-header">
+      <div class="intro-badge">URBANSHADE CORP — ХАДАЛЬНОЕ ПОДРАЗДЕЛЕНИЕ</div>
+      <div class="intro-title">НАЗНАЧЕНИЕ ДОЛЖНОСТИ</div>
+      <div class="intro-sub">Этот тест проводится Отделом кадров Urbanshade для определения оптимальной позиции нового сотрудника в Хадальном Тайном Объекте. Ваши ответы будут проанализированы NAVI AI и переданы вашему непосредственному руководству.</div>
+    </div>
 
-          <div class="intro-grid">
-            <div class="info-card">
-              <div class="info-card-label">Вопросов</div>
-              <div class="info-card-value">17</div>
-            </div>
-            <div class="info-card">
-              <div class="info-card-label">Возможных специализаций</div>
-              <div class="info-card-value">5</div>
-            </div>
+    <div class="intro-grid">
+      <div class="info-card">
+        <div class="info-card-label">Вопросов</div>
+        <div class="info-card-value">17</div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-label">Возможных специализаций</div>
+        <div class="info-card-value">5</div>
+      </div>
+    </div>
 
-          <div class="warning-stripe"></div>
+    <div class="warning-stripe"></div>
 
-          <button class="btn-start" onclick="startQuiz()">
-            ▶ НАЧАТЬ ТЕСТИРОВАНИЕ
-          </button>
-        </div>
+    <button class="btn-start" onclick="startQuiz()">
+      ▶ НАЧАТЬ ТЕСТИРОВАНИЕ
+    </button>
+  </div>
 
+  <!-- QUESTION STATE -->
+  <div class="quiz-state" id="state-question">
+    <div class="q-progress-bar">
+      <div class="q-progress-fill" id="progress-fill"></div>
+    </div>
+    <div class="q-meta">
+      <div class="q-counter">ВОПРОС <span id="q-num">1</span> / 17</div>
+      <div class="q-category" id="q-cat">ПСИХОЛОГИЧЕСКИЙ ПРОФИЛЬ</div>
+    </div>
+    <div class="q-text" id="q-text">Текст вопроса</div>
+    <div class="q-options" id="q-options"></div>
+    <div class="q-nav">
+      <button class="btn-nav" id="btn-prev" onclick="prevQ()">← НАЗАД</button>
+      <button class="btn-nav primary" id="btn-next" onclick="nextQ()" disabled>ДАЛЕЕ →</button>
+    </div>
+  </div>
 
-        <div class="quiz-state" id="state-question">
-          <div class="q-progress-bar">
-            <div class="q-progress-fill" id="progress-fill"></div>
-          </div>
-          <div class="q-meta">
-            <div class="q-counter">ВОПРОС <span id="q-num">1</span> / 12</div>
-            <div class="q-category" id="q-cat">ПСИХОЛОГИЧЕСКИЙ ПРОФИЛЬ</div>
-          </div>
-          <div class="q-text" id="q-text">Текст вопроса</div>
-          <div class="q-options" id="q-options"></div>
-          <div class="q-nav">
-            <button class="btn-nav" id="btn-prev" onclick="prevQ()">← НАЗАД</button>
-            <button class="btn-nav primary" id="btn-next" onclick="nextQ()" disabled>ДАЛЕЕ →</button>
-          </div>
-        </div>
+  <!-- LOADING STATE -->
+  <div class="loading-screen" id="state-loading">
+    <div style="font-family:'Orbitron',monospace; font-size:12px; color:var(--accent2); letter-spacing:0.1em; margin-bottom:12px;">ОБРАБОТКА ДАННЫХ</div>
+    <div class="loading-bar"><div class="loading-fill" id="load-fill"></div></div>
+    <div class="loading-text" id="load-text">Анализ психологического профиля...</div>
+  </div>
 
+  <!-- RESULT STATE -->
+  <div class="quiz-state" id="state-result">
+    <div class="result-header">
+      <div class="result-clearance">ПРОФИЛЬ СФОРМИРОВАН — ДОПУСК ПРИСВОЕН</div>
+      <div class="result-icon-wrap">
+        <div class="result-icon" id="result-icon">⬡</div>
+      </div>
+      <div class="result-title-label">Рекомендованная должность</div>
+      <div class="result-role" id="result-role">—</div>
+      <div class="result-role-en" id="result-role-en">—</div>
+      <div class="result-desc" id="result-desc">—</div>
+    </div>
 
-        <div class="loading-screen" id="state-loading">
-          <div style="font-family:'Orbitron',monospace; font-size:12px; color:var(--accent2); letter-spacing:0.1em; margin-bottom:12px;">ОБРАБОТКА ДАННЫХ</div>
-          <div class="loading-bar"><div class="loading-fill" id="load-fill"></div></div>
-          <div class="loading-text" id="load-text">Анализ психологического профиля...</div>
-        </div>
+    <div class="result-grid" id="result-grid"></div>
 
+    <div class="warning-stripe"></div>
 
-        <div class="quiz-state" id="state-result">
-          <div class="result-header">
-            <div class="result-clearance">ПРОФИЛЬ СФОРМИРОВАН — ДОПУСК ПРИСВОЕН</div>
-            <div class="result-icon-wrap">
-              <div class="result-icon" id="result-icon">⬡</div>
-            </div>
-            <div class="result-title-label">Рекомендованная должность</div>
-            <div class="result-role" id="result-role">—</div>
-            <div class="result-role-en" id="result-role-en">—</div>
-            <div class="result-desc" id="result-desc">—</div>
-          </div>
+    <div style="font-size:11px; color:var(--text-dim); margin-bottom:16px; letter-spacing:0.05em;">Профиль компетенций</div>
+    <div class="profile-bars" id="profile-bars"></div>
 
-          <div class="result-grid" id="result-grid"></div>
+    <div id="save-status" style="text-align:center; margin-top:16px; font-family:'Share Tech Mono',monospace; font-size:12px; letter-spacing:0.08em; color:var(--accent2);">
+      Сохранение данных...
+    </div>
 
-          <div class="warning-stripe"></div>
+    <div style="text-align:center; margin-top:24px;">
+      <button class="btn-nav primary" id="btn-proceed" onclick="goToIndex()" style="display:none; margin-bottom:12px;">
+        ПЕРЕЙТИ В БАЗУ ДАННЫХ →
+      </button>
+      <button class="btn-restart" onclick="restart()">↺ ПРОЙТИ ПОВТОРНО</button>
+    </div>
+  </div>
 
-          <div style="font-size:11px; color:var(--text-dim); margin-bottom:16px; letter-spacing:0.05em;">Профиль компетенций</div>
-          <div class="profile-bars" id="profile-bars"></div>
-
-
-          <div id="save-status" style="text-align:center; margin-top:16px; font-family:'Share Tech Mono',monospace; font-size:12px; letter-spacing:0.08em; color:var(--accent2);">
-            Сохранение данных...
-          </div>
-
-          <div style="text-align:center; margin-top:24px;">
-            <button class="btn-nav primary" id="btn-proceed" onclick="goToIndex()" style="display:none; margin-bottom:12px;">
-              ПЕРЕЙТИ В БАЗУ ДАННЫХ →
-            </button>
-            <button class="btn-restart" onclick="restart()">↺ ПРОЙТИ ПОВТОРНО</button>
-          </div>
-        </div>
-
+</div>
+      
       </div>
     </div>
   </div>
-</div>
 
 <script>
 
