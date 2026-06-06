@@ -376,7 +376,7 @@ function tryBypass() {
     const style = document.createElement('style');
     style.id = 'hadal-mail-styles';
     style.textContent = `
-      /* ─── FAB-кнопка ─── */
+
       #hm-fab {
         position: fixed;
         bottom: 24px;
@@ -424,7 +424,7 @@ function tryBypass() {
       }
       #hm-fab-badge.hidden { opacity: 0; }
  
-      /* ─── Оверлей ─── */
+
       #hm-overlay {
         position: fixed;
         inset: 0;
@@ -443,7 +443,7 @@ function tryBypass() {
         pointer-events: all;
       }
  
-      /* ─── Окно почты ─── */
+
       #hm-window {
         width: min(860px, 96vw);
         height: min(560px, 88vh);
@@ -462,7 +462,7 @@ function tryBypass() {
         transform: scale(1) translateY(0);
       }
  
-      /* ─── Заголовок окна ─── */
+
       #hm-titlebar {
         display: flex;
         align-items: center;
@@ -506,14 +506,14 @@ function tryBypass() {
       }
       #hm-close:hover { background: rgba(217,79,92,0.15); border-color: #d94f5c; }
  
-      /* ─── Тело почты ─── */
+
       #hm-body {
         display: flex;
         flex: 1;
         overflow: hidden;
       }
  
-      /* ─── Список писем ─── */
+
       #hm-list-col {
         width: 260px;
         min-width: 260px;
@@ -590,7 +590,7 @@ function tryBypass() {
         text-overflow: ellipsis;
       }
  
-      /* ─── Просмотр письма ─── */
+
       #hm-view-col {
         flex: 1;
         display: flex;
@@ -738,8 +738,8 @@ function tryBypass() {
       <div id="hm-window">
         <div id="hm-titlebar">
           <div id="hm-titlebar-left">
-            <img id="hm-titlebar-icon" src="MailIcon.png" alt="">
-            <span id="hm-titlebar-title">ВНУТРЕННЯЯ ПОЧТА </span>
+            <img id="hm-titlebar-icon" src="MailIcon.png">
+            <span id="hm-titlebar-title">ВНУТРЕННЯЯ ПОЧТА</span>
           </div>
           <button id="hm-close">✕</button>
         </div>
