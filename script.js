@@ -20,10 +20,12 @@ async function getProfile(userId) {
 async function fillSidebar() {
   const path = window.location.pathname;
 
-
   if (path.includes('login.html') || path.includes('confirm.html')) return;
 
   const user = await getCurrentUser();
+
+  const regTime = new Date(user.created_at).getTime();
+  localStorage.setItem('hadal_reg_ts', regTime.toString());
 
   if (!user) {
     window.location.href = 'login.html';
@@ -344,13 +346,30 @@ function tryBypass() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify([...s]));
   }
  
-  function getMails() {
-    const read = getReadSet();
-    return (window.HADAL_MAIL || []).map(m => ({
+function getMails() {
+  const read = getReadSet();
+  const now = Date.now();
+
+  return (window.HADAL_MAIL || [])
+    .filter(m => {
+      if (m.send_after) {
+        if (now < new Date(m.send_after).getTime()) return false;
+      }
+
+      if (m.delay_hours != null) {
+        const regTime = localStorage.getItem('hadal_reg_ts');
+        if (!regTime) return false;
+        const available = parseInt(regTime) + m.delay_hours * 60 * 60 * 1000;
+        if (now < available) return false;
+      }
+
+      return true;
+    })
+    .map(m => ({
       ...m,
       read: read.has(m.id) ? true : m.read
     }));
-  }
+}
  
   function unreadCount() {
     return getMails().filter(m => !m.read).length;
