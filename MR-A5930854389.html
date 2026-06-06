@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hadal Database</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+  <link href="style.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="script.js" defer></script>
+</head>
+<body>
+
+<div class="os-wrapper">
+  <div class="titlebar">
+    <span class="titlebar-title">HADAL DATABASE ACCESS</span>
+    <div class="titlebar-controls">
+      <span class="ctrl-close"></span>
+      <span class="ctrl-min"></span>
+      <span class="ctrl-max"></span>
+    </div>
+  </div>
+
+  <div class="main-window">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sidebar-user">
+        <div class="sidebar-username">ПОЛЬЗОВАТЕЛЬ</div>
+        <div class="sidebar-role">Уровень доступа: 3</div>
+      </div>
+
+      <div class="sidebar-section">Навигация</div>
+      <div class="sidebar-item active"><a href="index.html">Главная</a></div>
+      <div class="sidebar-item"><a href="personnel.html">Персоналии</a></div>
+      <div class="sidebar-item"><a href="prisoners.html">Заключённые</a></div>
+      <div class="sidebar-item"><a href="documents.html">Z-Классифицированные объекты</a></div>
+      <div class="sidebar-item"><a href="miscobjects.html">Разные объекты</a></div>
+      <div class="sidebar-item"><a href="letvandfauna.html">Фауна Летванд</a></div>
+      <div class="sidebar-item"><a href="realdocs.html">Документация</a></div>
+      <div class="sidebar-item"><a href="experimentlogs.html">Журналы экспериментов</a></div>
+      <div class="sidebar-section">Дополнительно</div>
+      <div class="sidebar-item"><a href="map.html">Карта</a></div>
+      <div class="sidebar-item"><a href="stories.html">Рассказы</a></div>
+      <div class="sidebar-item"><a href="object-classification.html">Классификация объектов</a></div>
+      <div class="sidebar-item"><a href="https://teletype.in/@yurubolski/GMpdKbCOIMu">Правила</a></div>
+      <div class="sidebar-bottom">
+        <div><span class="status-dot"></span><span class="status-text">ПОЛЬЗОВАТЕЛЬ В СЕТИ</span></div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+      <div class="topbar">
+        <div class="topbar-title">ДОСЬЕ СОТРУДНИКА</div>
+        <div class="topbar-actions">
+          <a class="btn-sm btn-back" href="personnel.html">Назад к реестру</a>
+        </div>
+      </div>
+
+      <div class="page">
+
+        <div id="ratingWidget"></div>
+
+        <!-- Main grid: portrait + info -->
+        <div class="dossier-grid">
+
+          <!-- Portrait column -->
+          <div class="portrait-col">
+
+            <!-- Portrait frame -->
+            <div class="portrait-frame">
+              <div class="corner-mark corner-tl"></div>
+              <div class="corner-mark corner-tr"></div>
+              <div class="corner-mark corner-bl"></div>
+              <div class="corner-mark corner-br"></div>
+              <!-- Replace the svg+text below with an <img> tag for a real portrait -->
+              <div class="portrait-inner">
+                <svg class="portrait-silhouette" viewBox="0 0 100 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <ellipse cx="50" cy="32" rx="22" ry="26" fill="#c8d8f0"/>
+                  <path d="M10 120 Q10 72 50 72 Q90 72 90 120Z" fill="#c8d8f0"/>
+                </svg>
+                <div class="portrait-placeholder-text">ФОТО НЕ ЗАГРУЖЕНО</div>
+              </div>
+              <div class="portrait-stamp">███████ ████████</div>
+            </div>
+
+            <!-- ID card -->
+            <div class="id-card">
+              <div class="id-card-header">ИДЕНТИФИКАЦИЯ</div>
+              <div class="id-card-body">
+                <div class="id-field">
+                  <span class="id-label">ID</span>
+                  <span class="id-value cyan">MR-A #5930854389</span>
+                </div>
+                <div class="id-field">
+                  <span class="id-label">СТАТУС</span>
+                  <span class="id-value"><span class="status-badge status-active">Жив</span></span>
+                </div>
+                <div class="id-field">
+                  <span class="id-label">ДОЛЖНОСТЬ</span>
+                  <span class="id-value">Диспетчер</span>
+              </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Info column -->
+          <div class="info-col">
+
+            <!-- Name block -->
+            <div class="name-block">
+              <div class="page-badge">URBANSHADE CORP — ХАДАЛЬНОЕ ПОДРАЗДЕЛЕНИЕ</div>
+              <div class="dossier-name">[УДАЛЕНО]</div>
+              <div class="dossier-alias">«Кошатник»</div>
+              <div class="dossier-role">Мужчина · 30 лет · 172 см · 65 кг</div>
+            </div>
+
+            <!-- Biography -->
+            <div class="dossier-section">
+              <div class="section-header">
+                <span class="section-title">БИОГРАФИЯ</span>
+                <span class="section-tag">ФАЙЛ 01 / ИСТОРИЯ</span>
+              </div>
+              <div class="section-body">
+                <div class="bio-text">
+                  <p>Информация засекречена.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Psychological profile -->
+            <div class="dossier-section">
+              <div class="section-header">
+                <span class="section-title">ПСИХОЛОГИЧЕСКИЙ ПРОФИЛЬ</span>
+                <span class="section-tag">ФАЙЛ 02 / ОЦЕНКА</span>
+              </div>
+              <div class="section-body">
+                <div class="typo-grid">
+
+                  <div class="typo-card">
+                    <div class="typo-card-label">ТЕМПЕРАМЕНТ</div>
+                    <div class="typo-card-value">Melancholic</div>
+                  </div>
+
+                  <div class="typo-card">
+                    <div class="typo-card-label">MBTI</div>
+                    <div class="typo-card-value typo-mbti">
+                      <span class="mbti-letter">I</span><span class="mbti-letter">S</span><span class="mbti-letter">F</span><span class="mbti-letter">J</span>
+                    </div>
+                  </div>
+
+                  <div class="typo-card">
+                    <div class="typo-card-label">ЭННЕАГРАММА</div>
+                    <div class="typo-card-value">6w5</div>
+                  </div>
+
+                  <div class="typo-card">
+                    <div class="typo-card-label">ИНСТИНКТ</div>
+                    <div class="typo-card-value">so/6</div>
+                    </div>
+                  </div>
+
+                </div>
+
+                <div class="trait-list" style="margin-top: 14px;">
+                  <span class="trait-tag positive">Профессионализм</span>
+                  <span class="trait-tag positive">Хладнокровие</span>
+                  <span class="trait-tag positive">Надёжность</span>
+                  <span class="trait-tag neutral">Педантичность</span>
+                  <span class="trait-tag warning">Холодность к чужим страданиям</span>
+                  <span class="trait-tag warning">Склонность к изоляции</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+  <div class="dossier-section" style="margin-top: 14px; margin-bottom: 14px;">
+            <div class="section-header">
+              <span class="section-title">ЗАКЛЮЧЕНИЕ ПСИХИАТРА</span>
+                <span class="section-tag">ФАЙЛ 02.1 / ПОДРОБНОСТИ</span>
+              </div>
+              <div class="section-body">
+                <div class="bio-text">
+                   <p>К подчинённым и заключённым относится без личной враждебности, однако и какого-либо интереса к ним, как к людям, не проявляет. Не груб, не жесток без причины. Часто шутит по причине и без, хотя смешны при этом казаться не пытается. Держит дистанцию от коллег и боится признавать, что имеет с кем-либо дружественные или более личные связи. Urbanshade искренне лоялен и подчиняется приказам безоговорочно.</p>
+                </div>
+              </div>
+            </div>
+
+        <div class="dossier-section dossier-full" style="margin-bottom:14px;">
+          <div class="section-header">
+            <span class="section-title">ГАЛЕРЕЯ / МАТЕРИАЛЫ</span>
+            <span class="section-tag">ФАЙЛ 03 / АРХИВ</span>
+          </div>
+          <div class="section-body">
+            <div class="gallery-grid">
+              <div class="gallery-item">
+                <!-- Replace .gallery-placeholder with <img src="..." style="width:100%;height:100%;object-fit:cover;"> -->
+                <div class="gallery-placeholder">[ ИЗОБРАЖЕНИЕ ]</div>
+                <div class="gallery-caption">Изображение не загружено</div>
+              </div>
+              <div class="gallery-item">
+                <div class="gallery-placeholder">[ ИЗОБРАЖЕНИЕ ]</div>
+                <div class="gallery-caption">Изображение не загружено</div>
+              </div>
+              <div class="gallery-item">
+                <div class="gallery-placeholder">[ ИЗОБРАЖЕНИЕ ]</div>
+                <div class="gallery-caption">Изображение не загружено</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Access log -->
+        <div class="dossier-section dossier-full">
+          <div class="section-header">
+            <span class="section-title">ЖУРНАЛ СОБЫТИЙ</span>
+            <span class="section-tag">ФАЙЛ 04 / СИСТЕМНЫЕ ЗАПИСИ</span>
+          </div>
+          <div class="section-body">
+              <div class="log-row">
+                <span class="log-ts">2024-06-12 · 12:46</span>
+                <span class="log-event">Информация о ███████ ████████ засекречена.</span>
+                <span class="log-level info">INFO</span>
+              </div>
+              <div class="log-row">
+                <span class="log-ts">2023-01-20 · 17:23</span>
+                <span class="log-event">Повышение с LR-A #5930854389 до MR-A #5930854389.</span>
+                <span class="log-level info">INFO</span>
+              </div>
+              <div class="log-row">
+                <span class="log-ts">2021-10-11 · 04:54</span>
+                <span class="log-event">Прибытие LR-A #5930854389 в Тайный Хадальный Объект.</span>
+                <span class="log-level info">INFO</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /page -->
+    </div><!-- /content -->
+  </div><!-- /main-window -->
+</div><!-- /os-wrapper -->
+
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    initRating('MR-P1220071418');
+  });
+</script>
+  
+</body>
+</html>
