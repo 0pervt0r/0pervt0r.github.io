@@ -731,7 +731,7 @@ function tryBypass() {
         <div id="hm-titlebar">
           <div id="hm-titlebar-left">
             <img id="hm-titlebar-icon" src="MailIcon.png" alt="">
-            <span id="hm-titlebar-title">ВНУТРЕННЯЯ ПОЧТА · HTO</span>
+            <span id="hm-titlebar-title">ВНУТРЕННЯЯ ПОЧТА</span>
           </div>
           <button id="hm-close">✕</button>
         </div>
