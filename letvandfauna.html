@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hadal Database — Z-Классифицированные объекты</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="style.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="script.js" defer></script>
+</head>
+<body>
+
+<div class="os-wrapper">
+  <div class="titlebar">
+    <span class="titlebar-title">HADAL DATABASE ACCESS</span>
+    <div class="titlebar-controls">
+      <span class="ctrl-close"></span>
+      <span class="ctrl-min"></span>
+      <span class="ctrl-max"></span>
+    </div>
+  </div>
+
+  <div class="main-window">
+
+    <div class="sidebar">
+      <div class="sidebar-user">
+        <div class="sidebar-username">ПОЛЬЗОВАТЕЛЬ</div>
+        <div class="sidebar-role">Уровень доступа: 3</div>
+      </div>
+      <div class="sidebar-section">Навигация</div>
+      <div class="sidebar-item active"><a href="index.html">Главная</a></div>
+      <div class="sidebar-item"><a href="personnel.html">Персоналии</a></div>
+      <div class="sidebar-item"><a href="prisoners.html">Заключённые</a></div>
+      <div class="sidebar-item"><a href="documents.html">Z-Классифицированные объекты</a></div>
+      <div class="sidebar-item"><a href="miscobjects.html">Разные объекты</a></div>
+      <div class="sidebar-item"><a href="letvandfauna.html">Фауна Летванд</a></div>
+      <div class="sidebar-item"><a href="realdocs.html">Документация</a></div>
+      <div class="sidebar-item"><a href="experimentlogs.html">Журналы экспериментов</a></div>
+      <div class="sidebar-section">Дополнительно</div>
+      <div class="sidebar-item"><a href="map.html">Карта</a></div>
+      <div class="sidebar-item"><a href="stories.html">Рассказы</a></div>
+      <div class="sidebar-item"><a href="object-classification.html">Классификация объектов</a></div>
+      <div class="sidebar-item"><a href="https://teletype.in/@yurubolski/GMpdKbCOIMu">Правила</a></div>
+      <div class="sidebar-bottom">
+        <div><span class="status-dot"></span><span class="status-text">ПОЛЬЗОВАТЕЛЬ В СЕТИ</span></div>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="topbar">
+        <div class="topbar-title">БАЗА ДАННЫХ — Документация</div>
+        <div class="search-wrap">
+          <input class="search-bar" type="text" placeholder="Поиск в базе данных" id="search-input" />
+        </div>
+      </div>
+
+      <div class="page">
+        <div class="page-header">
+          <div class="page-header-left">
+            <div class="page-badge">URBANSHADE CORP — ХАДАЛЬНОЕ ПОДРАЗДЕЛЕНИЕ</div>
+            <div class="page-title">Фауна Лет-Ванд</div>
+            <div class="page-sub">Список фауны Лет-Ванд</div>
+          </div>
+          <div class="page-count">
+            <span id="total-count">0</span>
+            ЗАПИСЕЙ
+          </div>
+        </div>
+
+        <div class="filter-label">КЛАСС АНОМАЛИИ</div>
+        <div class="filter-tabs">
+          <button class="filter-tab active" data-class="all">ВСЕ</button>
+          <button class="filter-tab" data-class="nemt">НЕМТ</button>
+          <button class="filter-tab" data-class="gennem">ГЕННЕМ</button>
+          <button class="filter-tab" data-class="vanskel">ВАНСКЕЛ</button>
+          <button class="filter-tab" data-class="umulig">УМУЛИГ</button>
+          <button class="filter-tab" data-class="forbud">ФОРБУД</button>
+          <button class="filter-tab" data-class="ladhem">ЛАДХЕМ</button>
+        </div>
+
+        <div class="filter-label" style="margin-top:14px;">ПРОИСХОЖДЕНИЕ</div>
+        <div class="filter-tabs">
+          <button class="filter-tab active" data-origin="all">ВСЕ</button>
+          <button class="filter-tab" data-origin="jord">ЙОРД</button>
+          <button class="filter-tab" data-origin="paradis">ПАРАДИС</button>
+          <button class="filter-tab" data-origin="helvede">ХЕЛВЕДЕ</button>
+          <button class="filter-tab" data-origin="rum">РУМ</button>
+          <button class="filter-tab" data-origin="sind">СИНД</button>
+          <button class="filter-tab" data-origin="andur">АНДУР</button>
+          <button class="filter-tab" data-origin="ukendт">УКЕНДТ</button>
+        </div>
+
+        <div class="filter-label" style="margin-top:14px;">УРОВЕНЬ ПОЛЬЗЫ</div>
+        <div class="filter-tabs">
+          <button class="filter-tab active" data-utility="all">ВСЕ</button>
+          <button class="filter-tab" data-utility="kort">КОРТ</button>
+          <button class="filter-tab" data-utility="tilf">ТИЛФ</button>
+          <button class="filter-tab" data-utility="snit">СНИТ</button>
+          <button class="filter-tab" data-utility="nok">НОК</button>
+          <button class="filter-tab" data-utility="hojd">ХОЙД</button>
+        </div>
+
+        <div class="filter-label" style="margin-top:14px;">УПРАВЛЯЕМОСТЬ</div>
+        <div class="filter-tabs">
+          <button class="filter-tab active" data-control="all">ВСЕ</button>
+          <button class="filter-tab" data-control="uolig">УОЛИГ</button>
+          <button class="filter-tab" data-control="svajr">СВАЙР</button>
+          <button class="filter-tab" data-control="vagt">ВАГТ</button>
+          <button class="filter-tab" data-control="overlig">ОВЕРЛИГ</button>
+          <button class="filter-tab" data-control="uverud">УВЕРУД</button>
+          <button class="filter-tab" data-control="none">Н/П</button>
+        </div>
+
+        <div class="filter-label" style="margin-top:14px;">РЕПЛИКАТИВНОСТЬ</div>
+        <div class="filter-tabs">
+          <button class="filter-tab active" data-rep="all">ВСЕ</button>
+          <button class="filter-tab" data-rep="vigenikke">ВИГЕНИККЕ</button>
+          <button class="filter-tab" data-rep="svorteg">СВОРТЕГ</button>
+          <button class="filter-tab" data-rep="gentake">ГЕНТАКЕ</button>
+          <button class="filter-tab" data-rep="vissevis">ВИССЕВИС</button>
+        </div>
+
+        <div class="filter-label" style="margin-top:14px;">СТАТУС</div>
+        <div class="filter-tabs">
+          <button class="filter-tab active" data-status="all">ВСЕ</button>
+          <button class="filter-tab" data-status="studying">ИЗУЧАЕТСЯ</button>
+          <button class="filter-tab" data-status="using">ИСПОЛЬЗУЕТСЯ</button>
+          <button class="filter-tab" data-status="storage">НА ХРАНЕНИИ</button>
+          <button class="filter-tab" data-status="neutralized">НЕЙТРАЛИЗОВАН</button>
+        </div>
+
+        <div class="table-header">
+          <div class="th th-num">#</div>
+          <div class="th th-id">ID</div>
+          <div class="th th-name">Наименование</div>
+          <div class="th th-class">Класс</div>
+          <div class="th th-status">Статус</div>
+          <div class="th th-actions">Доступ</div>
+        </div>
+
+        <div class="personnel-list" id="personnel-list"></div>
+        <div class="no-results" id="no-results">— Совпадений не найдено —</div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const OBJECTS = [
+  {
+    id:        'Z-283',
+    name:      'Удильщик',
+    anomClass: 'nemt',
+    origin:    'jord',
+    utility:   'tilf',
+    control:   'none',
+    rep:       'vigenikke',
+    status:    'storage',
+    url:       'Z283.html',
+  },
+  {
+    id:        'Z-367',
+    name:      'Пандемониум',
+    anomClass: 'gennem',
+    origin:    'jord',
+    utility:   'hojd',
+    control:   'svajr',
+    rep:       'vigenikke',
+    status:    'using',
+    url:       'Z367.html',
+  },
+  {
+    id:        null,
+    name:      null,
+    anomClass: null,
+    origin:    null,
+    utility:   null,
+    control:   null,
+    rep:       null,
+    status:    null,
+    url:       null,
+  },
+];
+
+const STATUS_MAP = {
+  studying:    { label: 'ИЗУЧАЕТСЯ',    cls: 'status-studying' },
+  using:       { label: 'ИСПОЛЬЗУЕТСЯ', cls: 'status-using' },
+  storage:     { label: 'НА ХРАНЕНИИ',  cls: 'status-storage' },
+  neutralized: { label: 'НЕЙТРАЛИЗОВАН',cls: 'status-neutralized' },
+};
+
+const CLASS_MAP = {
+  nemt:    { label: 'НЕМТ',    cls: 'class-nemt' },
+  gennem:  { label: 'ГЕННЕМ',  cls: 'class-gennem' },
+  vanskel: { label: 'ВАНСКЕЛ', cls: 'class-vanskel' },
+  umulig:  { label: 'УМУЛИГ',  cls: 'class-umulig' },
+  forbud:  { label: 'ФОРБУД',  cls: 'class-forbud' },
+  ladhem:  { label: 'ЛАДХЕМ',  cls: 'class-ladhem' },
+};
+
+let filters = {
+  anomClass: 'all',
+  origin:    'all',
+  utility:   'all',
+  control:   'all',
+  rep:       'all',
+  status:    'all',
+};
+let currentSearch = '';
+
+function render() {
+  const list      = document.getElementById('personnel-list');
+  const noResults = document.getElementById('no-results');
+  list.innerHTML  = '';
+
+  const filtered = OBJECTS.filter(o => {
+    if (!o.id) return false;
+    const matchClass   = filters.anomClass === 'all' || o.anomClass === filters.anomClass;
+    const matchOrigin  = filters.origin    === 'all' || o.origin    === filters.origin;
+    const matchUtility = filters.utility   === 'all' || o.utility   === filters.utility;
+    const matchControl = filters.control   === 'all' || o.control   === filters.control;
+    const matchRep     = filters.rep       === 'all' || o.rep       === filters.rep;
+    const matchStatus  = filters.status    === 'all' || o.status    === filters.status;
+    const q            = currentSearch.toLowerCase();
+    const matchSearch  = !q
+      || o.name?.toLowerCase().includes(q)
+      || o.id.toLowerCase().includes(q)
+      || o.desc?.toLowerCase().includes(q);
+    return matchClass && matchOrigin && matchUtility && matchControl && matchRep && matchStatus && matchSearch;
+  });
+
+  document.getElementById('total-count').textContent = filtered.length;
+
+  if (filtered.length === 0) {
+    noResults.classList.add('visible');
+    return;
+  }
+  noResults.classList.remove('visible');
+
+  filtered.forEach((o, i) => {
+    const s = STATUS_MAP[o.status] || { label: '—', cls: '' };
+    const c = CLASS_MAP[o.anomClass] || { label: o.anomClass || '—', cls: '' };
+
+    const displayName = o.desc
+      ? `${o.name} <span style="color:var(--text-dim);font-size:10px;">${o.desc}</span>`
+      : o.name;
+
+    const viewBtn = o.url
+      ? `<a class="btn-view" href="${o.url}">View</a>`
+      : `<span class="btn-view no-link">View</span>`;
+
+    const row = document.createElement('div');
+    row.className = 'personnel-row';
+    row.innerHTML = `
+      <div class="p-num">${String(i + 1).padStart(2, '0')}</div>
+      <div class="p-id">${o.id}</div>
+      <div class="p-name">${displayName}</div>
+      <div class="p-class"><span class="class-badge ${c.cls}">${c.label}</span></div>
+      <div class="p-status"><span class="status-badge ${s.cls}">${s.label}</span></div>
+      <div class="p-view">${viewBtn}</div>
+    `;
+    list.appendChild(row);
+  });
+}
+
+const filterGroups = [
+  { attr: 'data-class',   key: 'anomClass' },
+  { attr: 'data-origin',  key: 'origin' },
+  { attr: 'data-utility', key: 'utility' },
+  { attr: 'data-control', key: 'control' },
+  { attr: 'data-rep',     key: 'rep' },
+  { attr: 'data-status',  key: 'status' },
+];
+
+filterGroups.forEach(({ attr, key }) => {
+  document.querySelectorAll(`[${attr}]`).forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll(`[${attr}]`).forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      filters[key] = btn.getAttribute(attr);
+      render();
+    });
+  });
+});
+
+document.getElementById('search-input').addEventListener('input', e => {
+  currentSearch = e.target.value;
+  render();
+});
+
+render();
+</script>
+</body>
+</html>
