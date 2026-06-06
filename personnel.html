@@ -93,6 +93,7 @@
 </div>
 <div class="filter-tabs">
   <button class="filter-tab active" data-divfilter="all">ВСЕ</button>
+  <button class="filter-tab" data-divfilter="hadal">ХАДАЛЬНОЕ ПОДРАЗДЕЛЕНИЕ</button>
   <button class="filter-tab" data-divfilter="nost">N.O.S.T.</button>
   <button class="filter-tab" data-divfilter="bioparanormal">БИОПАРАНОРМАЛЬНОЕ ПОДРАЗДЕЛЕНИЕ</button>
   <button class="filter-tab" data-divfilter="infiltration">ОТДЕЛ ПРОНИКНОВЕНИЙ</button>
@@ -140,7 +141,7 @@ const PERSONNEL = [
     alias:  'Доктор Нет',
     role:   'Надзиратель',
     dept:   'admin',
-    div:    null,
+    div:    'hadal',
     status: 'active',
     url:    'HR-R1029043470.html',
   },
@@ -158,9 +159,9 @@ const PERSONNEL = [
     id:     'MR-R #9223000242',
     name:   'Оливия Эриксон',
     alias:  'Лебёдушка',
-    role:   'Исследователи',
+    role:   'Исследователь',
     dept:   'research',
-    div:    null,
+    div:    'hadal',
     status: 'active',
     url:    'MR-R9223000242.html',
   },
@@ -168,9 +169,9 @@ const PERSONNEL = [
     id:     'ER-G #14321571041',
     name:   '████  ████████',
     alias:  'Блиц',
-    role:   'Элитные Гвардейцы',
+    role:   'Элитный Гвардеец',
     dept:   'guard',
-    div:    null,
+    div:    'hadal',
     status: 'classified',
     url:    'ER-G14321571041.html',
   },
@@ -178,11 +179,21 @@ const PERSONNEL = [
     id:     'ER-G #3955438507',
     name:   'Керт Гётце',
     alias:  'Прокурор',
-    role:   'Элитные Гвардейцы',
+    role:   'Элитный Гвардеец',
     dept:   'guard',
     div:    'nost',
     status: 'active',
     url:    'ER-G3955438507.html',
+  },
+  {
+    id:     'MR-A #5930854389',
+    name:   '',
+    alias:  'Кошатник',
+    role:   'Диспетчер',
+    dept:   'admin',
+    div:    'hadal',
+    status: 'active',
+    url:    'MR-A5930854389.html',
   },
   {
     id:     null,
