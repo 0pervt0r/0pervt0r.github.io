@@ -155,7 +155,7 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// БАГ 2 ИСПРАВЛЕН: веса в вопросах используют A/G/S/M/C — маппинг соответствует
+
 const ROLE_TO_LETTER = {
   A: 'A', G: 'G', S: 'S', M: 'M', C: 'C'
 };
@@ -173,7 +173,7 @@ async function saveSpecialization(roleKey) {
       return;
     }
 
-    const letter = roleKey; // уже буква
+    const letter = roleKey;
     const serial = String(Math.floor(Math.random() * 9000000000) + 1000000000);
 
     const { error } = await db
@@ -204,8 +204,6 @@ function goToIndex() {
   window.location.href = 'index.html';
 }
 
-// БАГ 1 ИСПРАВЛЕН: убрана двойная запятая
-// БАГ 4 ИСПРАВЛЕН: добавлено поле en во все роли
 const ROLES = {
   A: {
     name: 'Управленческий персонал',
@@ -256,7 +254,6 @@ const STAT_COLORS = {
 
 const QUESTIONS = [
   {
-    // БАГ 3 ИСПРАВЛЕН: добавлено поле cat во все вопросы
     cat: 'ПСИХОЛОГИЧЕСКИЙ ПРОФИЛЬ',
     text: 'Ваш непосредственный начальник отдаёт приказ, который, по вашему мнению, приведёт к потерям среди персонала.',
     options: [
@@ -444,7 +441,6 @@ const QUESTIONS = [
   },
 ];
 
-// БАГ 6 ИСПРАВЛЕН: правильное количество вопросов
 const TOTAL_Q = QUESTIONS.length;
 
 let answers = new Array(TOTAL_Q).fill(null);
@@ -607,6 +603,14 @@ function showResult(roleKey) {
 function restart() {
   showState('intro');
 }
+
+  const { data, error, count } = await db
+  .from('profiles')
+  .update({ specialization: letter, serial_number: serial })
+  .eq('id', user.id)
+  .select(); // добавь .select() чтобы получить обновлённую строку
+
+console.log('update result:', { data, error, count });
 </script>
 </body>
 </html>
