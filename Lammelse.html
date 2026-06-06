@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hadal Database</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="style.css" rel="stylesheet">
+   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="script.js" defer></script>
+<style>
+
+/* ════════════════════════════════════
+   SVG CLASSIFICATION HEADER
+════════════════════════════════════ */
+.svgheader-wrap {
+  position:relative;
+  background:var(--bg2);
+  border:1px solid var(--border-grey);
+  border-radius:3px;
+  overflow:hidden;
+  margin-bottom:20px;
+  display:flex;
+  align-items:stretch;
+  min-height:120px;
+}
+
+/* Левая декоративная полоса с цветом угрозы */
+.svgheader-threat-stripe {
+  width:5px;
+  flex-shrink:0;
+}
+.threat-red    { background:var(--red); }
+.threat-amber  { background:var(--amber); }
+.threat-green  { background:var(--green); }
+.threat-purple { background:var(--purple); }
+.threat-grey   { background:var(--text-dim); }
+
+/* SVG круговая иконка */
+.svgheader-icon-col {
+  padding:18px 20px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-right:1px solid var(--border-grey);
+  background: rgba(0,0,0,0.15);
+  flex-shrink:0;
+}
+
+.svgheader-icon {
+  width:80px; height:80px;
+  position:relative;
+}
+
+/* Концентрические кольца (воспроизведение SVG с сайта) */
+.ring-svg { width:100%; height:100%; }
+
+/* Правая часть: метаданные */
+.svgheader-meta {
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  padding:16px 24px;
+  gap:4px;
+}
+
+.svgheader-row {
+  display:flex;
+  align-items:baseline;
+  gap:10px;
+}
+
+.svgheader-key {
+  font-family:'Orbitron',monospace;
+  font-size:9px;
+  color:var(--text-dim);
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  min-width:130px;
+  flex-shrink:0;
+}
+
+.svgheader-val {
+  font-family:'Orbitron',monospace;
+  font-size:13px;
+  font-weight:700;
+  color:var(--text-bright);
+  letter-spacing:0.04em;
+}
+
+.svgheader-val.accent { color:var(--accent2); }
+.svgheader-val.red    { color:var(--red); }
+.svgheader-val.amber  { color:var(--amber); }
+.svgheader-val.green  { color:var(--green); }
+.svgheader-val.purple { color:var(--purple); }
+
+.svgheader-val.strikethrough {
+  text-decoration: line-through;
+  opacity: 0.5;
+  font-size:11px;
+  margin-right:4px;
+}
+
+.svgheader-clearance {
+  margin-top:8px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.clearance-pill {
+  font-family:'Orbitron',monospace;
+  font-size:9px;
+  font-weight:700;
+  padding:3px 10px;
+  border-radius:2px;
+  letter-spacing:0.10em;
+}
+.cp-red    { background:rgba(217,79,92,0.12);  border:1px solid rgba(217,79,92,0.35);  color:var(--red); }
+.cp-amber  { background:rgba(212,146,26,0.12); border:1px solid rgba(212,146,26,0.35); color:var(--amber); }
+.cp-green  { background:var(--green-dim);       border:1px solid rgba(178,229,40,0.30); color:var(--green); }
+.cp-purple { background:rgba(138,104,204,0.10); border:1px solid rgba(138,104,204,0.30);color:var(--purple); }
+.cp-grey   { background:rgba(80,88,96,0.12);    border:1px solid rgba(80,88,96,0.30);   color:var(--text-dim); }
+
+/* Правая колонка: иконки подклассов */
+.svgheader-classes {
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:6px;
+  padding:16px 20px;
+  border-left:1px solid var(--border-grey);
+  background: rgba(0,0,0,0.10);
+  flex-shrink:0;
+  min-width:170px;
+}
+
+.class-row {
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.class-dot {
+  width:8px; height:8px;
+  border-radius:50%;
+  flex-shrink:0;
+}
+
+.class-label-sm {
+  font-size:8px;
+  color:var(--text-dim);
+  letter-spacing:0.10em;
+  text-transform:uppercase;
+  min-width:70px;
+}
+
+.class-val-sm {
+  font-family:'Orbitron',monospace;
+  font-size:9px;
+  color:var(--text-bright);
+  letter-spacing:0.04em;
+}
+
+/* ════════════════════════════════════
+   SECURITY NOTICE BANNERS
+════════════════════════════════════ */
+.notice-banner {
+  display:flex;
+  align-items:flex-start;
+  gap:14px;
+  border-radius:3px;
+  padding:11px 16px;
+  margin-bottom:12px;
+  position:relative;
+  overflow:hidden;
+}
+
+.notice-banner::before {
+  content:'';
+  position:absolute;
+  left:0; top:0; bottom:0; width:3px;
+}
+
+.notice-banner.nb-classified {
+  background:rgba(138,104,204,0.07);
+  border:1px solid rgba(138,104,204,0.28);
+}
+.notice-banner.nb-classified::before { background:var(--purple); }
+
+.notice-banner.nb-warning {
+  background:rgba(212,146,26,0.07);
+  border:1px solid rgba(212,146,26,0.28);
+}
+.notice-banner.nb-warning::before { background:var(--amber); }
+
+.notice-banner.nb-danger {
+  background:rgba(217,79,92,0.07);
+  border:1px solid rgba(217,79,92,0.28);
+}
+.notice-banner.nb-danger::before { background:var(--red); }
+
+.notice-banner.nb-info {
+  background:var(--accent-dim);
+  border:1px solid var(--border);
+}
+.notice-banner.nb-info::before { background:var(--accent2); }
+
+.notice-icon {
+  flex-shrink:0;
+  width:28px; height:28px;
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Orbitron',monospace;
+  font-size:12px; font-weight:900;
+  margin-top:1px;
+}
+.nb-classified .notice-icon { border:1px solid rgba(138,104,204,0.5); color:var(--purple); }
+.nb-warning    .notice-icon { border:1px solid rgba(212,146,26,0.5);  color:var(--amber); }
+.nb-danger     .notice-icon { border:1px solid rgba(217,79,92,0.5);   color:var(--red); }
+.nb-info       .notice-icon { border:1px solid var(--border2);         color:var(--accent2); }
+
+.notice-body { flex:1; }
+.notice-title {
+  font-family:'Orbitron',monospace;
+  font-size:9px;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  margin-bottom:4px;
+}
+.nb-classified .notice-title { color:var(--purple); }
+.nb-warning    .notice-title { color:var(--amber); }
+.nb-danger     .notice-title { color:var(--red); }
+.nb-info       .notice-title { color:var(--accent2); }
+
+.notice-text { font-size:10px; color:var(--text); line-height:1.6; letter-spacing:0.03em; }
+
+/* ════════════════════════════════════
+   DOCUMENT BODY TEXT
+════════════════════════════════════ */
+.doc-body { display:flex; flex-direction:column; gap:16px; }
+
+.doc-section {
+  background:var(--bg2);
+  border:1px solid var(--border-grey);
+  border-radius:3px;
+  overflow:hidden;
+}
+
+.doc-section-header {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:7px 16px;
+  background:var(--accent-dim);
+  border-bottom:1px solid var(--accent);
+}
+
+.doc-section-title {
+  font-family:'Orbitron',monospace;
+  font-size:9px;
+  color:var(--accent2);
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+}
+
+.doc-section-tag {
+  font-size:8px;
+  color:var(--text-dim);
+  letter-spacing:0.06em;
+}
+
+.doc-section-body {
+  padding:18px 20px;
+}
+
+.doc-text {
+  font-size:12px;
+  color:var(--text);
+  line-height:1.85;
+  letter-spacing:0.03em;
+}
+
+.doc-text p { margin-bottom:12px; }
+.doc-text p:last-child { margin-bottom:0; }
+
+.doc-text .redacted {
+  background:var(--text-dim);
+  color:transparent;
+  border-radius:1px;
+  padding:0 2px;
+  user-select:none;
+  cursor:not-allowed;
+}
+
+.doc-text strong {
+  color:var(--text-bright);
+  font-weight:normal;
+}
+
+/* ── INLINE PHOTO ── */
+.doc-photo-wrap {
+  float:right;
+  margin:0 0 16px 24px;
+  max-width:240px;
+  flex-shrink:0;
+}
+
+.doc-photo-wrap.left {
+  float:left;
+  margin:0 24px 16px 0;
+}
+
+.doc-photo-frame {
+  background:var(--bg);
+  border:1px solid var(--border-grey);
+  border-radius:3px;
+  overflow:hidden;
+  position:relative;
+}
+
+.doc-photo-frame::before {
+  content:'';
+  position:absolute; inset:0;
+  background:repeating-linear-gradient(45deg,transparent,transparent 6px,rgba(178,229,40,0.02) 6px,rgba(178,229,40,0.02) 7px);
+  pointer-events:none; z-index:1;
+}
+
+.doc-photo-frame img {
+  width:100%; height:auto;
+  display:block;
+  filter:grayscale(20%) contrast(1.05);
+  position:relative; z-index:0;
+}
+
+/* Placeholder когда нет фото */
+.doc-photo-placeholder {
+  width:100%;
+  aspect-ratio:4/3;
+  display:flex; align-items:center; justify-content:center;
+  flex-direction:column; gap:8px;
+}
+.placeholder-icon { font-size:28px; opacity:0.15; }
+.placeholder-text { font-size:9px; color:var(--text-dim); letter-spacing:0.08em; }
+
+.doc-photo-caption {
+  padding:6px 10px;
+  font-size:9px;
+  color:var(--text-dim);
+  letter-spacing:0.05em;
+  border-top:1px solid var(--border-grey);
+  background:rgba(10,12,15,0.5);
+  line-height:1.5;
+}
+
+.clearfix::after { content:''; display:table; clear:both; }
+
+/* ── SEPARATOR ── */
+.doc-divider {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin:4px 0;
+  opacity:0.4;
+}
+.doc-divider::before,
+.doc-divider::after {
+  content:'';
+  flex:1;
+  height:1px;
+  background:var(--border-grey);
+}
+.doc-divider-text { font-size:9px; color:var(--text-dim); letter-spacing:0.1em; white-space:nowrap; }
+
+/* ── OBJECT NUMBER WATERMARK ── */
+.doc-watermark {
+  position:fixed;
+  bottom:40px; right:40px;
+  font-family:'Orbitron',monospace;
+  font-size:60px; font-weight:900;
+  color:rgba(178,229,40,0.04);
+  letter-spacing:0.1em;
+  pointer-events:none; z-index:0;
+  transform:rotate(-20deg);
+  user-select:none;
+}
+
+/* ════════════════════════════════════
+   MOBILE
+════════════════════════════════════ */
+@media (max-width:768px) {
+  .os-wrapper { padding:0; }
+  .titlebar { border-radius:0; }
+  .titlebar-controls { display:none; }
+  .main-window { flex-direction:column; border-radius:0; border-left:none; border-right:none; }
+  .sidebar { width:100%; min-width:unset; border-right:none; border-bottom:1px solid var(--border); padding:4px 0; flex-direction:row; overflow-x:auto; scrollbar-width:none; }
+  .sidebar::-webkit-scrollbar { display:none; }
+  .sidebar-user,.sidebar-section,.sidebar-bottom { display:none; }
+  .sidebar-item { display:inline-block; padding:8px 14px; font-size:10px; white-space:nowrap; flex-shrink:0; }
+  .topbar { padding:8px 12px; }
+  .topbar-title { font-size:11px; }
+  .page { padding:12px; }
+  .svgheader-wrap { flex-direction:column; min-height:unset; }
+  .svgheader-threat-stripe { width:100%; height:4px; }
+  .svgheader-icon-col { border-right:none; border-bottom:1px solid var(--border-grey); }
+  .svgheader-classes { border-left:none; border-top:1px solid var(--border-grey); min-width:unset; }
+  .svgheader-key { min-width:100px; font-size:8px; }
+  .svgheader-val { font-size:11px; }
+  .doc-photo-wrap, .doc-photo-wrap.left { float:none; margin:0 0 14px 0; max-width:100%; }
+  .doc-watermark { display:none; }
+}
+</style>
+</head>
+<body>
+
+<div class="os-wrapper">
+
+  <!-- TITLEBAR -->
+  <div class="titlebar">
+    <span class="titlebar-title">HADAL DATABASE — OBJECT FILE VIEWER</span>
+    <div class="titlebar-controls">
+      <span class="ctrl-close"></span>
+      <span class="ctrl-min"></span>
+      <span class="ctrl-max"></span>
+    </div>
+  </div>
+
+  <!-- MAIN WINDOW -->
+  <div class="main-window">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sidebar-user">
+        <div class="sidebar-username">ПОЛЬЗОВАТЕЛЬ</div>
+        <div class="sidebar-role">Уровень доступа: 3</div>
+      </div>
+      <div class="sidebar-section">Навигация</div>
+      <div class="sidebar-item active"><a href="index.html">Главная</a></div>
+      <div class="sidebar-item"><a href="personnel.html">Персоналии</a></div>
+      <div class="sidebar-item"><a href="prisoners.html">Заключённые</a></div>
+      <div class="sidebar-item"><a href="documents.html">Z-Классифицированные объекты</a></div>
+      <div class="sidebar-item"><a href="miscobjects.html">Разные объекты</a></div>
+      <div class="sidebar-item"><a href="letvandfauna.html">Фауна Летванд</a></div>
+      <div class="sidebar-item"><a href="realdocs.html">Документация</a></div>
+      <div class="sidebar-item"><a href="experimentlogs.html">Журналы экспериментов</a></div>
+      <div class="sidebar-section">Дополнительно</div>
+      <div class="sidebar-item"><a href="map.html">Карта</a></div>
+      <div class="sidebar-item"><a href="stories.html">Рассказы</a></div>
+      <div class="sidebar-item"><a href="object-classification.html">Классификация объектов</a></div>
+      <div class="sidebar-item"><a href="https://teletype.in/@yurubolski/GMpdKbCOIMu">Правила</a></div>
+      <div class="sidebar-bottom">
+        <span class="status-dot"></span>
+        <span class="status-text">СИСТЕМА В СЕТИ</span>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- TOPBAR -->
+      <div class="topbar">
+        <div class="topbar-title">ДОКУМЕНТ · Lammelse</div>
+      </div>
+
+       <div id="ratingWidget"></div>
+
+      <!-- PAGE -->
+      <div class="page">
+        
+
+        <div class="doc-body">
+
+          <!-- ОПИСАНИЕ -->
+          <div class="doc-section">
+            <div class="doc-section-header">
+              <span class="doc-section-title">Описание</span>
+              <span class="doc-section-tag">ФАЙЛ 01</span>
+            </div>
+            <div class="doc-section-body">
+              <div class="doc-text clearfix">
+<p>Вид Lammelse прозванный персоналом «Донные пожиратели», представляет собой вид огромных слизней, чья кровь обладает парализующими свойствами.</p>
+
+<p>Обнаруженные во время первой экспедиции и раскопок Хадального Тайного Объекта, существа вида Lammelse считались не представляющими угрозы, и их не трогали.</p>
+
+<p>Вид Lammelse получил своё название благодаря основному механизму питания. Существо намеренно поднимает свой хвост в качестве приманки, делая вид, что это лёгкая добыча для хищных рыб. Как только его замечают, Lammelse позволяет рыбе откусить свой хвост. При контакте с парализующей тканью Lammelse нейротоксин, схожий по структуре с ботулотоксином, предотвращает пресинаптический выброс ацетилхолина, вызывая мышечный паралич у жертвы и обездвиживая её. После паралича Lammelse начинает врастать через рот рыбы внутрь остальных её внутренностей. Затем Lammelse естественным образом обрастает плотью вокруг зубов рыбы, закрепляясь в полости хозяина.</p>
+
+<p>Затем Lammelse прорастает своей кожей через зубные каналы в жизненно важные органы рыбы. И начинает потреблять биомассу напрямую через эти корневые каналы для питания. Каждый раз, когда пища потребляется, Lammelse передаёт небольшое количество питательных веществ своему хозяину, чтобы поддерживать его. Биопсия особей Lammelse показала, что хозяин на «хвостовом» конце Lammelse, хотя и парализован, всё ещё проявляет неврологическую активность, которая указывает на сознание. Как только поддержание жизни хозяина становится неустойчивым для Lammelse, хозяин отбрасывается.</p>
+
+<p>Lammelse, в некотором роде, является естественной добычей Vultus luminaria. Сосуществуя 80 миллионов лет, Lammelse выступает в роли своего рода «персональной доставки еды» для любого проходящего мимо Vultus. Когда Lammelse замечает Vultus, с которым не может разойтись на пути, он пытается предложить рыбу, застрявшую на его хвосте, чтобы спасти себя.</p>
+
+<p>Lammelse не следует считать угрозой для водолазов, так как они не умеют плавать вверх. Если водолаз в снаряжении «Тунгвест» идёт по жёлобу и сталкивается с Lammelse, ему следует сохранять спокойствие, принять угрожающую позу и стоять на своём. В большинстве случаев Lammelse испугается и уползёт. В случае, если Lammelse всё же попытается атаковать, водолаз должен быть готов дать отпор, когда тот попытается схватить его. Lammelse быстро поймёт, что не может пробить тяжёлые пластины, и уползёт. В крайне маловероятном случае, если персонал без костюма «Тунгвест» окажется на океанском дне лицом к лицу с Lammelse, им следует попытаться добраться до уступа, которого тот не сможет достичь. Если это невозможно, они должны уклониться от атаки, позволив ему броситься, а затем отступить с его пути.</p>
+              </div>
+            </div>
+          </div>
+
+       
+              </div>
+            </div>
+            
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+   <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    initRating('Lammelse');
+  });
+</script>
+</script>
+   
+</script>
+</body>
+</html>
