@@ -332,8 +332,7 @@ function tryBypass() {
   'use strict';
  
   const STORAGE_KEY = 'hadal_mail_read';
- 
-  // ── Хранилище прочитанных писем ──────────────────────────
+
   function getReadSet() {
     try { return new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')); }
     catch { return new Set(); }
@@ -345,7 +344,6 @@ function tryBypass() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify([...s]));
   }
  
-  // ── Получить письма (с учётом прочитанных) ───────────────
   function getMails() {
     const read = getReadSet();
     return (window.HADAL_MAIL || []).map(m => ({
@@ -358,14 +356,13 @@ function tryBypass() {
     return getMails().filter(m => !m.read).length;
   }
  
-  // ── Форматирование даты ───────────────────────────────────
   function fmtDate(str) {
     if (!str) return '';
     const d = new Date(str);
     return d.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' });
   }
  
-  // ── Экранирование HTML ────────────────────────────────────
+
   function esc(s) {
     return String(s)
       .replace(/&/g, '&amp;')
@@ -373,8 +370,7 @@ function tryBypass() {
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;');
   }
- 
-  // ── Инжект стилей ─────────────────────────────────────────
+
   function injectStyles() {
     if (document.getElementById('hadal-mail-styles')) return;
     const style = document.createElement('style');
@@ -667,7 +663,7 @@ function tryBypass() {
       #hm-view-body::-webkit-scrollbar { width: 4px; }
       #hm-view-body::-webkit-scrollbar-thumb { background: rgba(178,229,40,0.2); border-radius: 2px; }
  
-      /* ─── Пусто ─── */
+  
       #hm-empty-state {
         flex: 1;
         display: flex;
@@ -681,7 +677,6 @@ function tryBypass() {
         letter-spacing: 0.1em;
       }
  
-      /* ─── Сканлайн поверх окна ─── */
       #hm-window::after {
         content: '';
         position: absolute;
@@ -692,7 +687,7 @@ function tryBypass() {
         opacity: 0.5;
       }
  
-      /* ─── Мобильная версия ─── */
+
       @media (max-width: 600px) {
         #hm-fab {
           bottom: 16px;
@@ -727,7 +722,7 @@ function tryBypass() {
     document.head.appendChild(style);
   }
  
-  // ── HTML виджета ──────────────────────────────────────────
+
   function buildHTML() {
     const fab = document.createElement('button');
     fab.id = 'hm-fab';
@@ -744,7 +739,7 @@ function tryBypass() {
         <div id="hm-titlebar">
           <div id="hm-titlebar-left">
             <img id="hm-titlebar-icon" src="MailIcon.png" alt="">
-            <span id="hm-titlebar-title">ВНУТРЕННЯЯ ПОЧТА · HTO</span>
+            <span id="hm-titlebar-title">ВНУТРЕННЯЯ ПОЧТА </span>
           </div>
           <button id="hm-close">✕</button>
         </div>
@@ -771,7 +766,7 @@ function tryBypass() {
     document.body.appendChild(overlay);
   }
  
-  // ── Рендер списка ─────────────────────────────────────────
+
   function renderList(activeId) {
     const list = document.getElementById('hm-list');
     const mails = getMails();
@@ -795,7 +790,7 @@ function tryBypass() {
     });
   }
  
-  // ── Открыть письмо ────────────────────────────────────────
+
   function openMail(id) {
     const mail = getMails().find(m => m.id === id);
     if (!mail) return;
@@ -814,7 +809,7 @@ function tryBypass() {
     updateBadge();
   }
  
-  // ── Обновить бейдж ────────────────────────────────────────
+  
   function updateBadge() {
     const badge = document.getElementById('hm-fab-badge');
     if (!badge) return;
@@ -823,7 +818,7 @@ function tryBypass() {
     badge.classList.toggle('hidden', n === 0);
   }
  
-  // ── Открыть/закрыть окно ─────────────────────────────────
+
   function openWindow() {
     document.getElementById('hm-overlay').classList.add('open');
     renderList(null);
@@ -833,7 +828,7 @@ function tryBypass() {
     document.getElementById('hm-overlay').classList.remove('open');
   }
  
-  // ── Инициализация ─────────────────────────────────────────
+
   function init() {
     injectStyles();
     buildHTML();
