@@ -473,7 +473,7 @@ function renderQuestion() {
   document.getElementById('q-text').textContent = q.text;
   const fill = (currentQ / TOTAL_Q) * 100;
   document.getElementById('progress-fill').style.width = fill + '%';
-  // БАГ 6 ИСПРАВЛЕН: динамический счётчик
+
   document.querySelector('.q-counter').innerHTML = `ВОПРОС <span id="q-num">${currentQ + 1}</span> / ${TOTAL_Q}`;
   const container = document.getElementById('q-options');
   container.innerHTML = '';
@@ -604,13 +604,6 @@ function restart() {
   showState('intro');
 }
 
-  const { data, error, count } = await db
-  .from('profiles')
-  .update({ specialization: letter, serial_number: serial })
-  .eq('id', user.id)
-  .select(); // добавь .select() чтобы получить обновлённую строку
-
-console.log('update result:', { data, error, count });
 </script>
 </body>
 </html>
