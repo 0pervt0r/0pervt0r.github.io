@@ -2,10 +2,6 @@ const SUPABASE_URL = 'https://ytmwejebzkunzukuztvq.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl0bXdlamViemt1bnp1a3V6dHZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0ODEzMDksImV4cCI6MjA5NjA1NzMwOX0.nW1zgIFphXNF60p7vRd4hOV39n4my3ljKF9mCBqOH_E';
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// ════════════════════════════════════
-// КЭШИРОВАННЫЕ ЗАПРОСЫ К SUPABASE
-// ════════════════════════════════════
-
 let _userCache = undefined;
 let _profileCache = {};
 
@@ -27,9 +23,6 @@ async function getProfile(userId) {
   return _profileCache[userId];
 }
 
-// ════════════════════════════════════
-// SIDEBAR
-// ════════════════════════════════════
 
 async function fillSidebar() {
   const path = window.location.pathname;
@@ -37,7 +30,6 @@ async function fillSidebar() {
 
   const user = await getCurrentUser();
 
-  // Проверка пользователя РАНЬШЕ использования его данных
   if (!user) {
     window.location.href = 'login.html';
     return;
@@ -78,9 +70,6 @@ async function signOut() {
 
 document.addEventListener('DOMContentLoaded', fillSidebar);
 
-// ════════════════════════════════════
-// ACCORDION
-// ════════════════════════════════════
 
 function toggleAccordion(trigger) {
   const item = trigger.closest('.accordion-item');
@@ -101,9 +90,6 @@ function toggleAccordion(trigger) {
   }
 }
 
-// ════════════════════════════════════
-// RATING SYSTEM
-// ════════════════════════════════════
 
 async function initRating(articleId) {
   const container = document.getElementById('ratingWidget');
@@ -111,7 +97,6 @@ async function initRating(articleId) {
 
   const user = await getCurrentUser();
 
-  // Параллельные запросы вместо последовательных
   const votesPromise = db.from('article_votes').select('vote').eq('article_id', articleId);
   const myVotePromise = user
     ? db.from('article_votes').select('vote').eq('article_id', articleId).eq('user_id', user.id).single()
@@ -163,7 +148,7 @@ async function castVote(articleId, vote) {
       .eq('article_id', articleId)
       .eq('user_id', user.id);
   } else {
-    // Новый голос или смена — upsert вместо двух отдельных запросов
+
     await db.from('article_votes')
       .upsert({ article_id: articleId, user_id: user.id, vote },
                { onConflict: 'article_id,user_id' });
@@ -172,9 +157,6 @@ async function castVote(articleId, vote) {
   initRating(articleId);
 }
 
-// ════════════════════════════════════
-// ACCESS CONTROL
-// ════════════════════════════════════
 
 const BYPASS_PASSWORDS = {
   'Z-5':    'ILoveDrKepler6769',
@@ -258,7 +240,6 @@ function tryBypass() {
   const input = document.getElementById('bypassInput');
   if (!input) return;
 
-  // Проверяем по всем ключам объекта BYPASS_PASSWORDS
   const validPasswords = Object.values(BYPASS_PASSWORDS);
   if (validPasswords.includes(input.value)) {
     activateBypass();
@@ -286,6 +267,19 @@ function tryBypass() {
   'use strict';
 
   const STORAGE_KEY = 'hadal_mail_read';
+
+  const SENT_KEY = 'hadal_mail_sent';
+
+function getSentMap() {
+  try { return JSON.parse(localStorage.getItem(SENT_KEY) || '{}'); }
+  catch { return {}; }
+}
+
+function markSent(mailId, replyText) {
+  const s = getSentMap();
+  s[mailId] = replyText;
+  localStorage.setItem(SENT_KEY, JSON.stringify(s));
+}
 
   function getReadSet() {
     try { return new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')); }
@@ -455,6 +449,50 @@ function tryBypass() {
         #hm-view-col { flex:1; min-height:0; }
         #hm-view-subject { font-size:13px; }
       }
+      #hm-reply-area {
+  flex-shrink: 0;
+  border-top: 1px solid rgba(178,229,40,0.12);
+  padding: 10px 16px 14px;
+  background: #0e0e0e;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.hm-reply-label {
+  font-family: 'Orbitron', monospace;
+  font-size: 8px;
+  color: #526652;
+  letter-spacing: 0.14em;
+}
+.hm-reply-buttons { display: flex; gap: 6px; flex-wrap: wrap; }
+.hm-reply-btn {
+  background: transparent;
+  border: 1px solid rgba(178,229,40,0.3);
+  color: #c8f03a;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  padding: 5px 12px;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  letter-spacing: 0.04em;
+}
+.hm-reply-btn:hover { background: rgba(178,229,40,0.08); border-color: #c8f03a; }
+.hm-reply-sent {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  color: #c8f03a;
+  letter-spacing: 0.05em;
+}
+.hm-reply-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #c8f03a;
+  flex-shrink: 0;
+}
     `;
     document.head.appendChild(style);
   }
@@ -524,21 +562,60 @@ function tryBypass() {
     });
   }
 
-  function openMail(id) {
-    const mail = getMails().find(m => m.id === id);
-    if (!mail) return;
+function openMail(id) {
+  const mail = getMails().find(m => m.id === id);
+  if (!mail) return;
 
-    markRead(id);
+  markRead(id);
 
-    document.getElementById('hm-view-empty').style.display = 'none';
-    document.getElementById('hm-view-content').classList.add('visible');
-    document.getElementById('hm-view-subject').textContent = mail.subject;
-    document.getElementById('hm-view-from').textContent = mail.from;
-    document.getElementById('hm-view-body').textContent = mail.body;
+  document.getElementById('hm-view-empty').style.display = 'none';
+  document.getElementById('hm-view-content').classList.add('visible');
+  document.getElementById('hm-view-subject').textContent = mail.subject;
+  document.getElementById('hm-view-from').textContent = mail.from;
+  document.getElementById('hm-view-body').textContent = mail.body;
 
-    renderList(id);
-    updateBadge();
+  // — блок ответов —
+  let replyArea = document.getElementById('hm-reply-area');
+  if (replyArea) replyArea.remove();
+
+  if (mail.replies && mail.replies.length) {
+    replyArea = document.createElement('div');
+    replyArea.id = 'hm-reply-area';
+
+    const sentMap = getSentMap();
+    const sentText = sentMap[id];
+
+    if (sentText) {
+      replyArea.innerHTML = `
+        <div class="hm-reply-label">ОТВЕТ ОТПРАВЛЕН</div>
+        <div class="hm-reply-sent">
+          <span class="hm-reply-dot"></span>
+          <span>${esc(sentText)}</span>
+        </div>`;
+    } else {
+      replyArea.innerHTML = `
+        <div class="hm-reply-label">ОТВЕТИТЬ</div>
+        <div class="hm-reply-buttons">
+          ${mail.replies.map((r, i) =>
+            `<button class="hm-reply-btn" data-idx="${i}">${esc(r.label)}</button>`
+          ).join('')}
+        </div>`;
+
+      replyArea.querySelectorAll('.hm-reply-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const reply = mail.replies[+btn.dataset.idx];
+          markSent(id, reply.text);
+          openMail(id); // перерисовать с состоянием «отправлено»
+        });
+      });
+    }
+
+    document.getElementById('hm-view-content').appendChild(replyArea);
   }
+
+  renderList(id);
+  updateBadge();
+}
 
   function updateBadge() {
     const badge = document.getElementById('hm-fab-badge');
