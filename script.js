@@ -266,10 +266,9 @@ function tryBypass() {
 (function () {
   'use strict';
 
-  const STORAGE_KEY = 'hadal_mail_read';
-  const SENT_KEY    = 'hadal_mail_sent';
-
-  // ── localStorage helpers ──────────────────────────────────
+  const STORAGE_KEY    = 'hadal_mail_read';
+  const SENT_KEY       = 'hadal_mail_sent';
+  const PENDING_KEY    = 'hadal_mail_pending';
 
   function getReadSet() {
     try { return new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')); }
@@ -293,11 +292,54 @@ function tryBypass() {
     localStorage.setItem(SENT_KEY, JSON.stringify(s));
   }
 
-  // ── письма ───────────────────────────────────────────────
+  function getPendingResponses() {
+    try { return JSON.parse(localStorage.getItem(PENDING_KEY) || '[]'); }
+    catch { return []; }
+  }
+
+  function addPendingResponse(mailId, replyIdx, sendAt) {
+    const list = getPendingResponses();
+    if (list.find(p => p.mailId === mailId)) return;
+    list.push({ mailId, replyIdx, sendAt });
+    localStorage.setItem(PENDING_KEY, JSON.stringify(list));
+  }
+
+  function flushPendingResponses() {
+    const now     = Date.now();
+    const pending = getPendingResponses();
+    const remain  = [];
+    let   changed = false;
+
+    pending.forEach(p => {
+      if (now < p.sendAt) { remain.push(p); return; }
+
+      const sourceMail = (window.HADAL_MAIL || []).find(m => m.id === p.mailId);
+      if (!sourceMail) return;
+      const reply = sourceMail.replies?.[p.replyIdx];
+      if (!reply?.response_mail) return;
+
+      const rm    = reply.response_mail;
+      const newId = `resp-${p.mailId}-${p.replyIdx}`;
+
+      if ((window.HADAL_MAIL || []).find(m => m.id === newId)) return;
+
+      window.HADAL_MAIL.push({
+        id:      newId,
+        from:    rm.from,
+        subject: rm.subject,
+        body:    rm.body,
+        read:    false
+      });
+      changed = true;
+    });
+
+    localStorage.setItem(PENDING_KEY, JSON.stringify(remain));
+    return changed;
+  }
 
   function getMails() {
-    const read = getReadSet();
-    const now  = Date.now();
+    const read    = getReadSet();
+    const now     = Date.now();
     const regTime = parseInt(localStorage.getItem('hadal_reg_ts')) || null;
 
     return (window.HADAL_MAIL || [])
@@ -316,15 +358,11 @@ function tryBypass() {
     return getMails().filter(m => !m.read).length;
   }
 
-  // ── утилиты ──────────────────────────────────────────────
-
   function esc(s) {
     return String(s)
       .replace(/&/g, '&amp;').replace(/</g, '&lt;')
       .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
-
-  // ── стили ────────────────────────────────────────────────
 
   function injectStyles() {
     if (document.getElementById('hadal-mail-styles')) return;
@@ -479,18 +517,26 @@ function tryBypass() {
         background:#c8f03a;
         flex-shrink:0;
       }
-
-      /* bypass input */
-      .bypass-input-wrap { display:flex; gap:8px; align-items:center; margin-top:4px; }
-      .bypass-input-wrap input {
-        background:var(--bg2); border:1px solid var(--border-grey); border-radius:2px;
-        padding:5px 12px; font-family:'Share Tech Mono',monospace; font-size:11px;
-        color:var(--text); outline:none; width:220px; letter-spacing:0.05em;
+      .hm-reply-pending {
+        display:flex;
+        align-items:center;
+        gap:7px;
+        font-family:'Share Tech Mono',monospace;
+        font-size:10px;
+        color:#526652;
+        letter-spacing:0.05em;
+        margin-top:2px;
       }
-      .bypass-input-wrap button {
-        background:transparent; border:1px solid var(--border2); color:var(--accent2);
-        font-family:'Share Tech Mono',monospace; font-size:10px; padding:5px 14px;
-        border-radius:2px; cursor:pointer; letter-spacing:0.06em; transition:all 0.15s;
+      .hm-reply-pending-dot {
+        width:6px; height:6px;
+        border-radius:50%;
+        background:#526652;
+        flex-shrink:0;
+        animation: hm-blink 1.4s ease-in-out infinite;
+      }
+      @keyframes hm-blink {
+        0%, 100% { opacity: 1; }
+        50%       { opacity: 0.2; }
       }
 
       @media (max-width:600px) {
@@ -506,8 +552,6 @@ function tryBypass() {
     `;
     document.head.appendChild(style);
   }
-
-  // ── HTML структура ───────────────────────────────────────
 
   function buildHTML() {
     const fab = document.createElement('button');
@@ -552,8 +596,6 @@ function tryBypass() {
     document.body.appendChild(overlay);
   }
 
-  // ── список писем ─────────────────────────────────────────
-
   function renderList(activeId) {
     const list  = document.getElementById('hm-list');
     const mails = getMails();
@@ -576,8 +618,6 @@ function tryBypass() {
     });
   }
 
-  // ── открыть письмо ───────────────────────────────────────
-
   function openMail(id) {
     const mail = getMails().find(m => m.id === id);
     if (!mail) return;
@@ -590,7 +630,6 @@ function tryBypass() {
     document.getElementById('hm-view-from').textContent    = mail.from;
     document.getElementById('hm-view-body').textContent    = mail.body;
 
-    // -- блок ответов: сначала удалить старый, если есть --
     const old = document.getElementById('hm-reply-area');
     if (old) old.remove();
 
@@ -602,15 +641,29 @@ function tryBypass() {
       const sentText = sentMap[id];
 
       if (sentText) {
-        // ответ уже был отправлен — показать его
+        const pending    = getPendingResponses();
+        const hasPending = pending.find(p => p.mailId === id);
+
+        let pendingInfo = null;
+        if (hasPending) {
+          const msLeft = Math.max(0, hasPending.sendAt - Date.now());
+          const minLeft = Math.ceil(msLeft / 60000);
+          pendingInfo = minLeft;
+        }
+
         replyArea.innerHTML = `
           <div class="hm-reply-label">ОТВЕТ ОТПРАВЛЕН</div>
           <div class="hm-reply-sent">
             <span class="hm-reply-dot"></span>
             <span>${esc(sentText)}</span>
-          </div>`;
+          </div>
+          ${hasPending ? `
+          <div class="hm-reply-pending">
+            <span class="hm-reply-pending-dot"></span>
+            <span>ОЖИДАНИЕ ОТВЕТА${pendingInfo > 0 ? ' · ~' + pendingInfo + ' МИН' : '...'}</span>
+          </div>` : ''}
+        `;
       } else {
-        // показать кнопки выбора ответа
         replyArea.innerHTML = `
           <div class="hm-reply-label">ОТВЕТИТЬ</div>
           <div class="hm-reply-buttons">
@@ -621,9 +674,16 @@ function tryBypass() {
 
         replyArea.querySelectorAll('.hm-reply-btn').forEach(btn => {
           btn.addEventListener('click', () => {
-            const reply = mail.replies[+btn.dataset.idx];
+            const idx   = +btn.dataset.idx;
+            const reply = mail.replies[idx];
             markSent(id, reply.text);
-            openMail(id); // перерисовать с состоянием «отправлено»
+
+            if (reply.response_mail) {
+              const delayMs = (reply.response_mail.delay_minutes || 1) * 60 * 1000;
+              addPendingResponse(id, idx, Date.now() + delayMs);
+            }
+
+            openMail(id);
           });
         });
       }
@@ -635,8 +695,6 @@ function tryBypass() {
     updateBadge();
   }
 
-  // ── бейдж ────────────────────────────────────────────────
-
   function updateBadge() {
     const badge = document.getElementById('hm-fab-badge');
     if (!badge) return;
@@ -644,8 +702,6 @@ function tryBypass() {
     badge.textContent = n;
     badge.classList.toggle('hidden', n === 0);
   }
-
-  // ── открыть / закрыть окно ───────────────────────────────
 
   function openWindow() {
     document.getElementById('hm-overlay').classList.add('open');
@@ -656,12 +712,31 @@ function tryBypass() {
     document.getElementById('hm-overlay').classList.remove('open');
   }
 
-  // ── инициализация ────────────────────────────────────────
+  function startPolling() {
+    setInterval(() => {
+      const changed = flushPendingResponses();
+      if (changed) {
+        updateBadge();
+
+        if (document.getElementById('hm-overlay').classList.contains('open')) {
+          const activeItem = document.querySelector('.hm-item.active');
+          renderList(activeItem?.dataset.id || null);
+        }
+
+        const activeItem = document.querySelector('.hm-item.active');
+        if (activeItem) {
+          openMail(activeItem.dataset.id);
+        }
+      }
+    }, 15_000);
+  }
 
   function init() {
     injectStyles();
     buildHTML();
+    flushPendingResponses();
     updateBadge();
+    startPolling();
 
     document.getElementById('hm-fab').addEventListener('click', openWindow);
     document.getElementById('hm-close').addEventListener('click', closeWindow);
