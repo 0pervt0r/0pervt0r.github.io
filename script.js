@@ -267,19 +267,9 @@ function tryBypass() {
   'use strict';
 
   const STORAGE_KEY = 'hadal_mail_read';
+  const SENT_KEY    = 'hadal_mail_sent';
 
-  const SENT_KEY = 'hadal_mail_sent';
-
-function getSentMap() {
-  try { return JSON.parse(localStorage.getItem(SENT_KEY) || '{}'); }
-  catch { return {}; }
-}
-
-function markSent(mailId, replyText) {
-  const s = getSentMap();
-  s[mailId] = replyText;
-  localStorage.setItem(SENT_KEY, JSON.stringify(s));
-}
+  // ── localStorage helpers ──────────────────────────────────
 
   function getReadSet() {
     try { return new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')); }
@@ -292,9 +282,22 @@ function markSent(mailId, replyText) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify([...s]));
   }
 
+  function getSentMap() {
+    try { return JSON.parse(localStorage.getItem(SENT_KEY) || '{}'); }
+    catch { return {}; }
+  }
+
+  function markSent(mailId, replyText) {
+    const s = getSentMap();
+    s[mailId] = replyText;
+    localStorage.setItem(SENT_KEY, JSON.stringify(s));
+  }
+
+  // ── письма ───────────────────────────────────────────────
+
   function getMails() {
     const read = getReadSet();
-    const now = Date.now();
+    const now  = Date.now();
     const regTime = parseInt(localStorage.getItem('hadal_reg_ts')) || null;
 
     return (window.HADAL_MAIL || [])
@@ -313,11 +316,15 @@ function markSent(mailId, replyText) {
     return getMails().filter(m => !m.read).length;
   }
 
+  // ── утилиты ──────────────────────────────────────────────
+
   function esc(s) {
     return String(s)
       .replace(/&/g, '&amp;').replace(/</g, '&lt;')
       .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
+
+  // ── стили ────────────────────────────────────────────────
 
   function injectStyles() {
     if (document.getElementById('hadal-mail-styles')) return;
@@ -427,7 +434,53 @@ function markSent(mailId, replyText) {
         pointer-events:none; z-index:10; opacity:0.5;
       }
 
-      /* bypass input — стили вынесены из JS */
+      /* ── reply area ── */
+      #hm-reply-area {
+        flex-shrink:0;
+        border-top:1px solid rgba(178,229,40,0.12);
+        padding:10px 16px 14px;
+        background:#0e0e0e;
+        display:flex;
+        flex-direction:column;
+        gap:7px;
+      }
+      .hm-reply-label {
+        font-family:'Orbitron',monospace;
+        font-size:8px;
+        color:#526652;
+        letter-spacing:0.14em;
+      }
+      .hm-reply-buttons { display:flex; gap:6px; flex-wrap:wrap; }
+      .hm-reply-btn {
+        background:transparent;
+        border:1px solid rgba(178,229,40,0.3);
+        color:#c8f03a;
+        font-family:'Share Tech Mono',monospace;
+        font-size:10px;
+        padding:5px 12px;
+        border-radius:2px;
+        cursor:pointer;
+        transition:background 0.15s, border-color 0.15s;
+        letter-spacing:0.04em;
+      }
+      .hm-reply-btn:hover { background:rgba(178,229,40,0.08); border-color:#c8f03a; }
+      .hm-reply-sent {
+        display:flex;
+        align-items:center;
+        gap:7px;
+        font-family:'Share Tech Mono',monospace;
+        font-size:10px;
+        color:#c8f03a;
+        letter-spacing:0.05em;
+      }
+      .hm-reply-dot {
+        width:6px; height:6px;
+        border-radius:50%;
+        background:#c8f03a;
+        flex-shrink:0;
+      }
+
+      /* bypass input */
       .bypass-input-wrap { display:flex; gap:8px; align-items:center; margin-top:4px; }
       .bypass-input-wrap input {
         background:var(--bg2); border:1px solid var(--border-grey); border-radius:2px;
@@ -448,54 +501,13 @@ function markSent(mailId, replyText) {
         #hm-list-col { width:100%; min-width:unset; height:220px; min-height:220px; border-right:none; border-bottom:1px solid rgba(178,229,40,0.15); flex-shrink:0; }
         #hm-view-col { flex:1; min-height:0; }
         #hm-view-subject { font-size:13px; }
+        .hm-reply-btn { font-size:11px; padding:6px 14px; }
       }
-      #hm-reply-area {
-  flex-shrink: 0;
-  border-top: 1px solid rgba(178,229,40,0.12);
-  padding: 10px 16px 14px;
-  background: #0e0e0e;
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-}
-.hm-reply-label {
-  font-family: 'Orbitron', monospace;
-  font-size: 8px;
-  color: #526652;
-  letter-spacing: 0.14em;
-}
-.hm-reply-buttons { display: flex; gap: 6px; flex-wrap: wrap; }
-.hm-reply-btn {
-  background: transparent;
-  border: 1px solid rgba(178,229,40,0.3);
-  color: #c8f03a;
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 10px;
-  padding: 5px 12px;
-  border-radius: 2px;
-  cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
-  letter-spacing: 0.04em;
-}
-.hm-reply-btn:hover { background: rgba(178,229,40,0.08); border-color: #c8f03a; }
-.hm-reply-sent {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 10px;
-  color: #c8f03a;
-  letter-spacing: 0.05em;
-}
-.hm-reply-dot {
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: #c8f03a;
-  flex-shrink: 0;
-}
     `;
     document.head.appendChild(style);
   }
+
+  // ── HTML структура ───────────────────────────────────────
 
   function buildHTML() {
     const fab = document.createElement('button');
@@ -540,8 +552,10 @@ function markSent(mailId, replyText) {
     document.body.appendChild(overlay);
   }
 
+  // ── список писем ─────────────────────────────────────────
+
   function renderList(activeId) {
-    const list = document.getElementById('hm-list');
+    const list  = document.getElementById('hm-list');
     const mails = getMails();
     if (!list) return;
 
@@ -562,60 +576,66 @@ function markSent(mailId, replyText) {
     });
   }
 
-function openMail(id) {
-  const mail = getMails().find(m => m.id === id);
-  if (!mail) return;
+  // ── открыть письмо ───────────────────────────────────────
 
-  markRead(id);
+  function openMail(id) {
+    const mail = getMails().find(m => m.id === id);
+    if (!mail) return;
 
-  document.getElementById('hm-view-empty').style.display = 'none';
-  document.getElementById('hm-view-content').classList.add('visible');
-  document.getElementById('hm-view-subject').textContent = mail.subject;
-  document.getElementById('hm-view-from').textContent = mail.from;
-  document.getElementById('hm-view-body').textContent = mail.body;
+    markRead(id);
 
-  // — блок ответов —
-  let replyArea = document.getElementById('hm-reply-area');
-  if (replyArea) replyArea.remove();
+    document.getElementById('hm-view-empty').style.display = 'none';
+    document.getElementById('hm-view-content').classList.add('visible');
+    document.getElementById('hm-view-subject').textContent = mail.subject;
+    document.getElementById('hm-view-from').textContent    = mail.from;
+    document.getElementById('hm-view-body').textContent    = mail.body;
 
-  if (mail.replies && mail.replies.length) {
-    replyArea = document.createElement('div');
-    replyArea.id = 'hm-reply-area';
+    // -- блок ответов: сначала удалить старый, если есть --
+    const old = document.getElementById('hm-reply-area');
+    if (old) old.remove();
 
-    const sentMap = getSentMap();
-    const sentText = sentMap[id];
+    if (mail.replies && mail.replies.length) {
+      const replyArea = document.createElement('div');
+      replyArea.id = 'hm-reply-area';
 
-    if (sentText) {
-      replyArea.innerHTML = `
-        <div class="hm-reply-label">ОТВЕТ ОТПРАВЛЕН</div>
-        <div class="hm-reply-sent">
-          <span class="hm-reply-dot"></span>
-          <span>${esc(sentText)}</span>
-        </div>`;
-    } else {
-      replyArea.innerHTML = `
-        <div class="hm-reply-label">ОТВЕТИТЬ</div>
-        <div class="hm-reply-buttons">
-          ${mail.replies.map((r, i) =>
-            `<button class="hm-reply-btn" data-idx="${i}">${esc(r.label)}</button>`
-          ).join('')}
-        </div>`;
+      const sentMap  = getSentMap();
+      const sentText = sentMap[id];
 
-      replyArea.querySelectorAll('.hm-reply-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const reply = mail.replies[+btn.dataset.idx];
-          markSent(id, reply.text);
-          openMail(id); // перерисовать с состоянием «отправлено»
+      if (sentText) {
+        // ответ уже был отправлен — показать его
+        replyArea.innerHTML = `
+          <div class="hm-reply-label">ОТВЕТ ОТПРАВЛЕН</div>
+          <div class="hm-reply-sent">
+            <span class="hm-reply-dot"></span>
+            <span>${esc(sentText)}</span>
+          </div>`;
+      } else {
+        // показать кнопки выбора ответа
+        replyArea.innerHTML = `
+          <div class="hm-reply-label">ОТВЕТИТЬ</div>
+          <div class="hm-reply-buttons">
+            ${mail.replies.map((r, i) =>
+              `<button class="hm-reply-btn" data-idx="${i}">${esc(r.label)}</button>`
+            ).join('')}
+          </div>`;
+
+        replyArea.querySelectorAll('.hm-reply-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const reply = mail.replies[+btn.dataset.idx];
+            markSent(id, reply.text);
+            openMail(id); // перерисовать с состоянием «отправлено»
+          });
         });
-      });
+      }
+
+      document.getElementById('hm-view-content').appendChild(replyArea);
     }
 
-    document.getElementById('hm-view-content').appendChild(replyArea);
+    renderList(id);
+    updateBadge();
   }
 
-  renderList(id);
-  updateBadge();
-}
+  // ── бейдж ────────────────────────────────────────────────
 
   function updateBadge() {
     const badge = document.getElementById('hm-fab-badge');
@@ -625,6 +645,8 @@ function openMail(id) {
     badge.classList.toggle('hidden', n === 0);
   }
 
+  // ── открыть / закрыть окно ───────────────────────────────
+
   function openWindow() {
     document.getElementById('hm-overlay').classList.add('open');
     renderList(null);
@@ -633,6 +655,8 @@ function openMail(id) {
   function closeWindow() {
     document.getElementById('hm-overlay').classList.remove('open');
   }
+
+  // ── инициализация ────────────────────────────────────────
 
   function init() {
     injectStyles();
@@ -652,4 +676,5 @@ function openMail(id) {
   } else {
     init();
   }
+
 })();
