@@ -524,10 +524,15 @@ body::after {
   .shop-grid { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 560px) {
-  .shop-grid { grid-template-columns: 1fr; }
+  .shop-grid { grid-template-columns: repeat(3, 1fr); }
   .site-header { flex-direction: column; gap: 12px; align-items: flex-start; }
   .header-user { flex-wrap: wrap; }
   .shop-inner { padding: 20px 14px 28px; }
+  .shop-item { padding: 8px 4px 6px; gap: 4px; }
+  .shop-item-img { width: 48px; height: 48px; }
+  .shop-item-name { font-size: 9px; }
+  .shop-item-price { font-size: 10px; }
+  .shop-item-price img { width: 12px; height: 12px; }
 }
 .inventory-wrap {
   display: grid;
