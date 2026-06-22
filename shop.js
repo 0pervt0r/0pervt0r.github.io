@@ -322,3 +322,51 @@ function showToast(msg, isErr = false) {
   if (toastTimer) clearTimeout(toastTimer);
   toastTimer = setTimeout(() => toast.classList.add('hidden'), 3000);
 }
+
+/* ============================================================
+   INVENTORY
+   ============================================================ */
+async function loadInventory() {
+  const grid = document.getElementById('inventory-grid');
+  grid.innerHTML = '<div style="color:var(--text-dim);padding:20px">Загрузка...</div>';
+  try {
+    const items = await sb.getInventory(currentUser.username);
+    if (!items?.length) {
+      grid.innerHTML = '<div style="color:var(--text-dim);padding:20px">Инвентарь пуст</div>';
+      return;
+    }
+    grid.innerHTML = '';
+    items.forEach(order => {
+      const catalogItem = ITEMS.find(i => i.id === order.item_id);
+      const el = document.createElement('div');
+      el.className = 'shop-item' + (order.used ? ' item-used' : '');
+      el.innerHTML = `
+        <img class="shop-item-img" src="${catalogItem?.img || ''}" alt="${order.item_name}"
+             onerror="this.outerHTML='<div class=\\'shop-item-img-placeholder\\'>NO IMG</div>'" />
+        <div class="shop-item-name">${order.item_name}</div>
+        <div class="shop-item-price">⬡ ${fmt(order.item_price)} кр.</div>
+        <button class="modal-buy-btn" style="margin-top:8px;font-size:11px"
+          ${order.used ? 'disabled' : ''}
+          data-id="${order.id}">
+          ${order.used ? '✓ ИСПОЛЬЗОВАН' : 'ИСПОЛЬЗОВАТЬ'}
+        </button>
+      `;
+      if (!order.used) {
+        el.querySelector('button').addEventListener('click', async (e) => {
+          e.stopPropagation();
+          if (!confirm(`Использовать «${order.item_name}»? Предмет исчезнет.`)) return;
+          try {
+            await sb.useItem(order.id);
+            showToast(`«${order.item_name}» использован!`);
+            loadInventory();
+          } catch(err) {
+            showToast('Ошибка: ' + err.message, true);
+          }
+        });
+      }
+      grid.appendChild(el);
+    });
+  } catch(e) {
+    grid.innerHTML = `<div style="color:red;padding:20px">Ошибка: ${e.message}</div>`;
+  }
+}
