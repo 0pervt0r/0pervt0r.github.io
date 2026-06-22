@@ -309,6 +309,7 @@ tabBtns.forEach(btn => {
     btn.classList.add('active');
     document.getElementById(`tab-${tab}`).classList.remove('hidden');
     if (tab === 'leaders') loadLeaders();
+    if (tab === 'inventory') loadInventory();
   });
 });
 
