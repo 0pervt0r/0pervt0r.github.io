@@ -521,26 +521,33 @@ body::after {
    RESPONSIVE
    ============================================================ */
 @media (max-width: 860px) {
-  .shop-grid { grid-template-columns: repeat(2, 1fr); }
+  .shop-grid { grid-template-columns: repeat(3, 1fr); }
 }
 @media (max-width: 560px) {
   .shop-grid { grid-template-columns: repeat(3, 1fr); }
-  .site-header { flex-direction: column; gap: 12px; align-items: flex-start; }
-  .header-user { flex-wrap: wrap; }
-  .shop-inner { padding: 20px 14px 28px; }
-  .shop-item { padding: 8px 4px 6px; gap: 4px; }
-  .shop-item-img { width: 48px; height: 48px; }
-  .shop-item-name { font-size: 9px; }
-  .shop-item-price { font-size: 10px; }
-  .shop-item-price img { width: 12px; height: 12px; }
+  .site-header { flex-direction: column; gap: 8px; align-items: flex-start; padding: 10px 14px; }
+  .header-user { flex-wrap: wrap; gap: 8px; }
+  .header-title { font-size: 15px; letter-spacing: 2px; }
+  .hdr-name { font-size: 13px; }
+  .hdr-currency { gap: 8px; }
+  .hdr-crona, .hdr-bonus { font-size: 12px; }
+  .btn-exchange, .btn-logout { font-size: 11px; padding: 5px 10px; }
+  .tab-btn { font-size: 11px; padding: 10px 10px; letter-spacing: 1px; }
+  .tab-nav { padding: 0 8px; }
+  .shop-frame-wrapper { padding: 20px 8px 40px; }
+  .shop-inner { padding: 8px 4px; }
+  .shop-item { padding: 6px 3px 5px; gap: 3px; }
+  .shop-item-img { width: 44px; height: 44px; }
+  .shop-item-name { font-size: 8px; }
+  .shop-item-price { font-size: 9px; }
+  .shop-item-price img { width: 10px; height: 10px; }
+  .modal-box { padding: 24px 18px 20px; }
+  .modal-name { font-size: 14px; letter-spacing: 1px; }
+  .modal-price { font-size: 18px; }
+  .leaders-wrap { padding: 16px 10px; gap: 16px; }
+  .leaders-col { min-width: unset; padding: 16px; }
+  .inventory-wrap { grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 12px; }
 }
-.inventory-wrap {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 16px;
-  padding: 24px;
-}
-
 .item-used {
   opacity: 0.45;
   filter: grayscale(1);
