@@ -51,3 +51,13 @@ const sb = {
     return this.query('users?select=username,bonus&order=bonus.desc&limit=10');
   },
 };
+
+async createUser(username) {
+  return this.query('users', {
+    method: 'POST',
+    body: { username: username, crona: 0, bonus: 0 },
+    prefer: 'return=representation',
+  });
+},
+
+
