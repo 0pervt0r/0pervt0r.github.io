@@ -178,7 +178,7 @@ function buildShopGrid() {
       <img class="shop-item-img" src="${item.img}" alt="${item.name}"
            onerror="this.outerHTML='<div class=\\'shop-item-img-placeholder\\'>NO IMG</div>'" />
       <div class="shop-item-name">${item.name}</div>
-      <div class="shop-item-price">⬡ ${fmt(item.price)} кр.</div>
+      <div class="shop-item-price"><img src="shop-croner.png" class="ico" onerror="this.style.display='none'" /> ${fmt(item.price)}</div>
     `;
     el.addEventListener('click', () => openItemModal(item));
     shopGrid.appendChild(el);
@@ -345,7 +345,7 @@ async function loadInventory() {
         <img class="shop-item-img" src="${catalogItem?.img || ''}" alt="${order.item_name}"
              onerror="this.outerHTML='<div class=\\'shop-item-img-placeholder\\'>NO IMG</div>'" />
         <div class="shop-item-name">${order.item_name}</div>
-        <div class="shop-item-price">⬡ ${fmt(order.item_price)} кр.</div>
+        <div class="shop-item-price"><img src="shop-croner.png" class="ico" onerror="this.style.display='none'" /> ${fmt(order.item_price)}</div>
         <button class="modal-buy-btn" style="margin-top:8px;font-size:11px"
           ${order.used ? 'disabled' : ''}
           data-id="${order.id}">
