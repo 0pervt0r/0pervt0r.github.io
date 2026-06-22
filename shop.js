@@ -63,21 +63,48 @@ const tabContents    = document.querySelectorAll('.tab-content');
 authBtn.addEventListener('click', doLogin);
 authUsername.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 
+// Восстановить сессию при загрузке страницы
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('aktiv_user');
+  if (saved) {
+    try {
+      currentUser = JSON.parse(saved);
+      authScreen.classList.add('hidden');
+      app.classList.remove('hidden');
+      // Обновить данные с сервера (вдруг кроны изменились)
+      sb.getUser(currentUser.username).then(user => {
+        if (user) {
+          currentUser.crona = user.crona ?? 0;
+          currentUser.bonus = user.bonus ?? 0;
+          updateHeader();
+        }
+      });
+      initApp();
+    } catch(e) {
+      localStorage.removeItem('aktiv_user');
+    }
+  }
+});
+
 async function doLogin() {
   const name = authUsername.value.trim();
   if (!name) { authError.textContent = 'Введите ваш ник'; return; }
   authBtn.textContent = '...'; authBtn.disabled = true;
   authError.textContent = '';
   try {
-    const user = await sb.getUser(name);
+    let user = await sb.getUser(name);
+    
+    // Если пользователя нет — создать нового
     if (!user) {
-      authError.textContent = 'Пользователь не найден';
-    } else {
-      currentUser = { username: user.username, crona: user.crona ?? 0, bonus: user.bonus ?? 0 };
-      authScreen.classList.add('hidden');
-      app.classList.remove('hidden');
-      initApp();
+      const created = await sb.createUser(name);
+      user = created?.[0] || { username: name, crona: 0, bonus: 0 };
     }
+    
+    currentUser = { username: user.username, crona: user.crona ?? 0, bonus: user.bonus ?? 0 };
+    localStorage.setItem('aktiv_user', JSON.stringify(currentUser));
+    authScreen.classList.add('hidden');
+    app.classList.remove('hidden');
+    initApp();
   } catch(e) {
     authError.textContent = 'Ошибка: ' + e.message;
   }
@@ -86,6 +113,7 @@ async function doLogin() {
 
 logoutBtn.addEventListener('click', () => {
   currentUser = null;
+  localStorage.removeItem('aktiv_user'); // ← очищаем сессию
   app.classList.add('hidden');
   authScreen.classList.remove('hidden');
   authUsername.value = '';
