@@ -4,18 +4,18 @@
 
 /* ── CATALOGUE ── */
 const ITEMS = [
-  { id: 'BL1',          img: 'shop-BL1.png',          name: 'BL1',                  price: 75,   desc: 'Защита на чистке',                                             note: null },
-  { id: 'medkit',       img: 'shop-medkit.png',        name: 'Аптечка',              price: 250,  desc: 'Рест без выполнения норм',                                     note: null },
-  { id: 'revive',       img: 'shop-revive.png',        name: 'Жетон Лодочника',      price: 300,  desc: 'Снять все варны',                                              note: null },
-  { id: 'doc',          img: 'shop-doc.png',           name: 'Документ',             price: 300,  desc: 'Документ вашего персонажа добавят на вики Хроник Urbanshade',  note: null },
-  { id: 'scan',         img: 'shop-scan.png',          name: 'Сканнер Себастьяна',   price: 350,  desc: 'Личный ивент, созданный специально под вашего персонажа',      note: null },
+  { id: 'BL1',          img: 'shop-BL1.png',          name: 'BL1',                  price: 60,   desc: 'Защита на чистке',                                             note: null },
+  { id: 'doc',          img: 'shop-doc.png',           name: 'Документ',             price: 160,  desc: 'Документ вашего персонажа добавят на вики Хроник Urbanshade',  note: null },
+  { id: 'medkit',       img: 'shop-medkit.png',        name: 'Аптечка',              price: 200,  desc: 'Рест без выполнения норм',                                     note: null },
+  { id: 'revive',       img: 'shop-revive.png',        name: 'Жетон Лодочника',      price: 250,  desc: 'Снять все варны',                                              note: null },
+  { id: 'scan',         img: 'shop-scan.png',          name: 'Сканнер Себастьяна',   price: 300,  desc: 'Личный ивент, созданный специально под вашего персонажа',      note: null },
   { id: 'toy-remote',   img: 'shop-toy-remote.png',    name: 'Игрушечный пульт',     price: 400,  desc: 'Второй персонаж без анкеты',                                   note: '🥹 Обязательное условие: вы должны провести в сетке минимум 3 месяца.' },
-  { id: 'coctaile',     img: 'shop-coctaile.png',      name: 'Коктейль «Перитесен»', price: 750,  desc: 'Иконка вашего персонажа (как в диалогах в игре)',              note: null },
-  { id: 'party-special',img: 'shop-party-special.png', name: 'Party Special',        price: 800,  desc: 'Вашего персонажа превратят в плюш',                            note: null },
-  { id: 'necroblox',    img: 'shop-necroblox.png',     name: 'Некроблоксикон',       price: 1550, desc: 'Чиби скетч от @Koza_Ruina',                                    note: null },
-  { id: 'early-birds',  img: 'shop-early-birds.png',   name: 'Early Birds',          price: 2000, desc: 'Бейдж-достижение при встрече с вашим персонажем',              note: null },
-  { id: 'defibrl',      img: 'shop-defibrl.png',       name: 'Дефибриллятор',        price: 3000, desc: 'Чиби арт от @HeadQuartersIrl',                                 note: null },
-  { id: 'chibi',        img: 'shop-chibi.png',         name: 'Чиби брелок',          price: 4500, desc: 'Мы превратим вашего персонажа в чиби брелок',                  note: null },
+  { id: 'coctaile',     img: 'shop-coctaile.png',      name: 'Коктейль «Перитесен»', price: 400,  desc: 'Иконка вашего персонажа (как в диалогах в игре)',              note: null },
+  { id: 'party-special',img: 'shop-party-special.png', name: 'Party Special',        price: 450,  desc: 'Вашего персонажа превратят в плюш',                            note: null },
+  { id: 'early-birds',  img: 'shop-early-birds.png',   name: 'Early Birds',          price: 600, desc: 'Бейдж-достижение при встрече с вашим персонажем',              note: null },
+  { id: 'necroblox',    img: 'shop-necroblox.png',     name: 'Некроблоксикон',       price: 700, desc: 'Чиби скетч от @Koza_Ruina',                                    note: null },
+  { id: 'defibrl',      img: 'shop-defibrl.png',       name: 'Дефибриллятор',        price: 750, desc: 'Чиби арт от @HeadQuartersIrl',                                 note: null },
+  { id: 'chibi',        img: 'shop-chibi.png',         name: 'Чиби брелок',          price: 1000, desc: 'Мы превратим вашего персонажа в чиби брелок',                  note: null },
 ];
 
 /* ── STATE ── */
