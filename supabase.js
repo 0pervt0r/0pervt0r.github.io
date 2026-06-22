@@ -70,4 +70,20 @@ const sb = {
       prefer: 'return=representation',
     });
   },
+
+  async getInventory(username) {
+    return this.query(
+      `orders?username=eq.${encodeURIComponent(username)}&order=created_at.desc&select=*`
+    );
+  },
+  async useItem(orderId) {
+    return this.query(
+      `orders?id=eq.${orderId}`,
+      {
+        method: 'PATCH',
+        body: { used: true },
+        prefer: 'return=representation',
+      }
+    );
+  },
 };
