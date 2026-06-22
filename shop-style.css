@@ -1,7 +1,4 @@
-/* ============================================================
-   AKTIV SHOP — Urbanshade Corp.
-   Dark teal / neon green — inspired by shop-front.png
-   ============================================================ */
+
 
 :root {
   --bg:        #080f10;
@@ -221,68 +218,111 @@ body::after {
 /* ============================================================
    SHOP
    ============================================================ */
+
+/* ============================================================
+   SHOP — витрина поверх shop-front.png
+   ============================================================ */
 .shop-frame-wrapper {
   display: flex;
   justify-content: center;
-  padding: 40px 20px 60px;
+  padding: 40px 20px 80px;
   background: radial-gradient(ellipse at 50% 0%, #0d2a2e 0%, var(--bg) 60%);
-  min-height: calc(100vh - 120px);
 }
 
-/* The "frame" — mimics shop-front.png structure */
-.shop-inner {
-  width: 100%;
-  max-width: 1100px;
-  background: var(--bg2);
-  border: 2px solid var(--teal-l);
-  border-top: 3px solid var(--green);
-  border-radius: 2px;
-  box-shadow: var(--glow), inset 0 0 60px rgba(20,60,65,0.4);
-  padding: 32px 28px 40px;
+/* Контейнер с рамкой */
+.shop-stage {
   position: relative;
+  width: 100%;
+  max-width: 900px;
 }
 
-/* top neon bar */
-.shop-inner::before {
-  content: 'AKTIV SHOP';
+/* Сама картинка рамки — поверх всего, pointer-events: none */
+.shop-stage-frame {
   position: absolute;
-  top: -36px; left: 50%; transform: translateX(-50%);
-  font-family: var(--font-mono);
-  font-size: 22px;
-  color: var(--green);
-  letter-spacing: 8px;
-  text-shadow: 0 0 10px #39ff14, 0 0 20px #39ff14, 0 0 40px #27b80e;
-  white-space: nowrap;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  pointer-events: none;
+  z-index: 10;
+  display: block;
 }
+
+/* Прокручиваемая витрина ВНУТРИ стекла */
+.shop-inner {
+  position: relative;
+  /* стеклянная область: top 14.5%, bottom 26.8%, left 9%, right 9% */
+  margin-top: 14.5%;
+  margin-bottom: 26.8%;
+  margin-left: 9%;
+  margin-right: 9%;
+  max-height: 480px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: transparent;
+  padding: 16px 10px 16px;
+  scrollbar-width: thin;
+  scrollbar-color: #39ff1440 transparent;
+}
+
+.shop-inner::-webkit-scrollbar { width: 4px; }
+.shop-inner::-webkit-scrollbar-track { background: transparent; }
+.shop-inner::-webkit-scrollbar-thumb { background: #39ff1440; border-radius: 2px; }
 
 /* ── GRID ── */
 .shop-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  gap: 12px;
 }
 
 .shop-item {
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 18px 14px 14px;
-  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  background: rgba(8, 20, 22, 0.55);
+  border: none;          /* ← убрана обводка */
+  border-radius: 6px;
+  padding: 14px 10px 10px;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
   cursor: pointer;
-  transition: border-color .2s, box-shadow .2s, transform .15s;
-  position: relative;
-  overflow: hidden;
-}
-.shop-item::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: linear-gradient(135deg, rgba(57,255,20,0.03) 0%, transparent 60%);
-  pointer-events: none;
+  transition: background .2s, transform .15s;
 }
 .shop-item:hover {
-  border-color: var(--green-dim);
-  box-shadow: var(--glow-s);
-  transform: translateY(-3px);
+  background: rgba(20, 50, 55, 0.75);
+  transform: translateY(-2px);
+}
+
+.shop-item-img {
+  width: 72px; height: 72px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
+}
+
+.shop-item-img-placeholder {
+  width: 72px; height: 72px;
+  background: rgba(26,74,80,0.4);
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; color: var(--text-dim);
+  font-family: var(--font-mono);
+}
+
+.shop-item-name {
+  font-size: 12px; font-weight: 700;
+  color: var(--white);
+  letter-spacing: 0.5px;
+  text-align: center;
+  line-height: 1.3;
+}
+
+.shop-item-price {
+  display: flex; align-items: center; gap: 4px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--gold);
+}
+
+.shop-item-price img {
+  width: 16px; height: 16px;
+  object-fit: contain;
 }
 
 .shop-item-img {
