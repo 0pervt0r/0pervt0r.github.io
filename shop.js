@@ -208,27 +208,14 @@ itemModal.addEventListener('click', e => { if (e.target === itemModal) itemModal
 modalBuyBtn.addEventListener('click', async () => {
   if (!selectedItem || !currentUser) return;
   if (currentUser.crona < selectedItem.price) {
-    showToast('Недостаточно крон 😢', true); return;
+    showToast('Недостаточно крон', true); return;
   }
   const newCrona = currentUser.crona - selectedItem.price;
   modalBuyBtn.textContent = '...'; modalBuyBtn.disabled = true;
   try {
-    // Списываем кроны
     await sb.updateUser(currentUser.username, { crona: newCrona, bonus: currentUser.bonus });
     currentUser.crona = newCrona;
-
-    // Записываем заказ → уведомление в Telegram
     await sb.createOrder(currentUser.username, selectedItem);
-
-    updateHeader();
-    itemModal.classList.add('hidden');
-    showToast(`«${selectedItem.name}» куплено!`);
-  } catch(e) {
-    showToast('Ошибка: ' + e.message, true);
-  }
-  modalBuyBtn.textContent = 'КУПИТЬ'; modalBuyBtn.disabled = false;
-    });
-
     updateHeader();
     itemModal.classList.add('hidden');
     showToast(`«${selectedItem.name}» куплено!`);
@@ -237,6 +224,7 @@ modalBuyBtn.addEventListener('click', async () => {
   }
   modalBuyBtn.textContent = 'КУПИТЬ'; modalBuyBtn.disabled = false;
 });
+
 /* ============================================================
    EXCHANGE MODAL
    ============================================================ */
