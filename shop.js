@@ -213,8 +213,25 @@ modalBuyBtn.addEventListener('click', async () => {
   const newCrona = currentUser.crona - selectedItem.price;
   modalBuyBtn.textContent = '...'; modalBuyBtn.disabled = true;
   try {
+    // Списываем кроны
     await sb.updateUser(currentUser.username, { crona: newCrona, bonus: currentUser.bonus });
     currentUser.crona = newCrona;
+
+    // Записываем заказ → триггерит уведомление в Telegram
+    const { data: userData } = await supabase
+      .from('users')
+      .select('id')
+      .eq('username', currentUser.username)
+      .single();
+
+    await supabase.from('orders').insert({
+      user_id: userData.id,
+      username: currentUser.username,
+      item_id: selectedItem.id,
+      item_name: selectedItem.name,
+      item_price: selectedItem.price
+    });
+
     updateHeader();
     itemModal.classList.add('hidden');
     showToast(`«${selectedItem.name}» куплено!`);
@@ -223,7 +240,6 @@ modalBuyBtn.addEventListener('click', async () => {
   }
   modalBuyBtn.textContent = 'КУПИТЬ'; modalBuyBtn.disabled = false;
 });
-
 /* ============================================================
    EXCHANGE MODAL
    ============================================================ */
