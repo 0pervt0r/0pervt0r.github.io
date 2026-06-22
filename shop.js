@@ -217,19 +217,16 @@ modalBuyBtn.addEventListener('click', async () => {
     await sb.updateUser(currentUser.username, { crona: newCrona, bonus: currentUser.bonus });
     currentUser.crona = newCrona;
 
-    // Записываем заказ → триггерит уведомление в Telegram
-    const { data: userData } = await supabase
-      .from('users')
-      .select('id')
-      .eq('username', currentUser.username)
-      .single();
+    // Записываем заказ → уведомление в Telegram
+    await sb.createOrder(currentUser.username, selectedItem);
 
-    await supabase.from('orders').insert({
-      user_id: userData.id,
-      username: currentUser.username,
-      item_id: selectedItem.id,
-      item_name: selectedItem.name,
-      item_price: selectedItem.price
+    updateHeader();
+    itemModal.classList.add('hidden');
+    showToast(`«${selectedItem.name}» куплено!`);
+  } catch(e) {
+    showToast('Ошибка: ' + e.message, true);
+  }
+  modalBuyBtn.textContent = 'КУПИТЬ'; modalBuyBtn.disabled = false;
     });
 
     updateHeader();
