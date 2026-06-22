@@ -19,7 +19,7 @@ const ITEMS = [
 ];
 
 /* ── STATE ── */
-let currentUser = null;  // { username, crona, bonus }
+let currentUser = null;
 
 /* ── DOM refs ── */
 const authScreen     = document.getElementById('auth-screen');
@@ -56,6 +56,34 @@ const toast          = document.getElementById('toast');
 
 const tabBtns        = document.querySelectorAll('.tab-btn');
 const tabContents    = document.querySelectorAll('.tab-content');
+
+async function buyItem(userId, username, item) {
+  const { data: user } = await supabase
+    .from('users')
+    .select('crona')
+    .eq('id', userId)
+    .single();
+
+  if (user.crona < item.price) {
+    alert('Недостаточно крон!');
+    return;
+  }
+
+  await supabase
+    .from('users')
+    .update({ crona: user.crona - item.price })
+    .eq('id', userId);
+
+  await supabase.from('orders').insert({
+    user_id: userId,
+    username: username,
+    item_id: item.id,
+    item_name: item.name,
+    item_price: item.price
+  });
+
+  alert(`Вы купили ${item.name}!`);
+}
 
 /* ============================================================
    AUTH
