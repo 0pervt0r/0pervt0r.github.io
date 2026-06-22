@@ -535,7 +535,7 @@ body::after {
   .tab-btn { font-size: 11px; padding: 10px 10px; letter-spacing: 1px; }
   .tab-nav { padding: 0 8px; }
   .shop-frame-wrapper { padding: 20px 8px 40px; }
-  .shop-inner { padding: 8px 4px; }
+  .shop-inner { padding: 16px 4px 24px; }
   .shop-item { padding: 6px 3px 5px; gap: 3px; }
   .shop-item-img { width: 44px; height: 44px; }
   .shop-item-name { font-size: 8px; }
