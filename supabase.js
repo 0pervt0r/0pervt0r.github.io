@@ -23,13 +23,19 @@ const sb = {
     return res.json();
   },
 
-  /* get user by username */
   async getUser(username) {
     const rows = await this.query(`users?username=eq.${encodeURIComponent(username)}&select=*`);
     return rows?.[0] || null;
   },
 
-  /* update crona/bonus for a user */
+  async createUser(username) {
+    return this.query('users', {
+      method: 'POST',
+      body: { username: username, crona: 0, bonus: 0 },
+      prefer: 'return=representation',
+    });
+  },
+
   async updateUser(username, { crona, bonus }) {
     return this.query(
       `users?username=eq.${encodeURIComponent(username)}`,
@@ -41,23 +47,11 @@ const sb = {
     );
   },
 
-  /* leaderboard — top 10 by crona */
   async topByCrona() {
     return this.query('users?select=username,crona&order=crona.desc&limit=10');
   },
 
-  /* leaderboard — top 10 by bonus */
   async topByBonus() {
     return this.query('users?select=username,bonus&order=bonus.desc&limit=10');
   },
 };
-
-async createUser(username) {
-  return this.query('users', {
-    method: 'POST',
-    body: { username: username, crona: 0, bonus: 0 },
-    prefer: 'return=representation',
-  });
-},
-
-
