@@ -529,3 +529,14 @@ body::after {
   .header-user { flex-wrap: wrap; }
   .shop-inner { padding: 20px 14px 28px; }
 }
+.inventory-wrap {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 16px;
+  padding: 24px;
+}
+
+.item-used {
+  opacity: 0.45;
+  filter: grayscale(1);
+}
