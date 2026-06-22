@@ -54,4 +54,20 @@ const sb = {
   async topByBonus() {
     return this.query('users?select=username,bonus&order=bonus.desc&limit=10');
   },
+
+  async createOrder(username, item) {
+    const user = await this.getUser(username);
+    if (!user) throw new Error('Пользователь не найден');
+    return this.query('orders', {
+      method: 'POST',
+      body: {
+        user_id: user.id,
+        username: username,
+        item_id: item.id,
+        item_name: item.name,
+        item_price: item.price
+      },
+      prefer: 'return=representation',
+    });
+  },
 };
