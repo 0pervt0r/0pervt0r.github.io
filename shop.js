@@ -195,7 +195,7 @@ function openItemModal(item) {
   modalImg.src  = item.img;
   modalImg.alt  = item.name;
   modalName.textContent  = item.name;
-  modalPrice.textContent = `⬡ ${fmt(item.price)} крон`;
+  modalPrice.innerHTML = `<img src="shop-croner.png" class="ico" onerror="this.style.display='none'" /> ${fmt(item.price)} крон`;
   modalDesc.textContent  = item.desc;
   modalNote.textContent  = item.note || '';
   modalNote.style.display = item.note ? 'block' : 'none';
