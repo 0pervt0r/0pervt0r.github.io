@@ -150,6 +150,152 @@ logoutBtn.addEventListener('click', () => {
 });
 
 /* ============================================================
+   AKTIV SHOP — shop.js
+   ============================================================ */
+
+/* ── CATALOGUE ── */
+const ITEMS = [
+  { id: 'BL1',          img: 'shop-BL1.png',          name: 'BL1',                  price: 60,   desc: 'Защита на чистке',                                             note: null },
+  { id: 'doc',          img: 'shop-doc.png',           name: 'Документ',             price: 160,  desc: 'Документ вашего персонажа добавят на вики Хроник Urbanshade',  note: null },
+  { id: 'medkit',       img: 'shop-medkit.png',        name: 'Аптечка',              price: 200,  desc: 'Рест без выполнения норм',                                     note: null },
+  { id: 'revive',       img: 'shop-revive.png',        name: 'Жетон Лодочника',      price: 250,  desc: 'Снять все варны',                                              note: null },
+  { id: 'scan',         img: 'shop-scan.png',          name: 'Сканнер Себастьяна',   price: 300,  desc: 'Личный ивент, созданный специально под вашего персонажа',      note: null },
+  { id: 'coctaile',     img: 'shop-coctaile.png',      name: 'Коктейль Перитесен',   price: 400,  desc: 'Иконка вашего персонажа (как в диалогах в игре)',              note: null },
+  { id: 'party-special',img: 'shop-party-special.png', name: 'Party Special',        price: 400,  desc: 'Второй персонаж без анкеты',                            note: 'Обязательное условие: вы должны провести в сетке минимум 3 месяца.' },
+  { id: 'toy-remote',   img: 'shop-toy-remote.png',    name: 'Игрушечный пульт',     price: 450,  desc: 'Вашего персонажа превратят в плюш',                                   note: null },
+  { id: 'early-birds',  img: 'shop-early-birds.png',   name: 'Early Birds',          price: 600, desc: 'Бейдж-достижение при встрече с вашим персонажем',              note: null },
+  { id: 'necroblox',    img: 'shop-necroblox.png',     name: 'Некроблоксикон',       price: 700, desc: 'Чиби скетч от @Koza_Ruina',                                    note: null },
+  { id: 'defibrl',      img: 'shop-defibrl.png',       name: 'Дефибриллятор',        price: 750, desc: 'Чиби арт от @HeadQuartersIrl',                                 note: null },
+  { id: 'chibi',        img: 'shop-chibi.png',         name: 'Чиби брелок',          price: 1000, desc: 'Мы превратим вашего персонажа в чиби брелок',                  note: null },
+];
+
+/* ── BONUS CATALOGUE (товары за бонусы, используются мгновенно) ── */
+const BONUS_ITEMS = [
+  {
+    id: 'bonus-norm-cut',
+    img: 'shop-bonus-norm.png',
+    name: 'Снижение нормы',
+    price: 2,
+    desc: 'Снижает вашу следующую норму до 1 поста в неделю. Использовать можно только в день чистки, до начала нормы, которую вы хотите уменьшить.',
+    note: 'Применяется сразу при покупке.',
+  },
+  {
+    id: 'bonus-warn-protect',
+    img: 'shop-bonus-protect.png',
+    name: 'Защита от варна',
+    price: 3,
+    desc: 'Защищает себя или другого участника от получения варна за невыполненную норму.',
+    note: 'Применяется сразу при покупке.',
+  },
+];
+
+/* ── STATE ── */
+let currentUser = null;
+
+/* ── DOM refs ── */
+const authScreen     = document.getElementById('auth-screen');
+const authUsername   = document.getElementById('auth-username');
+const authBtn        = document.getElementById('auth-btn');
+const authError      = document.getElementById('auth-error');
+const app            = document.getElementById('app');
+
+const hdrName        = document.getElementById('hdr-name');
+const hdrCronaVal    = document.getElementById('hdr-crona-val');
+const hdrBonusVal    = document.getElementById('hdr-bonus-val');
+
+const shopGrid       = document.getElementById('shop-grid');
+const bonusShopGrid  = document.getElementById('bonus-shop-grid');
+
+const itemModal      = document.getElementById('item-modal');
+const modalClose     = document.getElementById('modal-close');
+const modalImg       = document.getElementById('modal-img');
+const modalName      = document.getElementById('modal-name');
+const modalPrice     = document.getElementById('modal-price');
+const modalDesc      = document.getElementById('modal-desc');
+const modalNote      = document.getElementById('modal-note');
+const modalBuyBtn    = document.getElementById('modal-buy-btn');
+
+const bonusItemModal   = document.getElementById('bonus-item-modal');
+const bonusModalClose  = document.getElementById('bonus-modal-close');
+const bonusModalImg    = document.getElementById('bonus-modal-img');
+const bonusModalName   = document.getElementById('bonus-modal-name');
+const bonusModalPrice  = document.getElementById('bonus-modal-price');
+const bonusModalDesc   = document.getElementById('bonus-modal-desc');
+const bonusModalBuyBtn = document.getElementById('bonus-modal-buy-btn');
+
+const exchangeModal  = document.getElementById('exchange-modal');
+const exchangeClose  = document.getElementById('exchange-close');
+const openExchangeBtn= document.getElementById('open-exchange');
+const exBonusCount   = document.getElementById('ex-bonus-count');
+const exCronaCount   = document.getElementById('ex-crona-count');
+const btnBonusToC    = document.getElementById('btn-bonus-to-crona');
+const btnCToBonus    = document.getElementById('btn-crona-to-bonus');
+
+const logoutBtn      = document.getElementById('logout-btn');
+const toast          = document.getElementById('toast');
+
+const tabBtns        = document.querySelectorAll('.tab-btn');
+const tabContents    = document.querySelectorAll('.tab-content');
+
+/* ============================================================
+   AUTH
+   ============================================================ */
+authBtn.addEventListener('click', doLogin);
+authUsername.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('aktiv_user');
+  if (saved) {
+    try {
+      currentUser = JSON.parse(saved);
+      authScreen.classList.add('hidden');
+      app.classList.remove('hidden');
+      sb.getUser(currentUser.username).then(user => {
+        if (user) {
+          currentUser.crona = user.crona ?? 0;
+          currentUser.bonus = user.bonus ?? 0;
+          updateHeader();
+        }
+      });
+      initApp();
+    } catch(e) {
+      localStorage.removeItem('aktiv_user');
+    }
+  }
+});
+
+async function doLogin() {
+  const name = authUsername.value.trim();
+  if (!name) { authError.textContent = 'Введите ваш ник'; return; }
+  authBtn.textContent = '...'; authBtn.disabled = true;
+  authError.textContent = '';
+  try {
+    let user = await sb.getUser(name);
+    if (!user) {
+      const created = await sb.createUser(name);
+      user = created?.[0] || { username: name, crona: 0, bonus: 0 };
+    }
+    currentUser = { username: user.username, crona: user.crona ?? 0, bonus: user.bonus ?? 0 };
+    localStorage.setItem('aktiv_user', JSON.stringify(currentUser));
+    authScreen.classList.add('hidden');
+    app.classList.remove('hidden');
+    initApp();
+  } catch(e) {
+    authError.textContent = 'Ошибка: ' + e.message;
+  }
+  authBtn.textContent = 'ВОЙТИ'; authBtn.disabled = false;
+}
+
+logoutBtn.addEventListener('click', () => {
+  currentUser = null;
+  localStorage.removeItem('aktiv_user');
+  app.classList.add('hidden');
+  authScreen.classList.remove('hidden');
+  authUsername.value = '';
+  authError.textContent = '';
+});
+
+/* ============================================================
    INIT
    ============================================================ */
 function initApp() {
@@ -159,7 +305,6 @@ function initApp() {
   loadLeaders();
 }
 
-/* ── header ── */
 function updateHeader() {
   hdrName.textContent = currentUser.username;
   hdrCronaVal.textContent = fmt(currentUser.crona);
@@ -206,6 +351,7 @@ function buildBonusShopGrid() {
     bonusShopGrid.appendChild(el);
   });
 }
+
 let selectedItem = null;
 
 function openItemModal(item) {
@@ -234,6 +380,7 @@ modalBuyBtn.addEventListener('click', async () => {
     await sb.updateUser(currentUser.username, { crona: newCrona, bonus: currentUser.bonus });
     currentUser.crona = newCrona;
     await sb.createOrder(currentUser.username, selectedItem);
+    sb.notify(`@${currentUser.username} купил ${selectedItem.name}`);
     updateHeader();
     itemModal.classList.add('hidden');
     showToast(`«${selectedItem.name}» куплено!`);
@@ -244,7 +391,7 @@ modalBuyBtn.addEventListener('click', async () => {
 });
 
 /* ============================================================
-   BONUS ITEM MODAL — товары за бонусы, используются мгновенно
+   BONUS ITEM MODAL
    ============================================================ */
 let selectedBonusItem = null;
 
@@ -274,6 +421,7 @@ bonusModalBuyBtn.addEventListener('click', async () => {
     await sb.updateUser(currentUser.username, { crona: currentUser.crona, bonus: newBonus });
     currentUser.bonus = newBonus;
     await sb.createUsedOrder(currentUser.username, selectedBonusItem);
+    sb.notify(`\u26a1 Бонус использован!\n@${currentUser.username} использовал ${selectedBonusItem.name}`);
     updateHeader();
     bonusItemModal.classList.add('hidden');
     showToast(`«${selectedBonusItem.name}» применено!`);
@@ -298,14 +446,14 @@ btnBonusToC.addEventListener('click', async () => {
   if (currentUser.bonus < 1) { showToast('Нет бонусов для обмена', true); return; }
   const newBonus = currentUser.bonus - 1;
   const newCrona = currentUser.crona + 25;
-  await doExchange(newCrona, newBonus, '1 бонус → 25 крон');
+  await doExchange(newCrona, newBonus, '1 бонус -> 25 крон');
 });
 
 btnCToBonus.addEventListener('click', async () => {
   if (currentUser.crona < 30) { showToast('Нужно минимум 30 крон', true); return; }
   const newCrona = currentUser.crona - 30;
   const newBonus = currentUser.bonus + 1;
-  await doExchange(newCrona, newBonus, '30 крон → 1 бонус');
+  await doExchange(newCrona, newBonus, '30 крон -> 1 бонус');
 });
 
 async function doExchange(newCrona, newBonus, label) {
@@ -416,6 +564,7 @@ async function loadInventory() {
           if (!confirm(`Использовать «${order.item_name}»? Предмет исчезнет.`)) return;
           try {
             await sb.useItem(order.id);
+            sb.notify(`@${currentUser.username} использовал ${order.item_name}`);
             showToast(`«${order.item_name}» использован!`);
             loadInventory();
           } catch(err) {
