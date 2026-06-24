@@ -24,6 +24,17 @@ const sb = {
     return res.json();
   },
 
+  async notify(message) {
+  return fetch(`${SUPABASE_URL}/functions/v1/notify`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+    },
+    body: JSON.stringify({ message }),
+  });
+},
+  
   /* ── USERS ── */
 
   /* get user by username */
