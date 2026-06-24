@@ -3,6 +3,7 @@ const SUPABASE_URL = 'https://pnpblkrgansvuhhhajwg.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBucGJsa3JnYW5zdnVoaGhhandnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxMzMzMDUsImV4cCI6MjA5NzcwOTMwNX0.iebKL_Lm7Db2ZVRvZvwXExQpDrghCW6VRq3RWBppbDU';
 
 const sb = {
+  /* ── base fetch ── */
   async query(path, opts = {}) {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
       headers: {
@@ -23,10 +24,21 @@ const sb = {
     return res.json();
   },
 
+  /* ── USERS ── */
+
   /* get user by username */
   async getUser(username) {
     const rows = await this.query(`users?username=eq.${encodeURIComponent(username)}&select=*`);
     return rows?.[0] || null;
+  },
+
+  /* create new user with 0 crona / 0 bonus */
+  async createUser(username) {
+    return this.query('users', {
+      method: 'POST',
+      body: { username, crona: 0, bonus: 0 },
+      prefer: 'return=representation',
+    });
   },
 
   /* update crona/bonus for a user */
@@ -49,5 +61,58 @@ const sb = {
   /* leaderboard — top 10 by bonus */
   async topByBonus() {
     return this.query('users?select=username,bonus&order=bonus.desc&limit=10');
+  },
+
+  /* ── ORDERS (магазин за кроны) ── */
+
+  /* create purchase order */
+  async createOrder(username, item) {
+    return this.query('orders', {
+      method: 'POST',
+      body: {
+        username,
+        item_id:    item.id,
+        item_name:  item.name,
+        item_price: item.price,
+        used: false,
+      },
+      prefer: 'return=representation',
+    });
+  },
+
+  /* get inventory (all orders) for user */
+  async getInventory(username) {
+    return this.query(
+      `orders?username=eq.${encodeURIComponent(username)}&select=*&order=created_at.desc`
+    );
+  },
+
+  /* mark an order as used */
+  async useItem(orderId) {
+    return this.query(
+      `orders?id=eq.${encodeURIComponent(orderId)}`,
+      {
+        method: 'PATCH',
+        body: { used: true },
+        prefer: 'return=representation',
+      }
+    );
+  },
+
+  /* ── BONUS ORDERS (мгновенное использование бонусов) ── */
+
+  /* create a "used" bonus order (применяется сразу, used=true) */
+  async createUsedOrder(username, item) {
+    return this.query('orders', {
+      method: 'POST',
+      body: {
+        username,
+        item_id:    item.id,
+        item_name:  item.name,
+        item_price: item.price,
+        used: true,
+      },
+      prefer: 'return=representation',
+    });
   },
 };
