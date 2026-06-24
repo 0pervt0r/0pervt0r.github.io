@@ -1,5 +1,3 @@
-
-
 /* ============================================================
    AKTIV SHOP — shop.js
    ============================================================ */
@@ -11,12 +9,12 @@ const ITEMS = [
   { id: 'medkit',       img: 'shop-medkit.png',        name: 'Аптечка',              price: 200,  desc: 'Рест без выполнения норм',                                     note: null },
   { id: 'revive',       img: 'shop-revive.png',        name: 'Жетон Лодочника',      price: 250,  desc: 'Снять все варны',                                              note: null },
   { id: 'scan',         img: 'shop-scan.png',          name: 'Сканнер Себастьяна',   price: 300,  desc: 'Личный ивент, созданный специально под вашего персонажа',      note: null },
-  { id: 'coctaile',     img: 'shop-coctaile.png',      name: 'Коктейль Перитесен',   price: 400,  desc: 'Иконка вашего персонажа (как в диалогах в игре)',              note: null },
-  { id: 'party-special',img: 'shop-party-special.png', name: 'Party Special',        price: 400,  desc: 'Второй персонаж без анкеты',                            note: 'Обязательное условие: вы должны провести в сетке минимум 3 месяца.' },
-  { id: 'toy-remote',   img: 'shop-toy-remote.png',    name: 'Игрушечный пульт',     price: 450,  desc: 'Вашего персонажа превратят в плюш',                                   note: null },
-  { id: 'early-birds',  img: 'shop-early-birds.png',   name: 'Early Birds',          price: 600, desc: 'Бейдж-достижение при встрече с вашим персонажем',              note: null },
-  { id: 'necroblox',    img: 'shop-necroblox.png',     name: 'Некроблоксикон',       price: 700, desc: 'Чиби скетч от @Koza_Ruina',                                    note: null },
-  { id: 'defibrl',      img: 'shop-defibrl.png',       name: 'Дефибриллятор',        price: 750, desc: 'Чиби арт от @HeadQuartersIrl',                                 note: null },
+  { id: 'coctaile',     img: 'shop-coctaile.png',      name: 'Коктейль «Перитесен»', price: 400,  desc: 'Иконка вашего персонажа (как в диалогах в игре)',              note: null },
+  { id: 'party-special',img: 'shop-party-special.png', name: 'Party Special',        price: 400,  desc: 'Второй персонаж без анкеты',                                   note: 'Обязательное условие: вы должны провести в сетке минимум 3 месяца.' },
+  { id: 'toy-remote',   img: 'shop-toy-remote.png',    name: 'Игрушечный пульт',     price: 450,  desc: 'Вашего персонажа превратят в плюш',                            note: null },
+  { id: 'early-birds',  img: 'shop-early-birds.png',   name: 'Early Birds',          price: 600,  desc: 'Бейдж-достижение при встрече с вашим персонажем',              note: null },
+  { id: 'necroblox',    img: 'shop-necroblox.png',     name: 'Некроблоксикон',       price: 700,  desc: 'Чиби скетч от @Koza_Ruina',                                    note: null },
+  { id: 'defibrl',      img: 'shop-defibrl.png',       name: 'Дефибриллятор',        price: 750,  desc: 'Чиби арт от @HeadQuartersIrl',                                 note: null },
   { id: 'chibi',        img: 'shop-chibi.png',         name: 'Чиби брелок',          price: 1000, desc: 'Мы превратим вашего персонажа в чиби брелок',                  note: null },
 ];
 
@@ -74,19 +72,19 @@ const bonusModalPrice  = document.getElementById('bonus-modal-price');
 const bonusModalDesc   = document.getElementById('bonus-modal-desc');
 const bonusModalBuyBtn = document.getElementById('bonus-modal-buy-btn');
 
-const exchangeModal  = document.getElementById('exchange-modal');
-const exchangeClose  = document.getElementById('exchange-close');
-const openExchangeBtn= document.getElementById('open-exchange');
-const exBonusCount   = document.getElementById('ex-bonus-count');
-const exCronaCount   = document.getElementById('ex-crona-count');
-const btnBonusToC    = document.getElementById('btn-bonus-to-crona');
-const btnCToBonus    = document.getElementById('btn-crona-to-bonus');
+const exchangeModal   = document.getElementById('exchange-modal');
+const exchangeClose   = document.getElementById('exchange-close');
+const openExchangeBtn = document.getElementById('open-exchange');
+const exBonusCount    = document.getElementById('ex-bonus-count');
+const exCronaCount    = document.getElementById('ex-crona-count');
+const btnBonusToC     = document.getElementById('btn-bonus-to-crona');
+const btnCToBonus     = document.getElementById('btn-crona-to-bonus');
 
-const logoutBtn      = document.getElementById('logout-btn');
-const toast          = document.getElementById('toast');
+const logoutBtn  = document.getElementById('logout-btn');
+const toast      = document.getElementById('toast');
 
-const tabBtns        = document.querySelectorAll('.tab-btn');
-const tabContents    = document.querySelectorAll('.tab-content');
+const tabBtns     = document.querySelectorAll('.tab-btn');
+const tabContents = document.querySelectorAll('.tab-content');
 
 /* ============================================================
    AUTH
@@ -157,7 +155,7 @@ function initApp() {
 }
 
 function updateHeader() {
-  hdrName.textContent = currentUser.username;
+  hdrName.textContent     = currentUser.username;
   hdrCronaVal.textContent = fmt(currentUser.crona);
   hdrBonusVal.textContent = fmt(currentUser.bonus);
 }
@@ -203,15 +201,18 @@ function buildBonusShopGrid() {
   });
 }
 
+/* ============================================================
+   ITEM MODAL (кроны)
+   ============================================================ */
 let selectedItem = null;
 
 function openItemModal(item) {
   selectedItem = item;
   modalImg.src  = item.img;
   modalImg.alt  = item.name;
-  modalName.textContent  = item.name;
-  modalPrice.innerHTML = `<img src="shop-croner.png" class="ico" onerror="this.style.display='none'" /> ${fmt(item.price)} крон`;
-  modalDesc.textContent  = item.desc;
+  modalName.textContent = item.name;
+  modalPrice.innerHTML  = `<img src="shop-croner.png" class="ico" onerror="this.style.display='none'" /> ${fmt(item.price)} крон`;
+  modalDesc.textContent = item.desc;
   modalNote.textContent  = item.note || '';
   modalNote.style.display = item.note ? 'block' : 'none';
   itemModal.classList.remove('hidden');
@@ -251,7 +252,7 @@ function openBonusItemModal(item) {
   bonusModalImg.src  = item.img;
   bonusModalImg.alt  = item.name;
   bonusModalName.textContent  = item.name;
-  bonusModalPrice.innerHTML = `<img src="shop-bonus.png" class="ico" onerror="this.style.display='none'" /> ${fmt(item.price)} бонусов`;
+  bonusModalPrice.innerHTML   = `<img src="shop-bonus.png" class="ico" onerror="this.style.display='none'" /> ${fmt(item.price)} бонусов`;
   bonusModalDesc.textContent  = item.desc;
   bonusItemModal.classList.remove('hidden');
 }
@@ -272,7 +273,7 @@ bonusModalBuyBtn.addEventListener('click', async () => {
     await sb.updateUser(currentUser.username, { crona: currentUser.crona, bonus: newBonus });
     currentUser.bonus = newBonus;
     await sb.createUsedOrder(currentUser.username, selectedBonusItem);
-    sb.notify(`\u26a1 Бонус использован!\n@${currentUser.username} использовал ${selectedBonusItem.name}`);
+    sb.notify(`⚡ Бонус использован!\n@${currentUser.username} использовал ${selectedBonusItem.name}`);
     updateHeader();
     bonusItemModal.classList.add('hidden');
     showToast(`«${selectedBonusItem.name}» применено!`);
@@ -297,14 +298,14 @@ btnBonusToC.addEventListener('click', async () => {
   if (currentUser.bonus < 1) { showToast('Нет бонусов для обмена', true); return; }
   const newBonus = currentUser.bonus - 1;
   const newCrona = currentUser.crona + 25;
-  await doExchange(newCrona, newBonus, '1 бонус -> 25 крон');
+  await doExchange(newCrona, newBonus, '1 бонус → 25 крон');
 });
 
 btnCToBonus.addEventListener('click', async () => {
   if (currentUser.crona < 30) { showToast('Нужно минимум 30 крон', true); return; }
   const newCrona = currentUser.crona - 30;
   const newBonus = currentUser.bonus + 1;
-  await doExchange(newCrona, newBonus, '30 крон -> 1 бонус');
+  await doExchange(newCrona, newBonus, '30 крон → 1 бонус');
 });
 
 async function doExchange(newCrona, newBonus, label) {
