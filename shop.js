@@ -10,15 +10,15 @@ const ITEMS = [
   { id: 'revive',       img: 'shop-revive.png',        name: 'Жетон Лодочника',      price: 250,  desc: 'Снять все варны',                                              note: null },
   { id: 'scan',         img: 'shop-scan.png',          name: 'Сканнер Себастьяна',   price: 300,  desc: 'Личный ивент, созданный специально под вашего персонажа',      note: null },
   { id: 'coctaile',     img: 'shop-coctaile.png',      name: 'Коктейль «Перитесен»', price: 400,  desc: 'Иконка вашего персонажа (как в диалогах в игре)',              note: null },
-  { id: 'party-special',img: 'shop-party-special.png', name: 'Party Special',        price: 400,  desc: 'Второй персонаж без анкеты',                                   note: 'Обязательное условие: вы должны провести в сетке минимум 3 месяца.' },
-  { id: 'toy-remote',   img: 'shop-toy-remote.png',    name: 'Игрушечный пульт',     price: 450,  desc: 'Вашего персонажа превратят в плюш',                            note: null },
-  { id: 'early-birds',  img: 'shop-early-birds.png',   name: 'Early Birds',          price: 600,  desc: 'Бейдж-достижение при встрече с вашим персонажем',              note: null },
-  { id: 'necroblox',    img: 'shop-necroblox.png',     name: 'Некроблоксикон',       price: 700,  desc: 'Чиби скетч от @Koza_Ruina',                                    note: null },
-  { id: 'defibrl',      img: 'shop-defibrl.png',       name: 'Дефибриллятор',        price: 750,  desc: 'Чиби арт от @HeadQuartersIrl',                                 note: null },
+  { id: 'party-special',img: 'shop-party-special.png', name: 'Party Special',        price: 400,  desc: 'Второй персонаж без анкеты',                            note: 'Обязательное условие: вы должны провести в сетке минимум 3 месяца.' },
+  { id: 'toy-remote',   img: 'shop-toy-remote.png',    name: 'Игрушечный пульт',     price: 450,  desc: 'Вашего персонажа превратят в плюш',                                   note: null },
+  { id: 'early-birds',  img: 'shop-early-birds.png',   name: 'Early Birds',          price: 600, desc: 'Бейдж-достижение при встрече с вашим персонажем',              note: null },
+  { id: 'necroblox',    img: 'shop-necroblox.png',     name: 'Некроблоксикон',       price: 700, desc: 'Чиби скетч от @Koza_Ruina',                                    note: null },
+  { id: 'defibrl',      img: 'shop-defibrl.png',       name: 'Дефибриллятор',        price: 750, desc: 'Чиби арт от @HeadQuartersIrl',                                 note: null },
   { id: 'chibi',        img: 'shop-chibi.png',         name: 'Чиби брелок',          price: 1000, desc: 'Мы превратим вашего персонажа в чиби брелок',                  note: null },
 ];
 
-/* ── BONUS CATALOGUE ── */
+/* ── BONUS CATALOGUE (товары за бонусы, используются мгновенно) ── */
 const BONUS_ITEMS = [
   {
     id: 'bonus-norm-cut',
@@ -26,6 +26,7 @@ const BONUS_ITEMS = [
     name: 'Снижение нормы',
     price: 2,
     desc: 'Снижает вашу следующую норму до 1 поста в неделю. Использовать можно только в день чистки, до начала нормы, которую вы хотите уменьшить.',
+    note: 'Применяется сразу при покупке.',
   },
   {
     id: 'bonus-warn-protect',
@@ -33,6 +34,7 @@ const BONUS_ITEMS = [
     name: 'Защита от варна',
     price: 3,
     desc: 'Защищает себя или другого участника от получения варна за невыполненную норму.',
+    note: 'Применяется сразу при покупке.',
   },
 ];
 
@@ -90,6 +92,7 @@ const tabContents    = document.querySelectorAll('.tab-content');
 authBtn.addEventListener('click', doLogin);
 authUsername.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 
+// Восстановить сессию при загрузке страницы
 window.addEventListener('DOMContentLoaded', () => {
   const saved = localStorage.getItem('aktiv_user');
   if (saved) {
@@ -97,6 +100,7 @@ window.addEventListener('DOMContentLoaded', () => {
       currentUser = JSON.parse(saved);
       authScreen.classList.add('hidden');
       app.classList.remove('hidden');
+      // Обновить данные с сервера (вдруг кроны изменились)
       sb.getUser(currentUser.username).then(user => {
         if (user) {
           currentUser.crona = user.crona ?? 0;
@@ -118,10 +122,13 @@ async function doLogin() {
   authError.textContent = '';
   try {
     let user = await sb.getUser(name);
+    
+    // Если пользователя нет — создать нового
     if (!user) {
       const created = await sb.createUser(name);
       user = created?.[0] || { username: name, crona: 0, bonus: 0 };
     }
+    
     currentUser = { username: user.username, crona: user.crona ?? 0, bonus: user.bonus ?? 0 };
     localStorage.setItem('aktiv_user', JSON.stringify(currentUser));
     authScreen.classList.add('hidden');
@@ -135,7 +142,7 @@ async function doLogin() {
 
 logoutBtn.addEventListener('click', () => {
   currentUser = null;
-  localStorage.removeItem('aktiv_user');
+  localStorage.removeItem('aktiv_user'); // ← очищаем сессию
   app.classList.add('hidden');
   authScreen.classList.remove('hidden');
   authUsername.value = '';
@@ -152,6 +159,7 @@ function initApp() {
   loadLeaders();
 }
 
+/* ── header ── */
 function updateHeader() {
   hdrName.textContent = currentUser.username;
   hdrCronaVal.textContent = fmt(currentUser.crona);
@@ -198,10 +206,6 @@ function buildBonusShopGrid() {
     bonusShopGrid.appendChild(el);
   });
 }
-
-/* ============================================================
-   ITEM MODAL
-   ============================================================ */
 let selectedItem = null;
 
 function openItemModal(item) {
@@ -240,7 +244,7 @@ modalBuyBtn.addEventListener('click', async () => {
 });
 
 /* ============================================================
-   BONUS ITEM MODAL
+   BONUS ITEM MODAL — товары за бонусы, используются мгновенно
    ============================================================ */
 let selectedBonusItem = null;
 
@@ -270,7 +274,6 @@ bonusModalBuyBtn.addEventListener('click', async () => {
     await sb.updateUser(currentUser.username, { crona: currentUser.crona, bonus: newBonus });
     currentUser.bonus = newBonus;
     await sb.createUsedOrder(currentUser.username, selectedBonusItem);
-    await notifyBonusUsed(currentUser.username, selectedBonusItem.name);
     updateHeader();
     bonusItemModal.classList.add('hidden');
     showToast(`«${selectedBonusItem.name}» применено!`);
@@ -279,19 +282,6 @@ bonusModalBuyBtn.addEventListener('click', async () => {
   }
   bonusModalBuyBtn.textContent = 'ИСПОЛЬЗОВАТЬ'; bonusModalBuyBtn.disabled = false;
 });
-
-/* ── Telegram уведомление об использовании бонусного товара ── */
-async function notifyBonusUsed(username, itemName) {
-  try {
-    await fetch('https://<YOUR_PROJECT>.supabase.co/functions/v1/notify-used', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, item_name: itemName, used: true })
-    });
-  } catch(e) {
-    console.warn('Notify failed:', e.message);
-  }
-}
 
 /* ============================================================
    EXCHANGE MODAL
