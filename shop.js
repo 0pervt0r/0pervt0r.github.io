@@ -10,12 +10,30 @@ const ITEMS = [
   { id: 'revive',       img: 'shop-revive.png',        name: 'Жетон Лодочника',      price: 250,  desc: 'Снять все варны',                                              note: null },
   { id: 'scan',         img: 'shop-scan.png',          name: 'Сканнер Себастьяна',   price: 300,  desc: 'Личный ивент, созданный специально под вашего персонажа',      note: null },
   { id: 'coctaile',     img: 'shop-coctaile.png',      name: 'Коктейль «Перитесен»', price: 400,  desc: 'Иконка вашего персонажа (как в диалогах в игре)',              note: null },
-  { id: 'party-special',img: 'shop-party-special.png', name: 'Party Special',        price: 400,  desc: 'Второй персонаж без анкеты',                            note: 'Обязательное условие: вы должны провести в сетке минимум 3 месяца.' },
-  { id: 'toy-remote',   img: 'shop-toy-remote.png',    name: 'Игрушечный пульт',     price: 450,  desc: 'Вашего персонажа превратят в плюш',                                   note: null },
-  { id: 'early-birds',  img: 'shop-early-birds.png',   name: 'Early Birds',          price: 600, desc: 'Бейдж-достижение при встрече с вашим персонажем',              note: null },
-  { id: 'necroblox',    img: 'shop-necroblox.png',     name: 'Некроблоксикон',       price: 700, desc: 'Чиби скетч от @Koza_Ruina',                                    note: null },
-  { id: 'defibrl',      img: 'shop-defibrl.png',       name: 'Дефибриллятор',        price: 750, desc: 'Чиби арт от @HeadQuartersIrl',                                 note: null },
+  { id: 'party-special',img: 'shop-party-special.png', name: 'Party Special',        price: 400,  desc: 'Второй персонаж без анкеты',                                   note: 'Обязательное условие: вы должны провести в сетке минимум 3 месяца.' },
+  { id: 'toy-remote',   img: 'shop-toy-remote.png',    name: 'Игрушечный пульт',     price: 450,  desc: 'Вашего персонажа превратят в плюш',                            note: null },
+  { id: 'early-birds',  img: 'shop-early-birds.png',   name: 'Early Birds',          price: 600,  desc: 'Бейдж-достижение при встрече с вашим персонажем',              note: null },
+  { id: 'necroblox',    img: 'shop-necroblox.png',     name: 'Некроблоксикон',       price: 700,  desc: 'Чиби скетч от @Koza_Ruina',                                    note: null },
+  { id: 'defibrl',      img: 'shop-defibrl.png',       name: 'Дефибриллятор',        price: 750,  desc: 'Чиби арт от @HeadQuartersIrl',                                 note: null },
   { id: 'chibi',        img: 'shop-chibi.png',         name: 'Чиби брелок',          price: 1000, desc: 'Мы превратим вашего персонажа в чиби брелок',                  note: null },
+];
+
+/* ── BONUS CATALOGUE ── */
+const BONUS_ITEMS = [
+  {
+    id: 'bonus-norm-cut',
+    img: 'shop-bonus-norm.png',
+    name: 'Снижение нормы',
+    price: 2,
+    desc: 'Снижает вашу следующую норму до 1 поста в неделю. Использовать можно только в день чистки, до начала нормы, которую вы хотите уменьшить.',
+  },
+  {
+    id: 'bonus-warn-protect',
+    img: 'shop-bonus-protect.png',
+    name: 'Защита от варна',
+    price: 3,
+    desc: 'Защищает себя или другого участника от получения варна за невыполненную норму.',
+  },
 ];
 
 /* ── STATE ── */
@@ -33,6 +51,7 @@ const hdrCronaVal    = document.getElementById('hdr-crona-val');
 const hdrBonusVal    = document.getElementById('hdr-bonus-val');
 
 const shopGrid       = document.getElementById('shop-grid');
+const bonusShopGrid  = document.getElementById('bonus-shop-grid');
 
 const itemModal      = document.getElementById('item-modal');
 const modalClose     = document.getElementById('modal-close');
@@ -42,6 +61,14 @@ const modalPrice     = document.getElementById('modal-price');
 const modalDesc      = document.getElementById('modal-desc');
 const modalNote      = document.getElementById('modal-note');
 const modalBuyBtn    = document.getElementById('modal-buy-btn');
+
+const bonusItemModal   = document.getElementById('bonus-item-modal');
+const bonusModalClose  = document.getElementById('bonus-modal-close');
+const bonusModalImg    = document.getElementById('bonus-modal-img');
+const bonusModalName   = document.getElementById('bonus-modal-name');
+const bonusModalPrice  = document.getElementById('bonus-modal-price');
+const bonusModalDesc   = document.getElementById('bonus-modal-desc');
+const bonusModalBuyBtn = document.getElementById('bonus-modal-buy-btn');
 
 const exchangeModal  = document.getElementById('exchange-modal');
 const exchangeClose  = document.getElementById('exchange-close');
@@ -57,41 +84,12 @@ const toast          = document.getElementById('toast');
 const tabBtns        = document.querySelectorAll('.tab-btn');
 const tabContents    = document.querySelectorAll('.tab-content');
 
-async function buyItem(userId, username, item) {
-  const { data: user } = await supabase
-    .from('users')
-    .select('crona')
-    .eq('id', userId)
-    .single();
-
-  if (user.crona < item.price) {
-    alert('Недостаточно крон!');
-    return;
-  }
-
-  await supabase
-    .from('users')
-    .update({ crona: user.crona - item.price })
-    .eq('id', userId);
-
-  await supabase.from('orders').insert({
-    user_id: userId,
-    username: username,
-    item_id: item.id,
-    item_name: item.name,
-    item_price: item.price
-  });
-
-  alert(`Вы купили ${item.name}!`);
-}
-
 /* ============================================================
    AUTH
    ============================================================ */
 authBtn.addEventListener('click', doLogin);
 authUsername.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 
-// Восстановить сессию при загрузке страницы
 window.addEventListener('DOMContentLoaded', () => {
   const saved = localStorage.getItem('aktiv_user');
   if (saved) {
@@ -99,7 +97,6 @@ window.addEventListener('DOMContentLoaded', () => {
       currentUser = JSON.parse(saved);
       authScreen.classList.add('hidden');
       app.classList.remove('hidden');
-      // Обновить данные с сервера (вдруг кроны изменились)
       sb.getUser(currentUser.username).then(user => {
         if (user) {
           currentUser.crona = user.crona ?? 0;
@@ -121,13 +118,10 @@ async function doLogin() {
   authError.textContent = '';
   try {
     let user = await sb.getUser(name);
-    
-    // Если пользователя нет — создать нового
     if (!user) {
       const created = await sb.createUser(name);
       user = created?.[0] || { username: name, crona: 0, bonus: 0 };
     }
-    
     currentUser = { username: user.username, crona: user.crona ?? 0, bonus: user.bonus ?? 0 };
     localStorage.setItem('aktiv_user', JSON.stringify(currentUser));
     authScreen.classList.add('hidden');
@@ -141,7 +135,7 @@ async function doLogin() {
 
 logoutBtn.addEventListener('click', () => {
   currentUser = null;
-  localStorage.removeItem('aktiv_user'); // ← очищаем сессию
+  localStorage.removeItem('aktiv_user');
   app.classList.add('hidden');
   authScreen.classList.remove('hidden');
   authUsername.value = '';
@@ -154,10 +148,10 @@ logoutBtn.addEventListener('click', () => {
 function initApp() {
   updateHeader();
   buildShopGrid();
+  buildBonusShopGrid();
   loadLeaders();
 }
 
-/* ── header ── */
 function updateHeader() {
   hdrName.textContent = currentUser.username;
   hdrCronaVal.textContent = fmt(currentUser.crona);
@@ -182,6 +176,26 @@ function buildShopGrid() {
     `;
     el.addEventListener('click', () => openItemModal(item));
     shopGrid.appendChild(el);
+  });
+}
+
+/* ============================================================
+   BONUS SHOP GRID
+   ============================================================ */
+function buildBonusShopGrid() {
+  bonusShopGrid.innerHTML = '';
+  BONUS_ITEMS.forEach(item => {
+    const el = document.createElement('div');
+    el.className = 'bonus-shop-item';
+    el.innerHTML = `
+      <img class="bonus-shop-item-img" src="${item.img}" alt="${item.name}"
+           onerror="this.outerHTML='<div class=\\'shop-item-img-placeholder\\'>NO IMG</div>'" />
+      <div class="bonus-shop-item-name">${item.name}</div>
+      <div class="bonus-shop-item-price"><img src="shop-bonus.png" class="ico" onerror="this.style.display='none'" /> ${fmt(item.price)}</div>
+      <div class="bonus-shop-item-tag">сразу используется</div>
+    `;
+    el.addEventListener('click', () => openBonusItemModal(item));
+    bonusShopGrid.appendChild(el);
   });
 }
 
@@ -224,6 +238,60 @@ modalBuyBtn.addEventListener('click', async () => {
   }
   modalBuyBtn.textContent = 'КУПИТЬ'; modalBuyBtn.disabled = false;
 });
+
+/* ============================================================
+   BONUS ITEM MODAL
+   ============================================================ */
+let selectedBonusItem = null;
+
+function openBonusItemModal(item) {
+  selectedBonusItem = item;
+  bonusModalImg.src  = item.img;
+  bonusModalImg.alt  = item.name;
+  bonusModalName.textContent  = item.name;
+  bonusModalPrice.innerHTML = `<img src="shop-bonus.png" class="ico" onerror="this.style.display='none'" /> ${fmt(item.price)} бонусов`;
+  bonusModalDesc.textContent  = item.desc;
+  bonusItemModal.classList.remove('hidden');
+}
+
+bonusModalClose.addEventListener('click', () => bonusItemModal.classList.add('hidden'));
+bonusItemModal.addEventListener('click', e => { if (e.target === bonusItemModal) bonusItemModal.classList.add('hidden'); });
+
+bonusModalBuyBtn.addEventListener('click', async () => {
+  if (!selectedBonusItem || !currentUser) return;
+  if (currentUser.bonus < selectedBonusItem.price) {
+    showToast('Недостаточно бонусов', true); return;
+  }
+  if (!confirm(`Использовать «${selectedBonusItem.name}» за ${selectedBonusItem.price} бонусов? Применится сразу.`)) return;
+
+  const newBonus = currentUser.bonus - selectedBonusItem.price;
+  bonusModalBuyBtn.textContent = '...'; bonusModalBuyBtn.disabled = true;
+  try {
+    await sb.updateUser(currentUser.username, { crona: currentUser.crona, bonus: newBonus });
+    currentUser.bonus = newBonus;
+    await sb.createUsedOrder(currentUser.username, selectedBonusItem);
+    await notifyBonusUsed(currentUser.username, selectedBonusItem.name);
+    updateHeader();
+    bonusItemModal.classList.add('hidden');
+    showToast(`«${selectedBonusItem.name}» применено!`);
+  } catch(e) {
+    showToast('Ошибка: ' + e.message, true);
+  }
+  bonusModalBuyBtn.textContent = 'ИСПОЛЬЗОВАТЬ'; bonusModalBuyBtn.disabled = false;
+});
+
+/* ── Telegram уведомление об использовании бонусного товара ── */
+async function notifyBonusUsed(username, itemName) {
+  try {
+    await fetch('https://<YOUR_PROJECT>.supabase.co/functions/v1/notify-used', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, item_name: itemName, used: true })
+    });
+  } catch(e) {
+    console.warn('Notify failed:', e.message);
+  }
+}
 
 /* ============================================================
    EXCHANGE MODAL
