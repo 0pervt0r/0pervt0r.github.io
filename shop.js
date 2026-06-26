@@ -232,7 +232,6 @@ modalBuyBtn.addEventListener('click', async () => {
     await sb.updateUser(currentUser.username, { crona: newCrona, bonus: currentUser.bonus });
     currentUser.crona = newCrona;
     await sb.createOrder(currentUser.username, selectedItem);
-    sb.notify(`🛒 <b>Новая покупка!</b>\n👤 @${currentUser.username}\n📦 ${selectedItem.name}\n💰 ${fmt(selectedItem.price)} крон`);
     updateHeader();
     itemModal.classList.add('hidden');
     showToast(`«${selectedItem.name}» куплено!`);
@@ -273,7 +272,6 @@ bonusModalBuyBtn.addEventListener('click', async () => {
     await sb.updateUser(currentUser.username, { crona: currentUser.crona, bonus: newBonus });
     currentUser.bonus = newBonus;
     await sb.createUsedOrder(currentUser.username, selectedBonusItem);
-    sb.notify(`⚡ <b>Бонус использован!</b>\n👤 @${currentUser.username}\n📦 ${selectedBonusItem.name}\n🎯 ${fmt(selectedBonusItem.price)} бонусов`);
     updateHeader();
     bonusItemModal.classList.add('hidden');
     showToast(`«${selectedBonusItem.name}» применено!`);
