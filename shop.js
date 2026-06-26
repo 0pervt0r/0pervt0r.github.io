@@ -396,31 +396,27 @@ async function loadInventory() {
     items.forEach(order => {
       const catalogItem = ITEMS.find(i => i.id === order.item_id);
       const el = document.createElement('div');
-      el.className = 'shop-item' + (order.used ? ' item-used' : '');
+      el.className = 'shop-item';
       el.innerHTML = `
         <img class="shop-item-img" src="${catalogItem?.img || ''}" alt="${order.item_name}"
              onerror="this.outerHTML='<div class=\\'shop-item-img-placeholder\\'>NO IMG</div>'" />
         <div class="shop-item-name">${order.item_name}</div>
         <div class="shop-item-price"><img src="shop-croner.png" class="ico" onerror="this.style.display='none'" /> ${fmt(order.item_price)}</div>
-        <button class="modal-buy-btn" style="margin-top:8px;font-size:11px"
-          ${order.used ? 'disabled' : ''}
-          data-id="${order.id}">
-          ${order.used ? '✓ ИСПОЛЬЗОВАН' : 'ИСПОЛЬЗОВАТЬ'}
+        <button class="modal-buy-btn" style="margin-top:8px;font-size:11px" data-id="${order.id}">
+          ИСПОЛЬЗОВАТЬ
         </button>
       `;
-      if (!order.used) {
-        el.querySelector('button').addEventListener('click', async (e) => {
-          e.stopPropagation();
-          if (!confirm(`Использовать «${order.item_name}»? Предмет исчезнет.`)) return;
-          try {
-            await sb.useItem(order.id, currentUser.username, order);
-            showToast(`«${order.item_name}» использован!`);
-            loadInventory();
-          } catch(err) {
-            showToast('Ошибка: ' + err.message, true);
-          }
-        });
-      }
+      el.querySelector('button').addEventListener('click', async (e) => {
+        e.stopPropagation();
+        if (!confirm(`Использовать «${order.item_name}»? Предмет исчезнет.`)) return;
+        try {
+          await sb.useItem(order.id, currentUser.username, order);
+          showToast(`«${order.item_name}» использован!`);
+          loadInventory();
+        } catch(err) {
+          showToast('Ошибка: ' + err.message, true);
+        }
+      });
       grid.appendChild(el);
     });
   } catch(e) {
