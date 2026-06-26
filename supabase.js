@@ -1,9 +1,9 @@
-
+/* ── Supabase minimal client (no npm needed) ── */
 const SUPABASE_URL = 'https://pnpblkrgansvuhhhajwg.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBucGJsa3JnYW5zdnVoaGhhandnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxMzMzMDUsImV4cCI6MjA5NzcwOTMwNX0.iebKL_Lm7Db2ZVRvZvwXExQpDrghCW6VRq3RWBppbDU';
 
 const sb = {
-
+  /* ── base fetch ── */
   async query(path, opts = {}) {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
       headers: {
@@ -24,7 +24,7 @@ const sb = {
     return res.json();
   },
 
-
+  /* ── USERS ── */
   async getUser(username) {
     const rows = await this.query(`users?username=eq.${encodeURIComponent(username)}&select=*`);
     return rows?.[0] || null;
@@ -53,7 +53,7 @@ const sb = {
     return this.query('users?select=username,bonus&order=bonus.desc&limit=10');
   },
 
-
+  /* ── ORDERS — покупки за кроны (таблица: orders) ── */
   async createOrder(username, item) {
     return this.query('orders', {
       method: 'POST',
@@ -69,13 +69,13 @@ const sb = {
   },
   async getInventory(username) {
     return this.query(
-      `orders?username=eq.${encodeURIComponent(username)}&select=*&order=created_at.desc`
+      `orders?username=eq.${encodeURIComponent(username)}&used=eq.false&select=*&order=created_at.desc`
     );
   },
 
-
+  /* ── USED ORDERS — использование предмета из инвентаря (таблица: used_orders) ── */
   async useItem(orderId, username, item) {
-
+    // Помечаем оригинальный заказ как использованный
     await this.query(
       `orders?id=eq.${encodeURIComponent(orderId)}`,
       {
@@ -84,7 +84,7 @@ const sb = {
         prefer: 'return=representation',
       }
     );
-    
+    // Пишем в used_orders — вебхук оттуда пошлёт уведомление
     return this.query('used_orders', {
       method: 'POST',
       body: {
@@ -98,7 +98,7 @@ const sb = {
     });
   },
 
-
+  /* ── BONUS ORDERS — мгновенное использование бонусов (таблица: bonus_orders) ── */
   async createUsedOrder(username, item) {
     return this.query('bonus_orders', {
       method: 'POST',
