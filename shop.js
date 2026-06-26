@@ -232,7 +232,6 @@ modalBuyBtn.addEventListener('click', async () => {
     await sb.updateUser(currentUser.username, { crona: newCrona, bonus: currentUser.bonus });
     currentUser.crona = newCrona;
     await sb.createOrder(currentUser.username, selectedItem);
-    sb.notify(`@${currentUser.username} купил ${selectedItem.name}`);
     updateHeader();
     itemModal.classList.add('hidden');
     showToast(`«${selectedItem.name}» куплено!`);
@@ -273,7 +272,6 @@ bonusModalBuyBtn.addEventListener('click', async () => {
     await sb.updateUser(currentUser.username, { crona: currentUser.crona, bonus: newBonus });
     currentUser.bonus = newBonus;
     await sb.createUsedOrder(currentUser.username, selectedBonusItem);
-    sb.notify(`⚡ Бонус использован!\n@${currentUser.username} использовал ${selectedBonusItem.name}`);
     updateHeader();
     bonusItemModal.classList.add('hidden');
     showToast(`«${selectedBonusItem.name}» применено!`);
@@ -416,7 +414,6 @@ async function loadInventory() {
           if (!confirm(`Использовать «${order.item_name}»? Предмет исчезнет.`)) return;
           try {
             await sb.useItem(order.id);
-            sb.notify(`@${currentUser.username} использовал ${order.item_name}`);
             showToast(`«${order.item_name}» использован!`);
             loadInventory();
           } catch(err) {
