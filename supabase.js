@@ -1,20 +1,9 @@
-/* ── Supabase minimal client (no npm needed) ── */
+
 const SUPABASE_URL = 'https://pnpblkrgansvuhhhajwg.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBucGJsa3JnYW5zdnVoaGhhandnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxMzMzMDUsImV4cCI6MjA5NzcwOTMwNX0.iebKL_Lm7Db2ZVRvZvwXExQpDrghCW6VRq3RWBppbDU';
-const sb = {
-  /* ── Telegram notify ── */
-  async notify(message) {
-    return fetch(`${SUPABASE_URL}/functions/v1/notify`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${SUPABASE_KEY}`,
-      },
-      body: JSON.stringify({ message }),
-    }).catch(e => console.warn('notify failed:', e.message));
-  },
 
-  /* ── base fetch ── */
+const sb = {
+
   async query(path, opts = {}) {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
       headers: {
@@ -35,13 +24,11 @@ const sb = {
     return res.json();
   },
 
-  /* ── USERS ── */
-  /* get user by username */
+
   async getUser(username) {
     const rows = await this.query(`users?username=eq.${encodeURIComponent(username)}&select=*`);
     return rows?.[0] || null;
   },
-  /* create new user with 0 crona / 0 bonus */
   async createUser(username) {
     return this.query('users', {
       method: 'POST',
@@ -49,7 +36,6 @@ const sb = {
       prefer: 'return=representation',
     });
   },
-  /* update crona/bonus for a user */
   async updateUser(username, { crona, bonus }) {
     return this.query(
       `users?username=eq.${encodeURIComponent(username)}`,
@@ -60,16 +46,14 @@ const sb = {
       }
     );
   },
-  /* leaderboard — top 10 by crona */
   async topByCrona() {
     return this.query('users?select=username,crona&order=crona.desc&limit=10');
   },
-  /* leaderboard — top 10 by bonus */
   async topByBonus() {
     return this.query('users?select=username,bonus&order=bonus.desc&limit=10');
   },
-  /* ── ORDERS (магазин за кроны) ── */
-  /* create purchase order */
+
+
   async createOrder(username, item) {
     return this.query('orders', {
       method: 'POST',
@@ -83,15 +67,16 @@ const sb = {
       prefer: 'return=representation',
     });
   },
-  /* get inventory (all orders) for user */
   async getInventory(username) {
     return this.query(
       `orders?username=eq.${encodeURIComponent(username)}&select=*&order=created_at.desc`
     );
   },
-  /* mark an order as used */
-  async useItem(orderId) {
-    return this.query(
+
+
+  async useItem(orderId, username, item) {
+
+    await this.query(
       `orders?id=eq.${encodeURIComponent(orderId)}`,
       {
         method: 'PATCH',
@@ -99,18 +84,29 @@ const sb = {
         prefer: 'return=representation',
       }
     );
+    
+    return this.query('used_orders', {
+      method: 'POST',
+      body: {
+        order_id:   orderId,
+        username,
+        item_id:    item.item_id,
+        item_name:  item.item_name,
+        item_price: item.item_price,
+      },
+      prefer: 'return=representation',
+    });
   },
-  /* ── BONUS ORDERS (мгновенное использование бонусов) ── */
-  /* create a "used" bonus order (применяется сразу, used=true) */
+
+
   async createUsedOrder(username, item) {
-    return this.query('orders', {
+    return this.query('bonus_orders', {
       method: 'POST',
       body: {
         username,
         item_id:    item.id,
         item_name:  item.name,
         item_price: item.price,
-        used: true,
       },
       prefer: 'return=representation',
     });
