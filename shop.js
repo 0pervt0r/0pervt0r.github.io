@@ -7,6 +7,7 @@ const ITEMS = [
   { id: 'BL1',          img: 'shop-BL1.png',          name: 'BL1',                  price: 60,   desc: 'Защита на чистке',                                             note: null },
   { id: 'doc',          img: 'shop-doc.png',           name: 'Документ',             price: 160,  desc: 'Документ вашего персонажа добавят на вики Хроник Urbanshade',  note: null },
   { id: 'medkit',       img: 'shop-medkit.png',        name: 'Аптечка',              price: 200,  desc: 'Рест без выполнения норм',                                     note: null },
+  { id: 'emojipack',       img: 'shop-emoji-pack.png',        name: 'Эмодзи-пак',              price: 225,  desc: 'Эмодзи-пак с вашим персонажем на основе Emotelab!',                                     note: null },
   { id: 'revive',       img: 'shop-revive.png',        name: 'Жетон Лодочника',      price: 250,  desc: 'Снять все варны',                                              note: null },
   { id: 'scan',         img: 'shop-scan.png',          name: 'Сканнер Себастьяна',   price: 300,  desc: 'Личный ивент, созданный специально под вашего персонажа',      note: null },
   { id: 'coctaile',     img: 'shop-coctaile.png',      name: 'Коктейль «Перитесен»', price: 400,  desc: 'Иконка вашего персонажа (как в диалогах в игре)',              note: null },
