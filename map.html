@@ -26,19 +26,17 @@
     color: var(--ui-text);
   }
 
-  /* ===================== ОКНО ПРОСМОТРА КАРТЫ ===================== */
-  /* .map-viewport — то, что видит пользователь. overflow:hidden обрезает мир по границам экрана. */
+
   #map-viewport {
     position: absolute;
     inset: 0;
     overflow: hidden;
     cursor: grab;
-    touch-action: none; /* отключаем нативный скролл/зум браузера, зум делаем сами */
+    touch-action: none;
   }
   #map-viewport.grabbing { cursor: grabbing; }
 
-  /* .map-world — контейнер фиксированного размера 6000x3652, ровно как исходные PNG.
-     Зум/пан делается ОДНИМ transform на этом элементе, поэтому все слои двигаются синхронно. */
+  
   #map-world {
     position: absolute;
     top: 0;
@@ -55,18 +53,17 @@
     left: 0;
     width: 6000px;
     height: 3652px;
-    pointer-events: none; /* клики ловит не картинка, а сам #map-world через canvas-хиттест */
+    pointer-events: none; 
     user-select: none;
     -webkit-user-drag: none;
   }
 
-  /* Хитмап-слой не показываем визуально, он существует только как источник данных для canvas.
-     Рисуем его один раз при загрузке в offscreen-подобный canvas и читаем оттуда пиксели. */
+  
   #layer-hitmap {
     display: none;
   }
 
-  /* Подсветка наведённого/выбранного сектора — рисуется поверх карты как маска того же цвета, полупрозрачно */
+ 
   #sector-highlight {
     position: absolute;
     top: 0; left: 0;
@@ -78,7 +75,7 @@
     transition: opacity .12s ease;
   }
 
-  /* ===================== ПАНЕЛЬ УПРАВЛЕНИЯ (справа сверху) ===================== */
+  
   #ui-panel {
     position: absolute;
     top: 16px;
@@ -132,7 +129,7 @@
   }
   #zoom-controls button:hover { background: rgba(255,255,255,0.12); }
 
-  /* ===================== ВСПЛЫВАЮЩАЯ КАРТОЧКА СЕКТОРА ===================== */
+  
   #sector-popup {
     position: absolute;
     display: none;
@@ -200,9 +197,9 @@
   <div id="map-world">
     <img class="layer" id="layer-bg" src="map-background.png" alt="">
     <img class="layer" id="layer-names" src="map-background-names.png" alt="">
-    <!-- Слой секторов (не хитмап, а реальное изображение секторов) — включается/выключается, чтобы смотреть на рельеф под ним -->
+    
     <img class="layer" id="layer-sectors" src="map-sectors.png" alt="" style="display:none;">
-    <!-- Слой метро — один PNG со всеми 10 линиями сразу -->
+    
     <img class="layer" id="layer-metro" src="map-metro.png" alt="">
     <canvas class="layer" id="layer-hitmap" width="6000" height="3652"></canvas>
     <canvas id="sector-highlight" width="6000" height="3652"></canvas>
@@ -243,28 +240,23 @@
 (function () {
   "use strict";
 
-  /* =========================================================================
-     1. ТАБЛИЦА "ЦВЕТ В HITMAP → ИНФОРМАЦИЯ О СЕКТОРЕ"
-     Цвета взяты напрямую из map-hitmap.png (сплошные RGBA, alpha=255).
-     Замени title/desc/url на реальные данные секторов; ключи цветов менять не нужно,
-     если ты не перекрашивала сами фигуры в исходном файле.
-  ========================================================================= */
+
   const SECTORS = [
-    { color: [90, 0, 40],     title: "Сектор «Маренго»",  desc: "Тёмно-бордовый производственный комплекс в северо-западной части зоны.", url: "#" },
-    { color: [129, 8, 0],     title: "Сектор «Клеймо»",   desc: "Центральный жилой и технический узел, соединяющий большинство веток.", url: "#" },
-    { color: [94, 197, 0],    title: "Сектор «Веер»",     desc: "Веерообразная структура доков в юго-восточной части карты.", url: "#" },
-    { color: [254, 255, 0],   title: "Сектор «Соты»",     desc: "Группа ромбовидных модулей в верхней части карты.", url: "#" },
-    { color: [255, 255, 183], title: "Сектор «Бледный»",  desc: "Скопление светлых построек рядом с голубыми доками.", url: "#" },
-    { color: [20, 126, 0],    title: "Сектор «Дуга»",     desc: "Изогнутая конструкция на восточном краю карты.", url: "#" },
-    { color: [255, 123, 0],   title: "Сектор «Крюк»",     desc: "Изогнутое ответвление, соединяющее верхние и правые сектора.", url: "#" },
-    { color: [255, 16, 0],    title: "Сектор «Осколки»",  desc: "Небольшая изолированная группа построек в юго-западной части.", url: "#" },
+    { color: [90, 0, 40],     title: "Сектор B",  desc: "Описание.", url: "#" },
+    { color: [129, 8, 0],     title: "Сектор А",   desc: "Описание.", url: "#" },
+    { color: [94, 197, 0],    title: "Сектор E",     desc: "Описание.", url: "#" },
+    { color: [254, 255, 0],   title: "Сектор C-1",     desc: "Описание.", url: "#" },
+    { color: [255, 255, 183], title: "Сектор C-2",  desc: "Описание.", url: "#" },
+    { color: [20, 126, 0],    title: "Стоянка Тренчблидеров",     desc: "Описание.", url: "#" },
+    { color: [255, 123, 0],   title: "Сектор C",     desc: "Описание.", url: "#" },
+    { color: [255, 16, 0],    title: "Сектор D",  desc: "Описание.", url: "#" },
   ];
 
-  // Порог совпадения цвета — чтобы не спотыкаться об антиалиасинг на краях фигур
+  
   const COLOR_TOLERANCE = 30;
 
   function findSectorByColor(r, g, b, a) {
-    if (a < 128) return null; // почти прозрачный пиксель — мимо всех секторов
+    if (a < 128) return null; 
     let best = null;
     let bestDist = Infinity;
     for (const s of SECTORS) {
@@ -275,9 +267,7 @@
     return bestDist <= COLOR_TOLERANCE ? best : null;
   }
 
-  /* =========================================================================
-     2. ЗАГРУЗКА HITMAP В CANVAS ДЛЯ ЧТЕНИЯ ПИКСЕЛЕЙ
-  ========================================================================= */
+ 
   const hitCanvas = document.getElementById("layer-hitmap");
   const hitCtx = hitCanvas.getContext("2d", { willReadFrequently: true });
   const hitImg = new Image();
@@ -288,14 +278,11 @@
   };
   hitImg.src = "map-hitmap.png";
 
-  /* =========================================================================
-     3. ZOOM / PAN
-     Один transform на #map-world: translate(panX, panY) scale(zoom)
-  ========================================================================= */
+ 
   const viewport = document.getElementById("map-viewport");
   const world = document.getElementById("map-world");
 
-  let zoom = 0.22;     // стартовый масштаб, чтобы карта 6000px влезала в экран
+  let zoom = 0.22;    
   let panX = 0, panY = 0;
   const ZOOM_MIN = 0.08;
   const ZOOM_MAX = 4;
@@ -315,28 +302,28 @@
     applyTransform();
   }
 
-  // Зум колесом мыши, с фиксацией точки под курсором (зум "от курсора", а не от угла)
+  
   viewport.addEventListener("wheel", function (e) {
     e.preventDefault();
     const rect = viewport.getBoundingClientRect();
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
 
-    // координата в мировых пикселях под курсором до зума
+ 
     const worldX = (mouseX - panX) / zoom;
     const worldY = (mouseY - panY) / zoom;
 
     const delta = e.deltaY < 0 ? 1.12 : 1 / 1.12;
     zoom = clampZoom(zoom * delta);
 
-    // пересчитываем pan так, чтобы worldX/worldY остались под курсором
+  
     panX = mouseX - worldX * zoom;
     panY = mouseY - worldY * zoom;
 
     applyTransform();
   }, { passive: false });
 
-  // Pan мышью (drag)
+  
   let isDragging = false;
   let dragStartX = 0, dragStartY = 0;
   let panStartX = 0, panStartY = 0;
@@ -370,7 +357,7 @@
     }
   });
 
-  // Touch: pan одним пальцем, pinch-zoom двумя
+  
   let touchStartDist = null;
   let touchStartZoom = zoom;
 
@@ -384,7 +371,7 @@
       panStartY = panY;
     } else if (e.touches.length === 2) {
       isDragging = false;
-      dragMoved = true; // два пальца — точно не одиночный клик
+      dragMoved = true; 
       const [t1, t2] = e.touches;
       touchStartDist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
       touchStartZoom = zoom;
@@ -444,9 +431,7 @@
     applyTransform();
   }
 
-  /* =========================================================================
-     4. КЛИК ПО КАРТЕ → ОПРЕДЕЛЕНИЕ СЕКТОРА ПО ПИКСЕЛЮ HITMAP
-  ========================================================================= */
+  
   const popup = document.getElementById("sector-popup");
   const popupTitle = document.getElementById("popup-title");
   const popupDesc = document.getElementById("popup-desc");
@@ -460,7 +445,7 @@
     const screenX = clientX - rect.left;
     const screenY = clientY - rect.top;
 
-    // экранные координаты -> координаты внутри "мира" 6000x3652
+    
     const worldX = Math.round((screenX - panX) / zoom);
     const worldY = Math.round((screenY - panY) / zoom);
 
@@ -487,7 +472,7 @@
     popupLink.href = sector.url;
     popup.style.display = "block";
 
-    // позиционируем рядом с точкой клика, но не даём вылезти за экран
+    
     const vw = viewport.clientWidth, vh = viewport.clientHeight;
     let left = screenX + 16;
     let top = screenY + 16;
@@ -505,7 +490,7 @@
 
   document.getElementById("popup-close").addEventListener("click", hidePopup);
 
-  // Подсветка выбранного сектора: перерисовываем hitmap, оставляя видимым только его цвет
+  
   function drawHighlight(sector) {
     highlightCtx.clearRect(0, 0, 6000, 3652);
     highlightCtx.drawImage(hitImg, 0, 0, 6000, 3652);
@@ -515,18 +500,16 @@
     for (let i = 0; i < data.length; i += 4) {
       const dist = Math.sqrt((data[i] - cr) ** 2 + (data[i + 1] - cg) ** 2 + (data[i + 2] - cb) ** 2);
       if (dist > COLOR_TOLERANCE || data[i + 3] < 128) {
-        data[i + 3] = 0; // всё, что не совпадает — делаем прозрачным
+        data[i + 3] = 0; 
       } else {
-        data[i] = 255; data[i + 1] = 255; data[i + 2] = 255; data[i + 3] = 90; // белая полупрозрачная подсветка
+        data[i] = 255; data[i + 1] = 255; data[i + 2] = 255; data[i + 3] = 90; 
       }
     }
     highlightCtx.putImageData(imgData, 0, 0);
     highlightCanvas.style.opacity = 1;
   }
 
-  /* =========================================================================
-     5. ПЕРЕКЛЮЧАТЕЛИ СЛОЁВ (названия рельефа, секторы, метро)
-  ========================================================================= */
+  
   document.getElementById("toggle-names").addEventListener("change", function (e) {
     document.getElementById("layer-names").style.display = e.target.checked ? "block" : "none";
   });
@@ -539,9 +522,7 @@
     document.getElementById("layer-metro").style.display = e.target.checked ? "block" : "none";
   });
 
-  /* =========================================================================
-     6. ДЕБАГ-КООРДИНАТЫ (можно удалить в проде) — полезно при подборе координат/секторов
-  ========================================================================= */
+  
   const coordDebug = document.getElementById("coord-debug");
   viewport.addEventListener("mousemove", function (e) {
     const rect = viewport.getBoundingClientRect();
@@ -550,9 +531,7 @@
     coordDebug.textContent = `x: ${worldX}, y: ${worldY}  |  zoom: ${zoom.toFixed(2)}`;
   });
 
-  /* =========================================================================
-     ИНИЦИАЛИЗАЦИЯ
-  ========================================================================= */
+ 
   window.addEventListener("resize", fitToScreen);
   window.addEventListener("load", fitToScreen);
   fitToScreen();
