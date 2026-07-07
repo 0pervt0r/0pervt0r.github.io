@@ -26,6 +26,32 @@
     color: var(--ui-text);
   }
 
+  body {
+    display: flex;
+    flex-direction: column;
+  }
+
+  
+  #info-banner {
+    flex: 0 0 auto;
+    background: var(--ui-bg);
+    border-bottom: 1px solid var(--ui-border);
+    padding: 12px calc(16px + env(safe-area-inset-right)) 12px calc(16px + env(safe-area-inset-left));
+    padding-top: calc(12px + env(safe-area-inset-top));
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--ui-muted);
+    z-index: 30;
+  }
+  #info-banner strong { color: var(--ui-accent); }
+
+  #stage {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+  }
+
   
   #map-viewport {
     position: absolute;
@@ -209,6 +235,9 @@
 
 
   @media (max-width: 640px), (pointer: coarse) and (max-width: 900px) {
+    #info-banner {
+      font-size: 12px;
+    }
     #ui-panel {
       top: calc(10px + env(safe-area-inset-top));
       right: calc(10px + env(safe-area-inset-right));
@@ -244,53 +273,59 @@
 </head>
 <body>
 
-<div id="map-viewport">
-  <div id="map-world">
-    <img class="layer" id="layer-bg" src="map-background.png" alt="">
-    <img class="layer" id="layer-names" src="map-background-names.png" alt="">
-
-    <img class="layer" id="layer-sectors" src="map-sectors.png" alt="" style="display:none;">
-
-    <img class="layer" id="layer-metro" src="map-trains.png" alt="">
-    <canvas class="layer" id="layer-hitmap" width="6000" height="3652"></canvas>
-    <canvas id="sector-highlight" width="6000" height="3652"></canvas>
-  </div>
+<div id="info-banner">
+  <strong>Эта карта интерактивная!</strong> Вы можете её отдалять и приближать, включать и прятать отображение сектора, линий метро и названий рельефа. Так же, нажав на строение комплекса вы можете открыть окошко с описанием сектора и кнопкой перехода на полную статью о нём.
 </div>
 
-<div id="ui-panel">
-  <div id="ui-panel-header">
-    <h3>Слои карты</h3>
-    <button id="panel-toggle" aria-label="Свернуть/развернуть панель">▾</button>
-  </div>
-  <div id="ui-panel-body">
-  <label class="ui-row">
-    <input type="checkbox" id="toggle-names" checked>
-    Названия рельефа
-  </label>
-  <label class="ui-row">
-    <input type="checkbox" id="toggle-sectors">
-    Секторы
-  </label>
-  <label class="ui-row">
-    <input type="checkbox" id="toggle-metro" checked>
-    Линии метро
-  </label>
-  <div id="zoom-controls">
-    <button id="zoom-in">+</button>
-    <button id="zoom-out">−</button>
-    <button id="zoom-reset">⟲</button>
-  </div>
-  </div>
-</div>
+<div id="stage">
+  <div id="map-viewport">
+    <div id="map-world">
+      <img class="layer" id="layer-bg" src="map-background.png" alt="">
+      <img class="layer" id="layer-names" src="map-background-names.png" alt="">
 
-<div id="sector-popup">
-  <button class="close-btn" id="popup-close">✕</button>
-  <h4 id="popup-title">—</h4>
-  <p id="popup-desc">—</p>
-  <a id="popup-link" href="#" target="_blank" rel="noopener">Читать статью →</a>
-</div>
+      <img class="layer" id="layer-sectors" src="map-sectors.png" alt="">
 
-<div id="coord-debug">x: 0, y: 0</div>
+      <img class="layer" id="layer-metro" src="map-trains.png" alt="">
+      <canvas class="layer" id="layer-hitmap" width="6000" height="3652"></canvas>
+      <canvas id="sector-highlight" width="6000" height="3652"></canvas>
+    </div>
+  </div>
+
+  <div id="ui-panel">
+    <div id="ui-panel-header">
+      <h3>Слои карты</h3>
+      <button id="panel-toggle" aria-label="Свернуть/развернуть панель">▾</button>
+    </div>
+    <div id="ui-panel-body">
+    <label class="ui-row">
+      <input type="checkbox" id="toggle-names" checked>
+      Названия рельефа
+    </label>
+    <label class="ui-row">
+      <input type="checkbox" id="toggle-sectors" checked>
+      Секторы
+    </label>
+    <label class="ui-row">
+      <input type="checkbox" id="toggle-metro" checked>
+      Линии метро
+    </label>
+    <div id="zoom-controls">
+      <button id="zoom-in">+</button>
+      <button id="zoom-out">−</button>
+      <button id="zoom-reset">⟲</button>
+    </div>
+    </div>
+  </div>
+
+  <div id="sector-popup">
+    <button class="close-btn" id="popup-close">✕</button>
+    <h4 id="popup-title">—</h4>
+    <p id="popup-desc">—</p>
+    <a id="popup-link" href="#" target="_blank" rel="noopener">Читать статью →</a>
+  </div>
+
+  <div id="coord-debug">x: 0, y: 0</div>
+</div>
 
 <script>
 (function () {
