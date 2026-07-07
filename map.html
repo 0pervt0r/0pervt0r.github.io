@@ -2,8 +2,8 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Интерактивная карта — Let-Vand Zone</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Карта комплекса</title>
 <style>
   :root {
     --ui-bg: rgba(15, 18, 22, 0.85);
@@ -26,13 +26,13 @@
     color: var(--ui-text);
   }
 
-
+  
   #map-viewport {
     position: absolute;
     inset: 0;
     overflow: hidden;
     cursor: grab;
-    touch-action: none;
+    touch-action: none; 
   }
   #map-viewport.grabbing { cursor: grabbing; }
 
@@ -58,12 +58,12 @@
     -webkit-user-drag: none;
   }
 
-  
+
   #layer-hitmap {
     display: none;
   }
 
- 
+
   #sector-highlight {
     position: absolute;
     top: 0; left: 0;
@@ -75,7 +75,7 @@
     transition: opacity .12s ease;
   }
 
-  
+
   #ui-panel {
     position: absolute;
     top: 16px;
@@ -89,15 +89,33 @@
     backdrop-filter: blur(6px);
     z-index: 10;
   }
+  #ui-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--ui-border);
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+  }
   #ui-panel h3 {
-    margin: 0 0 10px;
+    margin: 0;
     font-size: 12px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--ui-accent);
-    border-bottom: 1px solid var(--ui-border);
-    padding-bottom: 8px;
   }
+  #panel-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--ui-text);
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 4px 8px;
+  }
+  #ui-panel.collapsed #ui-panel-body { display: none; }
+  #ui-panel.collapsed #panel-toggle { transform: rotate(-90deg); }
   .ui-row {
     display: flex;
     align-items: center;
@@ -129,7 +147,6 @@
   }
   #zoom-controls button:hover { background: rgba(255,255,255,0.12); }
 
-  
   #sector-popup {
     position: absolute;
     display: none;
@@ -179,8 +196,8 @@
 
   #coord-debug {
     position: absolute;
-    bottom: 12px;
-    left: 12px;
+    bottom: calc(12px + env(safe-area-inset-bottom));
+    left: calc(12px + env(safe-area-inset-left));
     font-size: 11px;
     color: var(--ui-muted);
     background: var(--ui-bg);
@@ -188,6 +205,40 @@
     border-radius: 4px;
     z-index: 10;
     pointer-events: none;
+  }
+
+
+  @media (max-width: 640px), (pointer: coarse) and (max-width: 900px) {
+    #ui-panel {
+      top: calc(10px + env(safe-area-inset-top));
+      right: calc(10px + env(safe-area-inset-right));
+      left: calc(10px + env(safe-area-inset-left));
+      width: auto;
+      max-width: none;
+      padding: 10px 12px;
+    }
+    #panel-toggle { display: block; }
+    .ui-row {
+      padding: 6px 0;
+      font-size: 14px;
+    }
+    .ui-row input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+    }
+    #zoom-controls { margin-top: 8px; }
+    #zoom-controls button {
+      padding: 10px 0;
+      font-size: 16px;
+    }
+    #sector-popup {
+      max-width: calc(100vw - 24px - env(safe-area-inset-left) - env(safe-area-inset-right));
+      left: 12px !important;
+      right: 12px;
+      font-size: 14px;
+    }
+    #sector-popup h4 { font-size: 15px; }
+    #coord-debug { display: none; }
   }
 </style>
 </head>
@@ -197,9 +248,9 @@
   <div id="map-world">
     <img class="layer" id="layer-bg" src="map-background.png" alt="">
     <img class="layer" id="layer-names" src="map-background-names.png" alt="">
-    
+
     <img class="layer" id="layer-sectors" src="map-sectors.png" alt="" style="display:none;">
-    
+
     <img class="layer" id="layer-metro" src="map-metro.png" alt="">
     <canvas class="layer" id="layer-hitmap" width="6000" height="3652"></canvas>
     <canvas id="sector-highlight" width="6000" height="3652"></canvas>
@@ -207,7 +258,11 @@
 </div>
 
 <div id="ui-panel">
-  <h3>Слои карты</h3>
+  <div id="ui-panel-header">
+    <h3>Слои карты</h3>
+    <button id="panel-toggle" aria-label="Свернуть/развернуть панель">▾</button>
+  </div>
+  <div id="ui-panel-body">
   <label class="ui-row">
     <input type="checkbox" id="toggle-names" checked>
     Названия рельефа
@@ -224,6 +279,7 @@
     <button id="zoom-in">+</button>
     <button id="zoom-out">−</button>
     <button id="zoom-reset">⟲</button>
+  </div>
   </div>
 </div>
 
@@ -252,11 +308,11 @@
     { color: [255, 16, 0],    title: "Сектор D",  desc: "Описание.", url: "#" },
   ];
 
-  
+
   const COLOR_TOLERANCE = 30;
 
   function findSectorByColor(r, g, b, a) {
-    if (a < 128) return null; 
+    if (a < 128) return null;
     let best = null;
     let bestDist = Infinity;
     for (const s of SECTORS) {
@@ -267,7 +323,7 @@
     return bestDist <= COLOR_TOLERANCE ? best : null;
   }
 
- 
+
   const hitCanvas = document.getElementById("layer-hitmap");
   const hitCtx = hitCanvas.getContext("2d", { willReadFrequently: true });
   const hitImg = new Image();
@@ -278,11 +334,11 @@
   };
   hitImg.src = "map-hitmap.png";
 
- 
+
   const viewport = document.getElementById("map-viewport");
   const world = document.getElementById("map-world");
 
-  let zoom = 0.22;    
+  let zoom = 0.22;  
   let panX = 0, panY = 0;
   const ZOOM_MIN = 0.08;
   const ZOOM_MAX = 4;
@@ -302,28 +358,28 @@
     applyTransform();
   }
 
-  
+
   viewport.addEventListener("wheel", function (e) {
     e.preventDefault();
     const rect = viewport.getBoundingClientRect();
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
 
- 
+
     const worldX = (mouseX - panX) / zoom;
     const worldY = (mouseY - panY) / zoom;
 
     const delta = e.deltaY < 0 ? 1.12 : 1 / 1.12;
     zoom = clampZoom(zoom * delta);
 
-  
+
     panX = mouseX - worldX * zoom;
     panY = mouseY - worldY * zoom;
 
     applyTransform();
   }, { passive: false });
 
-  
+
   let isDragging = false;
   let dragStartX = 0, dragStartY = 0;
   let panStartX = 0, panStartY = 0;
@@ -357,7 +413,7 @@
     }
   });
 
-  
+
   let touchStartDist = null;
   let touchStartZoom = zoom;
 
@@ -371,7 +427,7 @@
       panStartY = panY;
     } else if (e.touches.length === 2) {
       isDragging = false;
-      dragMoved = true; 
+      dragMoved = true;
       const [t1, t2] = e.touches;
       touchStartDist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
       touchStartZoom = zoom;
@@ -431,7 +487,7 @@
     applyTransform();
   }
 
-  
+
   const popup = document.getElementById("sector-popup");
   const popupTitle = document.getElementById("popup-title");
   const popupDesc = document.getElementById("popup-desc");
@@ -445,7 +501,7 @@
     const screenX = clientX - rect.left;
     const screenY = clientY - rect.top;
 
-    
+
     const worldX = Math.round((screenX - panX) / zoom);
     const worldY = Math.round((screenY - panY) / zoom);
 
@@ -472,7 +528,7 @@
     popupLink.href = sector.url;
     popup.style.display = "block";
 
-    
+
     const vw = viewport.clientWidth, vh = viewport.clientHeight;
     let left = screenX + 16;
     let top = screenY + 16;
@@ -490,7 +546,7 @@
 
   document.getElementById("popup-close").addEventListener("click", hidePopup);
 
-  
+
   function drawHighlight(sector) {
     highlightCtx.clearRect(0, 0, 6000, 3652);
     highlightCtx.drawImage(hitImg, 0, 0, 6000, 3652);
@@ -500,7 +556,7 @@
     for (let i = 0; i < data.length; i += 4) {
       const dist = Math.sqrt((data[i] - cr) ** 2 + (data[i + 1] - cg) ** 2 + (data[i + 2] - cb) ** 2);
       if (dist > COLOR_TOLERANCE || data[i + 3] < 128) {
-        data[i + 3] = 0; 
+        data[i + 3] = 0;
       } else {
         data[i] = 255; data[i + 1] = 255; data[i + 2] = 255; data[i + 3] = 90; 
       }
@@ -509,7 +565,7 @@
     highlightCanvas.style.opacity = 1;
   }
 
-  
+
   document.getElementById("toggle-names").addEventListener("change", function (e) {
     document.getElementById("layer-names").style.display = e.target.checked ? "block" : "none";
   });
@@ -522,7 +578,7 @@
     document.getElementById("layer-metro").style.display = e.target.checked ? "block" : "none";
   });
 
-  
+
   const coordDebug = document.getElementById("coord-debug");
   viewport.addEventListener("mousemove", function (e) {
     const rect = viewport.getBoundingClientRect();
@@ -531,7 +587,20 @@
     coordDebug.textContent = `x: ${worldX}, y: ${worldY}  |  zoom: ${zoom.toFixed(2)}`;
   });
 
- 
+
+  const uiPanel = document.getElementById("ui-panel");
+  const panelToggle = document.getElementById("panel-toggle");
+  const isMobileLayout = window.matchMedia("(max-width: 640px), (pointer: coarse) and (max-width: 900px)");
+
+  function applyDefaultPanelState() {
+    uiPanel.classList.toggle("collapsed", isMobileLayout.matches);
+  }
+  panelToggle.addEventListener("click", function () {
+    uiPanel.classList.toggle("collapsed");
+  });
+  applyDefaultPanelState();
+
+
   window.addEventListener("resize", fitToScreen);
   window.addEventListener("load", fitToScreen);
   fitToScreen();
