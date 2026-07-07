@@ -1,1 +1,588 @@
 
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Карта комплекса</title>
+<style>
+  :root {
+    --ui-bg: rgba(15, 18, 22, 0.85);
+    --ui-border: rgba(255, 255, 255, 0.12);
+    --ui-text: #e8ecef;
+    --ui-accent: #c8f03a;
+    --ui-muted: #9aa3ad;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background: #0a0b0d;
+    overflow: hidden;
+    font-family: "Share Tech Mono", "Courier New", monospace;
+    color: var(--ui-text);
+  }
+
+
+  #map-viewport {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    cursor: grab;
+    touch-action: none;
+  }
+  #map-viewport.grabbing { cursor: grabbing; }
+
+
+  #map-world {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 6000px;
+    height: 3652px;
+    transform-origin: 0 0;
+    will-change: transform;
+  }
+
+  .layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 6000px;
+    height: 3652px;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  #layer-hitmap {
+    display: none;
+  }
+
+
+  #layer-metro {
+    width: 6000px;
+    height: 3652px;
+    pointer-events: none;
+  }
+  #layer-metro .metro-line { fill: none; stroke-width: 6; opacity: 1; transition: opacity .25s ease; }
+  #layer-metro .metro-line.hidden-line { opacity: 0; }
+  #layer-metro .metro-station { fill: #fff; stroke: #000; stroke-width: 2; }
+
+  #sector-highlight {
+    position: absolute;
+    top: 0; left: 0;
+    width: 6000px;
+    height: 3652px;
+    pointer-events: none;
+    mix-blend-mode: screen;
+    opacity: 0;
+    transition: opacity .12s ease;
+  }
+
+
+  #ui-panel {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: var(--ui-bg);
+    border: 1px solid var(--ui-border);
+    border-radius: 6px;
+    padding: 14px 16px;
+    width: 240px;
+    font-size: 13px;
+    backdrop-filter: blur(6px);
+    z-index: 10;
+  }
+  #ui-panel h3 {
+    margin: 0 0 10px;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ui-accent);
+    border-bottom: 1px solid var(--ui-border);
+    padding-bottom: 8px;
+  }
+  .ui-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    cursor: pointer;
+  }
+  .ui-row input[type="checkbox"] {
+    accent-color: var(--ui-accent);
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+  }
+  .ui-row .swatch {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+  #zoom-controls {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+  }
+  #zoom-controls button {
+    flex: 1;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--ui-border);
+    color: var(--ui-text);
+    padding: 6px 0;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+  }
+  #zoom-controls button:hover { background: rgba(255,255,255,0.12); }
+
+
+  #sector-popup {
+    position: absolute;
+    display: none;
+    background: var(--ui-bg);
+    border: 1px solid var(--ui-accent);
+    border-radius: 6px;
+    padding: 12px 14px;
+    min-width: 200px;
+    max-width: 280px;
+    font-size: 13px;
+    z-index: 20;
+    backdrop-filter: blur(6px);
+    pointer-events: auto;
+  }
+  #sector-popup h4 {
+    margin: 0 0 6px;
+    color: var(--ui-accent);
+    font-size: 14px;
+    letter-spacing: 0.03em;
+  }
+  #sector-popup p {
+    margin: 0 0 10px;
+    color: var(--ui-muted);
+    line-height: 1.4;
+  }
+  #sector-popup a {
+    display: inline-block;
+    color: #0a0b0d;
+    background: var(--ui-accent);
+    text-decoration: none;
+    font-size: 12px;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-weight: bold;
+  }
+  #sector-popup a:hover { opacity: 0.85; }
+  #sector-popup .close-btn {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    cursor: pointer;
+    color: var(--ui-muted);
+    font-size: 14px;
+    background: none;
+    border: none;
+  }
+
+  #coord-debug {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    font-size: 11px;
+    color: var(--ui-muted);
+    background: var(--ui-bg);
+    padding: 4px 8px;
+    border-radius: 4px;
+    z-index: 10;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+
+<div id="map-viewport">
+  <div id="map-world">
+    <img class="layer" id="layer-bg" src="map-background.png" alt="">
+    <img class="layer" id="layer-names" src="map-background-names.png" alt="">
+    <canvas class="layer" id="layer-hitmap" width="6000" height="3652"></canvas>
+    <canvas id="sector-highlight" width="6000" height="3652"></canvas>
+
+
+    <svg id="layer-metro" viewBox="0 0 6000 3652" xmlns="http://www.w3.org/2000/svg">
+      <g class="metro-line" id="line-red" stroke="#e30613" data-line-name="Красная ветка">
+        <path d="M 1500 800 L 2900 850 L 3350 950 L 3700 1000 L 4100 950"/>
+        <circle class="metro-station" cx="1500" cy="800" r="10"/>
+        <circle class="metro-station" cx="2900" cy="850" r="10"/>
+        <circle class="metro-station" cx="3350" cy="950" r="10"/>
+        <circle class="metro-station" cx="3700" cy="1000" r="10"/>
+        <circle class="metro-station" cx="4100" cy="950" r="10"/>
+      </g>
+      <g class="metro-line" id="line-blue" stroke="#1560bd" data-line-name="Синяя ветка">
+        <path d="M 4100 950 L 3900 1350 L 3850 2200 L 3400 2650"/>
+        <circle class="metro-station" cx="4100" cy="950" r="10"/>
+        <circle class="metro-station" cx="3900" cy="1350" r="10"/>
+        <circle class="metro-station" cx="3850" cy="2200" r="10"/>
+        <circle class="metro-station" cx="3400" cy="2650" r="10"/>
+      </g>
+      <g class="metro-line" id="line-cyan" stroke="#22c3d6" data-line-name="Бирюзовая ветка">
+        <path d="M 4300 1200 L 4550 1650 L 4650 2200 L 4550 2600"/>
+        <circle class="metro-station" cx="4300" cy="1200" r="10"/>
+        <circle class="metro-station" cx="4550" cy="1650" r="10"/>
+        <circle class="metro-station" cx="4650" cy="2200" r="10"/>
+        <circle class="metro-station" cx="4550" cy="2600" r="10"/>
+      </g>
+    </svg>
+  </div>
+</div>
+
+<div id="ui-panel">
+  <h3>Слои карты</h3>
+  <label class="ui-row">
+    <input type="checkbox" id="toggle-names" checked>
+    Названия рельефа
+  </label>
+  <div style="border-top:1px solid var(--ui-border); margin:10px 0 8px;"></div>
+  <label class="ui-row">
+    <input type="checkbox" class="metro-toggle" data-target="line-red" checked>
+    <span class="swatch" style="background:#e30613"></span>
+    Красная ветка
+  </label>
+  <label class="ui-row">
+    <input type="checkbox" class="metro-toggle" data-target="line-blue" checked>
+    <span class="swatch" style="background:#1560bd"></span>
+    Синяя ветка
+  </label>
+  <label class="ui-row">
+    <input type="checkbox" class="metro-toggle" data-target="line-cyan" checked>
+    <span class="swatch" style="background:#22c3d6"></span>
+    Бирюзовая ветка
+  </label>
+  <div id="zoom-controls">
+    <button id="zoom-in">+</button>
+    <button id="zoom-out">−</button>
+    <button id="zoom-reset">⟲</button>
+  </div>
+</div>
+
+<div id="sector-popup">
+  <button class="close-btn" id="popup-close">✕</button>
+  <h4 id="popup-title">—</h4>
+  <p id="popup-desc">—</p>
+  <a id="popup-link" href="#" target="_blank" rel="noopener">Читать статью →</a>
+</div>
+
+<div id="coord-debug">x: 0, y: 0</div>
+
+<script>
+(function () {
+  "use strict";
+
+
+  const SECTORS = [
+    { color: [90, 0, 40],    id: "sector-maroon", title: "Сектор «Маренго»",   desc: "Тёмно-бордовый производственный комплекс в северо-западной части зоны.", url: "#" },
+    { color: [129, 8, 0],    id: "sector-darkred", title: "Сектор «Клеймо»",   desc: "Центральный жилой и технический узел, соединяющий большинство веток.", url: "#" },
+    { color: [94, 197, 0],   id: "sector-green",  title: "Сектор «Веер»",      desc: "Веерообразная структура доков в юго-восточной части карты.", url: "#" },
+    { color: [254, 255, 0],  id: "sector-yellow", title: "Сектор «Соты»",      desc: "Группа ромбовидных модулей в верхней части карты.", url: "#" },
+    { color: [255, 255, 183],id: "sector-cream",  title: "Сектор «Бледный»",   desc: "Скопление светлых построек рядом с голубыми доками.", url: "#" },
+    { color: [20, 126, 0],   id: "sector-darkgreen", title: "Сектор «Дуга»",   desc: "Изогнутая конструкция на восточном краю карты.", url: "#" },
+    { color: [255, 123, 0],  id: "sector-orange", title: "Сектор «Крюк»",     desc: "Изогнутое ответвление, соединяющее верхние и правые сектора.", url: "#" },
+    { color: [255, 16, 0],   id: "sector-red",    title: "Сектор «Осколки»",  desc: "Небольшая изолированная группа построек в юго-западной части.", url: "#" },
+  ];
+
+
+  const COLOR_TOLERANCE = 30;
+
+  function findSectorByColor(r, g, b, a) {
+    if (a < 128) return null;
+    let best = null;
+    let bestDist = Infinity;
+    for (const s of SECTORS) {
+      const [cr, cg, cb] = s.color;
+      const dist = Math.sqrt((r - cr) ** 2 + (g - cg) ** 2 + (b - cb) ** 2);
+      if (dist < bestDist) { bestDist = dist; best = s; }
+    }
+    return bestDist <= COLOR_TOLERANCE ? best : null;
+  }
+
+
+  const hitCanvas = document.getElementById("layer-hitmap");
+  const hitCtx = hitCanvas.getContext("2d", { willReadFrequently: true });
+  const hitImg = new Image();
+  let hitmapReady = false;
+  hitImg.onload = function () {
+    hitCtx.drawImage(hitImg, 0, 0, 6000, 3652);
+    hitmapReady = true;
+  };
+  hitImg.src = "map-hitmap.png";
+
+
+  const viewport = document.getElementById("map-viewport");
+  const world = document.getElementById("map-world");
+
+  let zoom = 0.22;   
+  let panX = 0, panY = 0;
+  const ZOOM_MIN = 0.08;
+  const ZOOM_MAX = 4;
+
+  function clampZoom(z) { return Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, z)); }
+
+  function applyTransform() {
+    world.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
+  }
+
+  function fitToScreen() {
+    const vw = viewport.clientWidth;
+    const vh = viewport.clientHeight;
+    zoom = clampZoom(Math.min(vw / 6000, vh / 3652) * 0.95);
+    panX = (vw - 6000 * zoom) / 2;
+    panY = (vh - 3652 * zoom) / 2;
+    applyTransform();
+  }
+
+
+  viewport.addEventListener("wheel", function (e) {
+    e.preventDefault();
+    const rect = viewport.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+
+
+    const worldX = (mouseX - panX) / zoom;
+    const worldY = (mouseY - panY) / zoom;
+
+    const delta = e.deltaY < 0 ? 1.12 : 1 / 1.12;
+    zoom = clampZoom(zoom * delta);
+
+
+    panX = mouseX - worldX * zoom;
+    panY = mouseY - worldY * zoom;
+
+    applyTransform();
+  }, { passive: false });
+
+
+  let isDragging = false;
+  let dragStartX = 0, dragStartY = 0;
+  let panStartX = 0, panStartY = 0;
+  let dragMoved = false;
+
+  viewport.addEventListener("mousedown", function (e) {
+    isDragging = true;
+    dragMoved = false;
+    dragStartX = e.clientX;
+    dragStartY = e.clientY;
+    panStartX = panX;
+    panStartY = panY;
+    viewport.classList.add("grabbing");
+  });
+
+  window.addEventListener("mousemove", function (e) {
+    if (!isDragging) return;
+    const dx = e.clientX - dragStartX;
+    const dy = e.clientY - dragStartY;
+    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) dragMoved = true;
+    panX = panStartX + dx;
+    panY = panStartY + dy;
+    applyTransform();
+  });
+
+  window.addEventListener("mouseup", function (e) {
+    if (isDragging) {
+      isDragging = false;
+      viewport.classList.remove("grabbing");
+      if (!dragMoved) handleClick(e.clientX, e.clientY);
+    }
+  });
+
+
+  let touchStartDist = null;
+  let touchStartZoom = zoom;
+  let lastTouchMid = null;
+
+  viewport.addEventListener("touchstart", function (e) {
+    if (e.touches.length === 1) {
+      isDragging = true;
+      dragMoved = false;
+      dragStartX = e.touches[0].clientX;
+      dragStartY = e.touches[0].clientY;
+      panStartX = panX;
+      panStartY = panY;
+    } else if (e.touches.length === 2) {
+      isDragging = false;
+      const [t1, t2] = e.touches;
+      touchStartDist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+      touchStartZoom = zoom;
+      lastTouchMid = { x: (t1.clientX + t2.clientX) / 2, y: (t1.clientY + t2.clientY) / 2 };
+    }
+  }, { passive: false });
+
+  viewport.addEventListener("touchmove", function (e) {
+    e.preventDefault();
+    if (e.touches.length === 1 && isDragging) {
+      const dx = e.touches[0].clientX - dragStartX;
+      const dy = e.touches[0].clientY - dragStartY;
+      if (Math.abs(dx) > 3 || Math.abs(dy) > 3) dragMoved = true;
+      panX = panStartX + dx;
+      panY = panStartY + dy;
+      applyTransform();
+    } else if (e.touches.length === 2 && touchStartDist) {
+      const [t1, t2] = e.touches;
+      const dist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+      const rect = viewport.getBoundingClientRect();
+      const midX = (t1.clientX + t2.clientX) / 2 - rect.left;
+      const midY = (t1.clientY + t2.clientY) / 2 - rect.top;
+
+      const worldX = (midX - panX) / zoom;
+      const worldY = (midY - panY) / zoom;
+
+      zoom = clampZoom(touchStartZoom * (dist / touchStartDist));
+
+      panX = midX - worldX * zoom;
+      panY = midY - worldY * zoom;
+      applyTransform();
+    }
+  }, { passive: false });
+
+  viewport.addEventListener("touchend", function (e) {
+    if (e.touches.length === 0) {
+      if (isDragging && !dragMoved) {
+        const t = e.changedTouches[0];
+        handleClick(t.clientX, t.clientY);
+      }
+      isDragging = false;
+      touchStartDist = null;
+    }
+  });
+
+  document.getElementById("zoom-in").addEventListener("click", () => zoomBy(1.25));
+  document.getElementById("zoom-out").addEventListener("click", () => zoomBy(1 / 1.25));
+  document.getElementById("zoom-reset").addEventListener("click", fitToScreen);
+
+  function zoomBy(factor) {
+    const rect = viewport.getBoundingClientRect();
+    const cx = rect.width / 2, cy = rect.height / 2;
+    const worldX = (cx - panX) / zoom;
+    const worldY = (cy - panY) / zoom;
+    zoom = clampZoom(zoom * factor);
+    panX = cx - worldX * zoom;
+    panY = cy - worldY * zoom;
+    applyTransform();
+  }
+
+
+  
+  const popup = document.getElementById("sector-popup");
+  const popupTitle = document.getElementById("popup-title");
+  const popupDesc = document.getElementById("popup-desc");
+  const popupLink = document.getElementById("popup-link");
+  const highlightCanvas = document.getElementById("sector-highlight");
+  const highlightCtx = highlightCanvas.getContext("2d");
+
+  function handleClick(clientX, clientY) {
+    if (!hitmapReady) return;
+    const rect = viewport.getBoundingClientRect();
+    const screenX = clientX - rect.left;
+    const screenY = clientY - rect.top;
+
+
+    const worldX = Math.round((screenX - panX) / zoom);
+    const worldY = Math.round((screenY - panY) / zoom);
+
+    if (worldX < 0 || worldY < 0 || worldX >= 6000 || worldY >= 3652) {
+      hidePopup();
+      return;
+    }
+
+    const pixel = hitCtx.getImageData(worldX, worldY, 1, 1).data;
+    const sector = findSectorByColor(pixel[0], pixel[1], pixel[2], pixel[3]);
+
+    if (!sector) {
+      hidePopup();
+      return;
+    }
+
+    showPopup(sector, screenX, screenY);
+    drawHighlight(sector);
+  }
+
+  function showPopup(sector, screenX, screenY) {
+    popupTitle.textContent = sector.title;
+    popupDesc.textContent = sector.desc;
+    popupLink.href = sector.url;
+    popup.style.display = "block";
+
+
+    const vw = viewport.clientWidth, vh = viewport.clientHeight;
+    let left = screenX + 16;
+    let top = screenY + 16;
+    if (left + 280 > vw) left = screenX - 280 - 16;
+    if (top + 140 > vh) top = vh - 150;
+    popup.style.left = left + "px";
+    popup.style.top = top + "px";
+  }
+
+  function hidePopup() {
+    popup.style.display = "none";
+    highlightCtx.clearRect(0, 0, 6000, 3652);
+    highlightCanvas.style.opacity = 0;
+  }
+
+  document.getElementById("popup-close").addEventListener("click", hidePopup);
+
+
+  function drawHighlight(sector) {
+    highlightCtx.clearRect(0, 0, 6000, 3652);
+    highlightCtx.drawImage(hitImg, 0, 0, 6000, 3652);
+    const imgData = highlightCtx.getImageData(0, 0, 6000, 3652);
+    const data = imgData.data;
+    const [cr, cg, cb] = sector.color;
+    for (let i = 0; i < data.length; i += 4) {
+      const dist = Math.sqrt((data[i] - cr) ** 2 + (data[i + 1] - cg) ** 2 + (data[i + 2] - cb) ** 2);
+      if (dist > COLOR_TOLERANCE || data[i + 3] < 128) {
+        data[i + 3] = 0; 
+      } else {
+        data[i] = 255; data[i + 1] = 255; data[i + 2] = 255; data[i + 3] = 90; 
+      }
+    }
+    highlightCtx.putImageData(imgData, 0, 0);
+    highlightCanvas.style.opacity = 1;
+  }
+
+
+  document.getElementById("toggle-names").addEventListener("change", function (e) {
+    document.getElementById("layer-names").style.display = e.target.checked ? "block" : "none";
+  });
+
+  document.querySelectorAll(".metro-toggle").forEach(function (checkbox) {
+    checkbox.addEventListener("change", function () {
+      const target = document.getElementById(checkbox.dataset.target);
+      if (!target) return;
+      target.classList.toggle("hidden-line", !checkbox.checked);
+    });
+  });
+
+
+  const coordDebug = document.getElementById("coord-debug");
+  viewport.addEventListener("mousemove", function (e) {
+    const rect = viewport.getBoundingClientRect();
+    const worldX = Math.round((e.clientX - rect.left - panX) / zoom);
+    const worldY = Math.round((e.clientY - rect.top - panY) / zoom);
+    coordDebug.textContent = `x: ${worldX}, y: ${worldY}  |  zoom: ${zoom.toFixed(2)}`;
+  });
+
+
+  window.addEventListener("resize", fitToScreen);
+  window.addEventListener("load", fitToScreen);
+  fitToScreen();
+})();
+</script>
+</body>
+</html>
