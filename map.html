@@ -104,15 +104,17 @@
 
   #ui-panel {
     position: absolute;
-    top: 16px;
-    right: 16px;
+    top: 0;
+    left: 0;
+    bottom: 0;
     background: var(--ui-bg);
-    border: 1px solid var(--ui-border);
-    border-radius: 6px;
-    padding: 14px 16px;
-    width: 240px;
+    border-right: 1px solid var(--ui-border);
+    border-radius: 0;
+    padding: 20px 18px;
+    width: 300px;
     font-size: 13px;
     backdrop-filter: blur(6px);
+    overflow-y: auto;
     z-index: 10;
   }
   #ui-panel-header {
@@ -172,6 +174,50 @@
     font-size: 13px;
   }
   #zoom-controls button:hover { background: rgba(255,255,255,0.12); }
+
+  #sidebar-sector-info {
+    display: none;
+    margin-top: 6px;
+  }
+  #sidebar-sector-info.active { display: block; }
+  .sidebar-divider {
+    border-top: 1px solid var(--ui-border);
+    margin: 16px 0 14px;
+  }
+  #sidebar-sector-info h4 {
+    margin: 0 0 8px;
+    color: var(--ui-accent);
+    font-size: 14px;
+    letter-spacing: 0.03em;
+  }
+  #sidebar-sector-info p {
+    margin: 0 0 12px;
+    color: var(--ui-muted);
+    line-height: 1.5;
+  }
+  #sidebar-sector-info a {
+    display: inline-block;
+    color: #0a0b0d;
+    background: var(--ui-accent);
+    text-decoration: none;
+    font-size: 12px;
+    padding: 7px 12px;
+    border-radius: 4px;
+    font-weight: bold;
+    margin-right: 8px;
+  }
+  #sidebar-sector-info a:hover { opacity: 0.85; }
+  #sidebar-sector-close {
+    background: none;
+    border: 1px solid var(--ui-border);
+    color: var(--ui-muted);
+    font-size: 12px;
+    padding: 7px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  #sidebar-sector-close:hover { color: var(--ui-text); border-color: var(--ui-text); }
 
   #sector-popup {
     position: absolute;
@@ -242,11 +288,16 @@
       top: calc(10px + env(safe-area-inset-top));
       right: calc(10px + env(safe-area-inset-right));
       left: calc(10px + env(safe-area-inset-left));
+      bottom: auto;
       width: auto;
       max-width: none;
       padding: 10px 12px;
+      border: 1px solid var(--ui-border);
+      border-radius: 6px;
+      overflow-y: visible;
     }
     #panel-toggle { display: block; }
+    #sidebar-sector-info { display: none !important; }
     .ui-row {
       padding: 6px 0;
       font-size: 14px;
@@ -314,6 +365,14 @@
       <button id="zoom-out">−</button>
       <button id="zoom-reset">⟲</button>
     </div>
+    </div>
+
+    <div id="sidebar-sector-info">
+      <div class="sidebar-divider"></div>
+      <h4 id="sidebar-sector-title">—</h4>
+      <p id="sidebar-sector-desc">—</p>
+      <a id="sidebar-sector-link" href="#" target="_blank" rel="noopener">Читать статью →</a>
+      <button id="sidebar-sector-close">Закрыть</button>
     </div>
   </div>
 
@@ -530,6 +589,11 @@
   const highlightCanvas = document.getElementById("sector-highlight");
   const highlightCtx = highlightCanvas.getContext("2d");
 
+  const sidebarInfo = document.getElementById("sidebar-sector-info");
+  const sidebarTitle = document.getElementById("sidebar-sector-title");
+  const sidebarDesc = document.getElementById("sidebar-sector-desc");
+  const sidebarLink = document.getElementById("sidebar-sector-link");
+
   function handleClick(clientX, clientY) {
     if (!hitmapReady) return;
     const rect = viewport.getBoundingClientRect();
@@ -541,7 +605,7 @@
     const worldY = Math.round((screenY - panY) / zoom);
 
     if (worldX < 0 || worldY < 0 || worldX >= 6000 || worldY >= 3652) {
-      hidePopup();
+      hideSectorInfo();
       return;
     }
 
@@ -549,12 +613,29 @@
     const sector = findSectorByColor(pixel[0], pixel[1], pixel[2], pixel[3]);
 
     if (!sector) {
-      hidePopup();
+      hideSectorInfo();
       return;
     }
 
-    showPopup(sector, screenX, screenY);
+    showSectorInfo(sector, screenX, screenY);
     drawHighlight(sector);
+  }
+
+  function showSectorInfo(sector, screenX, screenY) {
+    if (isMobileLayout.matches) {
+      showPopup(sector, screenX, screenY);
+    } else {
+      popup.style.display = "none";
+      sidebarTitle.textContent = sector.title;
+      sidebarDesc.textContent = sector.desc;
+      sidebarLink.href = sector.url;
+      sidebarInfo.classList.add("active");
+    }
+  }
+
+  function hideSectorInfo() {
+    hidePopup();
+    sidebarInfo.classList.remove("active");
   }
 
   function showPopup(sector, screenX, screenY) {
@@ -579,7 +660,8 @@
     highlightCanvas.style.opacity = 0;
   }
 
-  document.getElementById("popup-close").addEventListener("click", hidePopup);
+  document.getElementById("popup-close").addEventListener("click", hideSectorInfo);
+  document.getElementById("sidebar-sector-close").addEventListener("click", hideSectorInfo);
 
 
   function drawHighlight(sector) {
@@ -634,6 +716,10 @@
     uiPanel.classList.toggle("collapsed");
   });
   applyDefaultPanelState();
+  isMobileLayout.addEventListener("change", function () {
+    applyDefaultPanelState();
+    hideSectorInfo();
+  });
 
 
   window.addEventListener("resize", fitToScreen);
