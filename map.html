@@ -60,24 +60,13 @@
     -webkit-user-drag: none;
   }
 
+  /* Хитмап-слой не показываем визуально, он существует только как источник данных для canvas.
+     Рисуем его один раз при загрузке в offscreen-подобный canvas и читаем оттуда пиксели. */
   #layer-hitmap {
-    /* Хитмап-слой не показываем визуально, он существует только как источник для canvas.
-       display:none НЕ используем, чтобы можно было прочитать пиксели через drawImage без лишних сложностей —
-       но т.к. рисуем его в offscreen canvas один раз при загрузке, тут можно и не показывать вовсе. */
     display: none;
   }
 
-  /* Слой станций метро (белые точки + линии) — рисуем через SVG, чтобы было легко включать/выключать по цвету линии */
-  #layer-metro {
-    width: 6000px;
-    height: 3652px;
-    pointer-events: none;
-  }
-  #layer-metro .metro-line { fill: none; stroke-width: 6; opacity: 1; transition: opacity .25s ease; }
-  #layer-metro .metro-line.hidden-line { opacity: 0; }
-  #layer-metro .metro-station { fill: #fff; stroke: #000; stroke-width: 2; }
-
-  /* Подсветка наведённого сектора — рисуется поверх хитмапа как маска того же цвета, полупрозрачно */
+  /* Подсветка наведённого/выбранного сектора — рисуется поверх карты как маска того же цвета, полупрозрачно */
   #sector-highlight {
     position: absolute;
     top: 0; left: 0;
@@ -124,12 +113,6 @@
     width: 14px;
     height: 14px;
     cursor: pointer;
-  }
-  .ui-row .swatch {
-    width: 10px;
-    height: 10px;
-    border-radius: 2px;
-    flex-shrink: 0;
   }
   #zoom-controls {
     display: flex;
@@ -217,35 +200,12 @@
   <div id="map-world">
     <img class="layer" id="layer-bg" src="map-background.png" alt="">
     <img class="layer" id="layer-names" src="map-background-names.png" alt="">
+    <!-- Слой секторов (не хитмап, а реальное изображение секторов) — включается/выключается, чтобы смотреть на рельеф под ним -->
+    <img class="layer" id="layer-sectors" src="map-sectors.png" alt="" style="display:none;">
+    <!-- Слой метро — один PNG со всеми 10 линиями сразу -->
+    <img class="layer" id="layer-metro" src="map-metro.png" alt="">
     <canvas class="layer" id="layer-hitmap" width="6000" height="3652"></canvas>
     <canvas id="sector-highlight" width="6000" height="3652"></canvas>
-
-    <!-- Слой линий метро. Каждая линия — отдельная группа, легко переключается по id.
-         Координаты ниже условные/примерные — замени на реальные точки станций твоей карты. -->
-    <svg id="layer-metro" viewBox="0 0 6000 3652" xmlns="http://www.w3.org/2000/svg">
-      <g class="metro-line" id="line-red" stroke="#e30613" data-line-name="Красная ветка">
-        <path d="M 1500 800 L 2900 850 L 3350 950 L 3700 1000 L 4100 950"/>
-        <circle class="metro-station" cx="1500" cy="800" r="10"/>
-        <circle class="metro-station" cx="2900" cy="850" r="10"/>
-        <circle class="metro-station" cx="3350" cy="950" r="10"/>
-        <circle class="metro-station" cx="3700" cy="1000" r="10"/>
-        <circle class="metro-station" cx="4100" cy="950" r="10"/>
-      </g>
-      <g class="metro-line" id="line-blue" stroke="#1560bd" data-line-name="Синяя ветка">
-        <path d="M 4100 950 L 3900 1350 L 3850 2200 L 3400 2650"/>
-        <circle class="metro-station" cx="4100" cy="950" r="10"/>
-        <circle class="metro-station" cx="3900" cy="1350" r="10"/>
-        <circle class="metro-station" cx="3850" cy="2200" r="10"/>
-        <circle class="metro-station" cx="3400" cy="2650" r="10"/>
-      </g>
-      <g class="metro-line" id="line-cyan" stroke="#22c3d6" data-line-name="Бирюзовая ветка">
-        <path d="M 4300 1200 L 4550 1650 L 4650 2200 L 4550 2600"/>
-        <circle class="metro-station" cx="4300" cy="1200" r="10"/>
-        <circle class="metro-station" cx="4550" cy="1650" r="10"/>
-        <circle class="metro-station" cx="4650" cy="2200" r="10"/>
-        <circle class="metro-station" cx="4550" cy="2600" r="10"/>
-      </g>
-    </svg>
   </div>
 </div>
 
@@ -255,21 +215,13 @@
     <input type="checkbox" id="toggle-names" checked>
     Названия рельефа
   </label>
-  <div style="border-top:1px solid var(--ui-border); margin:10px 0 8px;"></div>
   <label class="ui-row">
-    <input type="checkbox" class="metro-toggle" data-target="line-red" checked>
-    <span class="swatch" style="background:#e30613"></span>
-    Красная ветка
+    <input type="checkbox" id="toggle-sectors">
+    Секторы
   </label>
   <label class="ui-row">
-    <input type="checkbox" class="metro-toggle" data-target="line-blue" checked>
-    <span class="swatch" style="background:#1560bd"></span>
-    Синяя ветка
-  </label>
-  <label class="ui-row">
-    <input type="checkbox" class="metro-toggle" data-target="line-cyan" checked>
-    <span class="swatch" style="background:#22c3d6"></span>
-    Бирюзовая ветка
+    <input type="checkbox" id="toggle-metro" checked>
+    Линии метро
   </label>
   <div id="zoom-controls">
     <button id="zoom-in">+</button>
@@ -293,19 +245,19 @@
 
   /* =========================================================================
      1. ТАБЛИЦА "ЦВЕТ В HITMAP → ИНФОРМАЦИЯ О СЕКТОРЕ"
-     Цвета взяты напрямую из присланного map-hitmap.png (сплошные RGBA, alpha=255).
+     Цвета взяты напрямую из map-hitmap.png (сплошные RGBA, alpha=255).
      Замени title/desc/url на реальные данные секторов; ключи цветов менять не нужно,
      если ты не перекрашивала сами фигуры в исходном файле.
   ========================================================================= */
   const SECTORS = [
-    { color: [90, 0, 40],    id: "sector-maroon", title: "Сектор «Маренго»",   desc: "Тёмно-бордовый производственный комплекс в северо-западной части зоны.", url: "#" },
-    { color: [129, 8, 0],    id: "sector-darkred", title: "Сектор «Клеймо»",   desc: "Центральный жилой и технический узел, соединяющий большинство веток.", url: "#" },
-    { color: [94, 197, 0],   id: "sector-green",  title: "Сектор «Веер»",      desc: "Веерообразная структура доков в юго-восточной части карты.", url: "#" },
-    { color: [254, 255, 0],  id: "sector-yellow", title: "Сектор «Соты»",      desc: "Группа ромбовидных модулей в верхней части карты.", url: "#" },
-    { color: [255, 255, 183],id: "sector-cream",  title: "Сектор «Бледный»",   desc: "Скопление светлых построек рядом с голубыми доками.", url: "#" },
-    { color: [20, 126, 0],   id: "sector-darkgreen", title: "Сектор «Дуга»",   desc: "Изогнутая конструкция на восточном краю карты.", url: "#" },
-    { color: [255, 123, 0],  id: "sector-orange", title: "Сектор «Крюк»",     desc: "Изогнутое ответвление, соединяющее верхние и правые сектора.", url: "#" },
-    { color: [255, 16, 0],   id: "sector-red",    title: "Сектор «Осколки»",  desc: "Небольшая изолированная группа построек в юго-западной части.", url: "#" },
+    { color: [90, 0, 40],     title: "Сектор «Маренго»",  desc: "Тёмно-бордовый производственный комплекс в северо-западной части зоны.", url: "#" },
+    { color: [129, 8, 0],     title: "Сектор «Клеймо»",   desc: "Центральный жилой и технический узел, соединяющий большинство веток.", url: "#" },
+    { color: [94, 197, 0],    title: "Сектор «Веер»",     desc: "Веерообразная структура доков в юго-восточной части карты.", url: "#" },
+    { color: [254, 255, 0],   title: "Сектор «Соты»",     desc: "Группа ромбовидных модулей в верхней части карты.", url: "#" },
+    { color: [255, 255, 183], title: "Сектор «Бледный»",  desc: "Скопление светлых построек рядом с голубыми доками.", url: "#" },
+    { color: [20, 126, 0],    title: "Сектор «Дуга»",     desc: "Изогнутая конструкция на восточном краю карты.", url: "#" },
+    { color: [255, 123, 0],   title: "Сектор «Крюк»",     desc: "Изогнутое ответвление, соединяющее верхние и правые сектора.", url: "#" },
+    { color: [255, 16, 0],    title: "Сектор «Осколки»",  desc: "Небольшая изолированная группа построек в юго-западной части.", url: "#" },
   ];
 
   // Порог совпадения цвета — чтобы не спотыкаться об антиалиасинг на краях фигур
@@ -324,7 +276,7 @@
   }
 
   /* =========================================================================
-     2. ЗАГРУЗКА HITMAP В OFFSCREEN CANVAS ДЛЯ ЧТЕНИЯ ПИКСЕЛЕЙ
+     2. ЗАГРУЗКА HITMAP В CANVAS ДЛЯ ЧТЕНИЯ ПИКСЕЛЕЙ
   ========================================================================= */
   const hitCanvas = document.getElementById("layer-hitmap");
   const hitCtx = hitCanvas.getContext("2d", { willReadFrequently: true });
@@ -421,7 +373,6 @@
   // Touch: pan одним пальцем, pinch-zoom двумя
   let touchStartDist = null;
   let touchStartZoom = zoom;
-  let lastTouchMid = null;
 
   viewport.addEventListener("touchstart", function (e) {
     if (e.touches.length === 1) {
@@ -433,10 +384,10 @@
       panStartY = panY;
     } else if (e.touches.length === 2) {
       isDragging = false;
+      dragMoved = true; // два пальца — точно не одиночный клик
       const [t1, t2] = e.touches;
       touchStartDist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
       touchStartZoom = zoom;
-      lastTouchMid = { x: (t1.clientX + t2.clientX) / 2, y: (t1.clientY + t2.clientY) / 2 };
     }
   }, { passive: false });
 
@@ -574,22 +525,22 @@
   }
 
   /* =========================================================================
-     5. ПЕРЕКЛЮЧАТЕЛИ СЛОЁВ (названия рельефа, ветки метро)
+     5. ПЕРЕКЛЮЧАТЕЛИ СЛОЁВ (названия рельефа, секторы, метро)
   ========================================================================= */
   document.getElementById("toggle-names").addEventListener("change", function (e) {
     document.getElementById("layer-names").style.display = e.target.checked ? "block" : "none";
   });
 
-  document.querySelectorAll(".metro-toggle").forEach(function (checkbox) {
-    checkbox.addEventListener("change", function () {
-      const target = document.getElementById(checkbox.dataset.target);
-      if (!target) return;
-      target.classList.toggle("hidden-line", !checkbox.checked);
-    });
+  document.getElementById("toggle-sectors").addEventListener("change", function (e) {
+    document.getElementById("layer-sectors").style.display = e.target.checked ? "block" : "none";
+  });
+
+  document.getElementById("toggle-metro").addEventListener("change", function (e) {
+    document.getElementById("layer-metro").style.display = e.target.checked ? "block" : "none";
   });
 
   /* =========================================================================
-     6. ДЕБАГ-КООРДИНАТЫ (можно удалить в проде) — полезно при подборе координат станций метро
+     6. ДЕБАГ-КООРДИНАТЫ (можно удалить в проде) — полезно при подборе координат/секторов
   ========================================================================= */
   const coordDebug = document.getElementById("coord-debug");
   viewport.addEventListener("mousemove", function (e) {
