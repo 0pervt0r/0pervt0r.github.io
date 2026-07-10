@@ -668,7 +668,7 @@
     if (metroReady && metroLayerVisible) {
       const line = findLineNear(metroCtx, worldX, worldY, LINE_HIT_RADIUS);
       if (line) {
-        showSectorInfo(line, screenX, screenY);
+        showSectorInfo(line, screenX, screenY, true);
         drawHighlight(metroImg, line.color);
         return;
       }
@@ -680,7 +680,7 @@
       const pixel = sectorCtx.getImageData(worldX, worldY, 1, 1).data;
       const sector = findEntryByColor(SECTORS, pixel[0], pixel[1], pixel[2], pixel[3]);
       if (sector) {
-        showSectorInfo(sector, screenX, screenY);
+        showSectorInfo(sector, screenX, screenY, false);
         drawHighlight(sectorImg, sector.color);
         return;
       }
@@ -689,14 +689,15 @@
     hideSectorInfo();
   }
 
-  function showSectorInfo(entry, screenX, screenY) {
+  function showSectorInfo(entry, screenX, screenY, isLine) {
     if (isMobileLayout.matches) {
-      showPopup(entry, screenX, screenY);
+      showPopup(entry, screenX, screenY, isLine);
     } else {
       popup.style.display = "none";
       sidebarTitle.textContent = entry.title;
       sidebarDesc.textContent = entry.desc;
       sidebarLink.href = entry.url;
+      sidebarLink.style.display = isLine ? "none" : "inline-block";
       sidebarInfo.classList.add("active");
     }
   }
@@ -706,10 +707,11 @@
     sidebarInfo.classList.remove("active");
   }
 
-  function showPopup(entry, screenX, screenY) {
+  function showPopup(entry, screenX, screenY, isLine) {
     popupTitle.textContent = entry.title;
     popupDesc.textContent = entry.desc;
     popupLink.href = entry.url;
+    popupLink.style.display = isLine ? "none" : "inline-block";
     popup.style.display = "block";
 
     const vw = viewport.clientWidth, vh = viewport.clientHeight;
