@@ -31,7 +31,6 @@
     flex-direction: column;
   }
 
-  
   #info-banner {
     flex: 0 0 auto;
     background: var(--ui-bg);
@@ -52,17 +51,15 @@
     overflow: hidden;
   }
 
-  
   #map-viewport {
     position: absolute;
     inset: 0;
     overflow: hidden;
     cursor: grab;
-    touch-action: none; 
+    touch-action: none;
   }
   #map-viewport.grabbing { cursor: grabbing; }
 
-  
   #map-world {
     position: absolute;
     top: 0;
@@ -79,16 +76,17 @@
     left: 0;
     width: 6000px;
     height: 3652px;
-    pointer-events: none; 
+    pointer-events: none;
     user-select: none;
     -webkit-user-drag: none;
   }
 
-
-  #layer-hitmap {
+  /* Оба hit-test слоя (сектора и метро) физически не показываются — используются только
+     как источник пикселей для offscreen canvas-проверки при клике. */
+  #layer-hitmap,
+  #layer-metro-hitmap {
     display: none;
   }
-
 
   #sector-highlight {
     position: absolute;
@@ -100,7 +98,6 @@
     opacity: 0;
     transition: opacity .12s ease;
   }
-
 
   #ui-panel {
     position: absolute;
@@ -279,7 +276,6 @@
     pointer-events: none;
   }
 
-
   @media (max-width: 640px), (pointer: coarse) and (max-width: 900px) {
     #info-banner {
       font-size: 12px;
@@ -325,7 +321,7 @@
 <body>
 
 <div id="info-banner">
-  <strong>Эта карта интерактивная!</strong> Вы можете её отдалять и приближать, включать и прятать отображение сектора, линий метро и названий рельефа. Так же, нажав на строение комплекса вы можете открыть окошко с описанием сектора и кнопкой перехода на полную статью о нём.
+  <strong>Эта карта интерактивная!</strong> Вы можете её отдалять и приближать, включать и прятать отображение сектора, линий метро и названий рельефа. Так же, нажав на строение комплекса или на линию метро вы можете открыть окошко с описанием и кнопкой перехода на полную статью.
 </div>
 
 <div id="stage">
@@ -337,7 +333,11 @@
       <img class="layer" id="layer-sectors" src="map-sectors.png" alt="">
 
       <img class="layer" id="layer-metro" src="map-trains.png" alt="">
+
+
       <canvas class="layer" id="layer-hitmap" width="6000" height="3652"></canvas>
+      <canvas class="layer" id="layer-metro-hitmap" width="6000" height="3652"></canvas>
+
       <canvas id="sector-highlight" width="6000" height="3652"></canvas>
     </div>
   </div>
@@ -403,36 +403,95 @@
   ];
 
 
+  const LINES = [
+    { color: [248, 10, 0],   title: "Красная ветка",     desc: "Основная транспортная артерия комплекса, соединяющая северные и восточные сектора.", url: "#" },
+    { color: [0, 244, 255],  title: "Бирюзовая ветка",   desc: "Восточная ветка, идущая вдоль сектора E.", url: "#" },
+    { color: [0, 73, 255],   title: "Синяя ветка",       desc: "Соединяет центральный узел с восточными секторами.", url: "#" },
+    { color: [248, 73, 0],   title: "Оранжевая ветка",   desc: "Западное ответвление от Сектора C.", url: "#" },
+    { color: [138, 43, 5],   title: "Коричневая ветка",  desc: "Южная ветка, соединяющая стоянку Тренчблидеров с сектором E.", url: "#" },
+    { color: [255, 246, 0],  title: "Жёлтая ветка",      desc: "Короткая связующая ветка в юго-восточной части.", url: "#" },
+    { color: [104, 0, 248],  title: "Фиолетовая ветка",  desc: "Диагональная ветка, связывающая центральный узел с северным сектором.", url: "#" },
+    { color: [77, 0, 0],     title: "Тёмно-красная ветка", desc: "Короткая ветка в северо-западной части, у Сектора B.", url: "#" },
+    { color: [1, 14, 34],    title: "Тёмная ветка",      desc: "Изолированный служебный участок в центре карты.", url: "#" },
+    { color: [128, 248, 0],  title: "Зелёная ветка",     desc: "Соединяет центральный узел с фиолетовой веткой.", url: "#" },
+  ];
+
   const COLOR_TOLERANCE = 30;
 
-  function findSectorByColor(r, g, b, a) {
+  const LINE_HIT_RADIUS = 14;
+
+  function colorDistance(r, g, b, cr, cg, cb) {
+    return Math.sqrt((r - cr) ** 2 + (g - cg) ** 2 + (b - cb) ** 2);
+  }
+
+  function findEntryByColor(list, r, g, b, a) {
     if (a < 128) return null;
     let best = null;
     let bestDist = Infinity;
-    for (const s of SECTORS) {
-      const [cr, cg, cb] = s.color;
-      const dist = Math.sqrt((r - cr) ** 2 + (g - cg) ** 2 + (b - cb) ** 2);
-      if (dist < bestDist) { bestDist = dist; best = s; }
+    for (const entry of list) {
+      const [cr, cg, cb] = entry.color;
+      const dist = colorDistance(r, g, b, cr, cg, cb);
+      if (dist < bestDist) { bestDist = dist; best = entry; }
     }
     return bestDist <= COLOR_TOLERANCE ? best : null;
   }
 
 
-  const hitCanvas = document.getElementById("layer-hitmap");
-  const hitCtx = hitCanvas.getContext("2d", { willReadFrequently: true });
-  const hitImg = new Image();
-  let hitmapReady = false;
-  hitImg.onload = function () {
-    hitCtx.drawImage(hitImg, 0, 0, 6000, 3652);
-    hitmapReady = true;
-  };
-  hitImg.src = "map-hitmap.png";
+  function loadHitmap(canvasId, src, onReady) {
+    const canvas = document.getElementById(canvasId);
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+    const img = new Image();
+    img.onload = function () {
+      ctx.drawImage(img, 0, 0, 6000, 3652);
+      onReady(ctx, img);
+    };
+    img.src = src;
+    return { canvas, ctx };
+  }
+
+  let sectorCtx = null, sectorImg = null, sectorReady = false;
+  let metroCtx = null, metroImg = null, metroReady = false;
+
+  loadHitmap("layer-hitmap", "map-hitmap.png", function (ctx, img) {
+    sectorCtx = ctx; sectorImg = img; sectorReady = true;
+  });
+  loadHitmap("layer-metro-hitmap", "map-trains-hitmap.png", function (ctx, img) {
+    metroCtx = ctx; metroImg = img; metroReady = true;
+  });
+
+ 
+  function findLineNear(ctx, x, y, wRadius) {
+    const x0 = Math.max(0, x - wRadius);
+    const y0 = Math.max(0, y - wRadius);
+    const w = Math.min(6000, x + wRadius) - x0;
+    const h = Math.min(3652, y + wRadius) - y0;
+    if (w <= 0 || h <= 0) return null;
+
+    const data = ctx.getImageData(x0, y0, w, h).data;
+    let bestEntry = null;
+    let bestDist = Infinity;
+
+    for (let py = 0; py < h; py++) {
+      for (let px = 0; px < w; px++) {
+        const i = (py * w + px) * 4;
+        const a = data[i + 3];
+        if (a < 128) continue;
+        const r = data[i], g = data[i + 1], b = data[i + 2];
+        const entry = findEntryByColor(LINES, r, g, b, a);
+        if (!entry) continue;
+        const worldPx = x0 + px, worldPy = y0 + py;
+        const clickDist = Math.hypot(worldPx - x, worldPy - y);
+        if (clickDist < bestDist) { bestDist = clickDist; bestEntry = entry; }
+      }
+    }
+    return bestEntry;
+  }
 
 
   const viewport = document.getElementById("map-viewport");
   const world = document.getElementById("map-world");
 
-  let zoom = 0.22;  
+  let zoom = 0.22;
   let panX = 0, panY = 0;
   const ZOOM_MIN = 0.08;
   const ZOOM_MAX = 4;
@@ -452,13 +511,11 @@
     applyTransform();
   }
 
-
   viewport.addEventListener("wheel", function (e) {
     e.preventDefault();
     const rect = viewport.getBoundingClientRect();
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
-
 
     const worldX = (mouseX - panX) / zoom;
     const worldY = (mouseY - panY) / zoom;
@@ -466,13 +523,11 @@
     const delta = e.deltaY < 0 ? 1.12 : 1 / 1.12;
     zoom = clampZoom(zoom * delta);
 
-
     panX = mouseX - worldX * zoom;
     panY = mouseY - worldY * zoom;
 
     applyTransform();
   }, { passive: false });
-
 
   let isDragging = false;
   let dragStartX = 0, dragStartY = 0;
@@ -506,7 +561,6 @@
       if (!dragMoved) handleClick(e.clientX, e.clientY);
     }
   });
-
 
   let touchStartDist = null;
   let touchStartZoom = zoom;
@@ -582,6 +636,7 @@
   }
 
 
+
   const popup = document.getElementById("sector-popup");
   const popupTitle = document.getElementById("popup-title");
   const popupDesc = document.getElementById("popup-desc");
@@ -595,11 +650,10 @@
   const sidebarLink = document.getElementById("sidebar-sector-link");
 
   function handleClick(clientX, clientY) {
-    if (!hitmapReady) return;
+    if (!sectorReady && !metroReady) return;
     const rect = viewport.getBoundingClientRect();
     const screenX = clientX - rect.left;
     const screenY = clientY - rect.top;
-
 
     const worldX = Math.round((screenX - panX) / zoom);
     const worldY = Math.round((screenY - panY) / zoom);
@@ -609,26 +663,40 @@
       return;
     }
 
-    const pixel = hitCtx.getImageData(worldX, worldY, 1, 1).data;
-    const sector = findSectorByColor(pixel[0], pixel[1], pixel[2], pixel[3]);
 
-    if (!sector) {
-      hideSectorInfo();
-      return;
+    const metroLayerVisible = document.getElementById("layer-metro").style.display !== "none";
+    if (metroReady && metroLayerVisible) {
+      const line = findLineNear(metroCtx, worldX, worldY, LINE_HIT_RADIUS);
+      if (line) {
+        showSectorInfo(line, screenX, screenY);
+        drawHighlight(metroImg, line.color);
+        return;
+      }
     }
 
-    showSectorInfo(sector, screenX, screenY);
-    drawHighlight(sector);
+
+    const sectorsLayerVisible = document.getElementById("layer-sectors").style.display !== "none";
+    if (sectorReady && sectorsLayerVisible) {
+      const pixel = sectorCtx.getImageData(worldX, worldY, 1, 1).data;
+      const sector = findEntryByColor(SECTORS, pixel[0], pixel[1], pixel[2], pixel[3]);
+      if (sector) {
+        showSectorInfo(sector, screenX, screenY);
+        drawHighlight(sectorImg, sector.color);
+        return;
+      }
+    }
+
+    hideSectorInfo();
   }
 
-  function showSectorInfo(sector, screenX, screenY) {
+  function showSectorInfo(entry, screenX, screenY) {
     if (isMobileLayout.matches) {
-      showPopup(sector, screenX, screenY);
+      showPopup(entry, screenX, screenY);
     } else {
       popup.style.display = "none";
-      sidebarTitle.textContent = sector.title;
-      sidebarDesc.textContent = sector.desc;
-      sidebarLink.href = sector.url;
+      sidebarTitle.textContent = entry.title;
+      sidebarDesc.textContent = entry.desc;
+      sidebarLink.href = entry.url;
       sidebarInfo.classList.add("active");
     }
   }
@@ -638,12 +706,11 @@
     sidebarInfo.classList.remove("active");
   }
 
-  function showPopup(sector, screenX, screenY) {
-    popupTitle.textContent = sector.title;
-    popupDesc.textContent = sector.desc;
-    popupLink.href = sector.url;
+  function showPopup(entry, screenX, screenY) {
+    popupTitle.textContent = entry.title;
+    popupDesc.textContent = entry.desc;
+    popupLink.href = entry.url;
     popup.style.display = "block";
-
 
     const vw = viewport.clientWidth, vh = viewport.clientHeight;
     let left = screenX + 16;
@@ -664,18 +731,18 @@
   document.getElementById("sidebar-sector-close").addEventListener("click", hideSectorInfo);
 
 
-  function drawHighlight(sector) {
+  function drawHighlight(sourceImg, targetColor) {
     highlightCtx.clearRect(0, 0, 6000, 3652);
-    highlightCtx.drawImage(hitImg, 0, 0, 6000, 3652);
+    highlightCtx.drawImage(sourceImg, 0, 0, 6000, 3652);
     const imgData = highlightCtx.getImageData(0, 0, 6000, 3652);
     const data = imgData.data;
-    const [cr, cg, cb] = sector.color;
+    const [cr, cg, cb] = targetColor;
     for (let i = 0; i < data.length; i += 4) {
-      const dist = Math.sqrt((data[i] - cr) ** 2 + (data[i + 1] - cg) ** 2 + (data[i + 2] - cb) ** 2);
+      const dist = colorDistance(data[i], data[i + 1], data[i + 2], cr, cg, cb);
       if (dist > COLOR_TOLERANCE || data[i + 3] < 128) {
         data[i + 3] = 0;
       } else {
-        data[i] = 255; data[i + 1] = 255; data[i + 2] = 255; data[i + 3] = 90; 
+        data[i] = 255; data[i + 1] = 255; data[i + 2] = 255; data[i + 3] = 140;
       }
     }
     highlightCtx.putImageData(imgData, 0, 0);
@@ -720,7 +787,6 @@
     applyDefaultPanelState();
     hideSectorInfo();
   });
-
 
   window.addEventListener("resize", fitToScreen);
   window.addEventListener("load", fitToScreen);
