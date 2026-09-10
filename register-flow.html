@@ -1,0 +1,62 @@
+<section class="form-page">
+  <h2>Заявка на трудоустройство</h2>
+  <form id="register-form" class="form" novalidate>
+    <div class="form__group">
+      <label class="form__label" for="emergency_contact">Экстренный контакт</label>
+      <input class="form__input" type="email" id="emergency_contact" name="emergency_contact" placeholder="name@gmail.com">
+      <div class="form__error"></div>
+    </div>
+
+    <div class="form__group">
+      <label class="form__label" for="access_code">Код доступа</label>
+      <input class="form__input" type="password" id="access_code" name="access_code">
+      <div class="form__error"></div>
+    </div>
+
+    <div class="form__group">
+      <label class="form__label" for="name">Имя</label>
+      <input class="form__input" type="text" id="name" name="name">
+      <div class="form__hint">Не обязательно указывать настоящее имя</div>
+      <div class="form__error"></div>
+    </div>
+
+    <div class="form__group">
+      <label class="form__label" for="surname">Фамилия</label>
+      <input class="form__input" type="text" id="surname" name="surname">
+      <div class="form__hint">Не обязательно указывать настоящую фамилию</div>
+      <div class="form__error"></div>
+    </div>
+
+    <div class="form__group">
+      <label class="form__label" for="username">Позывной</label>
+      <input class="form__input" type="text" id="username" name="username" minlength="4" maxlength="20">
+      <div class="form__hint">На английском, от 4 до 20 символов</div>
+      <div class="form__error"></div>
+    </div>
+
+    <div class="form__group">
+      <label class="form__label" for="birth_date">Дата рождения</label>
+      <input class="form__input" type="date" id="birth_date" name="birth_date">
+      <div class="form__error"></div>
+    </div>
+
+    <div class="form__group">
+      <label class="form__checkbox">
+        <input type="checkbox" name="age_confirm">
+        Медицинское освидетельствование пройдено (мне есть 18 лет)
+      </label>
+      <div class="form__error"></div>
+    </div>
+
+    <button class="btn btn-accent form__submit" type="submit">Отправить заявку</button>
+    <div class="form__status"></div>
+  </form>
+</section>
+
+<section class="test-page" hidden>
+  <div class="test" data-role="assignment">
+    <div class="test__progress"></div>
+    <div class="test__question"></div>
+    <div class="test__options"></div>
+  </div>
+</section>
