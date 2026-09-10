@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Хроники Urbanshade</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <a class="site-header__account" href="login.html">Войти в аккаунт</a>
+</header>
+
+<main class="container">
+  <section class="hero">
+    <img class="hero__logo" src="assets/logo_big.png" alt="">
+    <h1 class="hero__title">ХРОНИКИ URBANSHADE</h1>
+    <p class="hero__welcome">Добро пожаловать в закрытую базу данных Тайного Хадального Объекта!</p>
+
+    <nav class="icon-nav">
+      <a class="icon-nav__item" href="map.html">
+        <img class="icon-btn" src="assets/map-icon.png" alt="Карта">
+        <span>Карта</span>
+      </a>
+      <a class="icon-nav__item" href="account.html">
+        <img class="icon-btn" src="assets/user_account_icon.png" alt="Личный аккаунт">
+        <span>Личный аккаунт</span>
+      </a>
+      <a class="icon-nav__item" href="minigames.html">
+        <img class="icon-btn" src="assets/minigames_icon.png" alt="Мини-игры">
+        <span>Мини-игры</span>
+      </a>
+      <a class="icon-nav__item" href="classifications.html">
+        <img class="icon-btn" src="assets/classifications_icon.png" alt="Классификации">
+        <span>Классификации</span>
+      </a>
+      <a class="icon-nav__item" href="mail.html">
+        <img class="icon-btn" src="assets/mail_icon.png" alt="Почта">
+        <span>Почта</span>
+      </a>
+    </nav>
+  </section>
+
+  <div class="carousel">
+    <div class="carousel__track">
+      <div class="carousel__slide"><img src="assets/main_menu_image1.png" alt=""></div>
+      <div class="carousel__slide"><img src="assets/main_menu_image2.png" alt=""></div>
+      <div class="carousel__slide"><img src="assets/main_menu_image3.png" alt=""></div>
+      <div class="carousel__slide"><img src="assets/main_menu_image4.png" alt=""></div>
+      <div class="carousel__slide"><img src="assets/main_menu_image5.png" alt=""></div>
+    </div>
+    <button class="carousel__arrow carousel__arrow--prev" aria-label="Предыдущее изображение">‹</button>
+    <button class="carousel__arrow carousel__arrow--next" aria-label="Следующее изображение">›</button>
+  </div>
+
+  <div class="split">
+    <div class="split__col">
+      <h2>О нас</h2>
+      <p>Urbanshade — датский многонациональный конгломерат, основанный в начале XX века.</p>
+      <p>Тайный Хадальный Объект расположен на предельных глубинах океанского дна. Здесь содержатся, изучаются и используются аномальные объекты для различных вещей.</p>
+      <p>Доступ к большинству материалов требует допуска уровня 3 и выше. Ряд досье засекречен полностью и недоступен в данной сети.</p>
+    </div>
+    <div class="divider-v split__divider"></div>
+    <div class="split__col">
+      <h2>Разделы</h2>
+      <nav class="section-links">
+        <a class="section-links__item" href="personnel.html">
+          <img src="assets/workers_icon.png" alt="">
+          <span class="divider-v"></span>
+          <span>Персоналии</span>
+        </a>
+        <a class="section-links__item" href="prisoners.html">
+          <img src="assets/prisoners_icons.png" alt="">
+          <span class="divider-v"></span>
+          <span>Заключённые</span>
+        </a>
+        <a class="section-links__item" href="zobjects.html">
+          <img src="assets/zobjects_icon.png" alt="">
+          <span class="divider-v"></span>
+          <span>Z-объекты</span>
+        </a>
+        <a class="section-links__item" href="docs.html">
+          <img src="assets/docs_icon.png" alt="">
+          <span class="divider-v"></span>
+          <span>Документация</span>
+        </a>
+      </nav>
+    </div>
+  </div>
+</main>
+
+<script type="module" src="script.js"></script>
+</body>
+</html>
