@@ -308,17 +308,24 @@ img.icon-btn { width: 48px; height: 48px; }
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: rgba(15, 15, 15, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
   border: none;
   color: var(--text);
   width: 44px;
   height: 44px;
+  font-size: 0;
+  line-height: 1;
   cursor: pointer;
-  transition: background-color 0.15s var(--ease);
+  transition: color 0.15s var(--ease), transform 0.15s var(--ease);
 }
-.carousel__arrow:hover { background: var(--accent); color: var(--bg); }
+.carousel__arrow:hover { color: var(--accent); transform: translateY(-50%) scale(1.15); }
 .carousel__arrow--prev { left: 0; }
 .carousel__arrow--next { right: 0; }
+.carousel__arrow--prev::before { content: '◀'; font-size: 1.4rem; }
+.carousel__arrow--next::before { content: '▶'; font-size: 1.4rem; }
 
 .split {
   display: grid;
