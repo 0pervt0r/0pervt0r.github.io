@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Личный аккаунт — Urbanshade Chronicles</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<aside class="side-nav">
+  <a class="side-nav__profile" href="login.html">
+    <div class="side-nav__avatar">
+      <img src="assets/avatar_placeholder.png" alt="">
+    </div>
+    <div class="side-nav__name">Войти в аккаунт</div>
+  </a>
+  <nav class="side-nav__body">
+    <div class="side-nav__section">
+      <div class="side-nav__section-title">Навигация</div>
+      <a class="side-nav__link" href="map.html">Карта</a>
+      <a class="side-nav__link" href="account.html">Личный аккаунт</a>
+      <a class="side-nav__link" href="minigames.html">Мини-игры</a>
+      <a class="side-nav__link" href="classifications.html">Классификации</a>
+      <a class="side-nav__link" href="mail.html">Почта</a>
+    </div>
+    <div class="side-nav__section">
+      <div class="side-nav__section-title">Разделы</div>
+      <a class="side-nav__link" href="personnel.html">Персоналии</a>
+      <a class="side-nav__link" href="prisoners.html">Заключённые</a>
+      <a class="side-nav__link" href="zobjects.html">Z-объекты</a>
+      <a class="side-nav__link" href="docs.html">Документация</a>
+    </div>
+  </nav>
+  <div class="side-nav__lang">
+    <button type="button" class="active" data-lang="ru">RU</button>
+    <button type="button" data-lang="en">EN</button>
+    <button type="button" data-lang="es">ES</button>
+  </div>
+</aside>
+
+<main class="container main">
+
+  <!-- ============================= HEADER ============================= -->
+  <section class="profile-header" data-profile-header>
+    <div class="profile-header__avatar">
+      <img src="assets/avatar_placeholder.png" alt="">
+    </div>
+    <div>
+      <div class="profile-header__name" data-field="display-name">Имя</div>
+      <div class="profile-header__id" data-field="id-label">#R-N 0000000000</div>
+    </div>
+    <div class="profile-header__actions" data-field="actions" hidden>
+      <button type="button" data-action="add-friend" title="Добавить в друзья">
+        <img src="assets/add_friend.png" alt="Добавить в друзья">
+      </button>
+      <button type="button" data-action="message" title="Написать сообщение">
+        <img src="assets/message.png" alt="Написать сообщение">
+      </button>
+      <button type="button" data-action="block" title="Заблокировать">
+        <img src="assets/block.png" alt="Заблокировать">
+      </button>
+    </div>
+    <div class="profile-header__actions" data-field="own-actions" hidden>
+      <button type="button" data-action="edit-profile" title="Редактировать профиль">
+        <img src="assets/edit.png" alt="Редактировать профиль">
+      </button>
+      <button type="button" data-action="logout" title="Выйти из аккаунта" hidden>
+        <img src="assets/logout.png" alt="Выйти из аккаунта">
+      </button>
+    </div>
+  </section>
+
+  <p class="profile-header__desc" data-field="description">Описание пока не заполнено.</p>
+
+  <!-- ============================= GALLERY ============================= -->
+  <div class="profile-gallery" data-profile-gallery hidden>
+    <button type="button" class="profile-gallery__arrow profile-gallery__arrow--prev" aria-label="Предыдущее изображение">◁</button>
+    <div class="profile-gallery__thumb profile-gallery__thumb--prev"><img alt=""></div>
+    <div class="profile-gallery__main"><img alt=""></div>
+    <div class="profile-gallery__thumb profile-gallery__thumb--next"><img alt=""></div>
+    <button type="button" class="profile-gallery__arrow profile-gallery__arrow--next" aria-label="Следующее изображение">▷</button>
+  </div>
+
+  <!-- ============================= TABS ============================= -->
+  <div class="tabs">
+    <div class="tabs__item active" data-tab="blog">Блог</div>
+    <div class="tabs__item" data-tab="posts">Публикации</div>
+    <div class="tabs__item" data-tab="friends">Друзья</div>
+  </div>
+
+  <div class="tab-panel active" data-tab="blog">
+    <div class="list list--blog" data-field="blog-list">
+      <div class="list__empty" data-field="blog-empty" hidden>На стене пока пусто.</div>
+    </div>
+  </div>
+
+  <div class="tab-panel" data-tab="posts">
+    <div class="list" data-field="posts-list">
+      <div class="list__empty" data-field="posts-empty" hidden>Публикаций пока нет.</div>
+    </div>
+  </div>
+
+  <div class="tab-panel" data-tab="friends">
+    <div class="list" data-field="friends-list">
+      <div class="list__empty" data-field="friends-empty" hidden>В списке друзей пока никого нет.</div>
+    </div>
+  </div>
+
+</main>
+
+<script type="module" src="script.js"></script>
+<script type="module" src="account.js"></script>
+</body>
+</html>
