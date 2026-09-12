@@ -351,6 +351,13 @@ function initRegistrationForm(form) {
     }
 
     statusEl.textContent = 'Заявка передана в отдел кадров';
+    if (authData.session) {
+      // Сессия появляется сразу только если подтверждение почты отключено
+      // (Authentication → Providers → Email → Confirm email). Если оно
+      // включено, session будет null до перехода по ссылке из письма —
+      // тогда шапка останется в состоянии "Войти в аккаунт", и это ожидаемо.
+      await initAuthState();
+    }
     window.dispatchEvent(new CustomEvent('registration:complete', { detail: { userId: authData.user.id } }));
   });
 }
