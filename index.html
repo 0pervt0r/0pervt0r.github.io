@@ -9,9 +9,6 @@
 <body>
 
 <aside class="side-nav">
-  <!-- Гостевое состояние: вся область профиля — ссылка на вход.
-       После авторизации script.js должен заменить содержимое .side-nav__profile
-       на аватар + <div class="side-nav__name">Username</div> + <div class="side-nav__id">ID: ...</div> -->
   <a class="side-nav__profile" href="login.html">
     <div class="side-nav__avatar">
       <img src="assets/avatar_placeholder.png" alt="">
@@ -43,9 +40,6 @@
 </aside>
 
 <main class="container main">
-  <!-- Глобальный поиск по всему сайту. Реальную логику (поиск по всем страницам/файлам)
-       должен подключить script.js — например через отправку на search.html?q=... или
-       через клиентский индекс контента. -->
   <form class="site-search" action="search.html" method="get" role="search">
     <svg class="site-search__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
@@ -55,7 +49,7 @@
   </form>
 
   <section class="hero">
-    <img class="hero__logo" src="assets/logo_big.png" alt="">
+    <img class="hero__logo" src="logo_big.png" alt="">
     <h1 class="hero__title">ХРОНИКИ URBANSHADE</h1>
     <p class="hero__welcome">Добро пожаловать в закрытую базу данных Тайного Хадального Объекта!</p>
 
