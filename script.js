@@ -209,7 +209,7 @@ export function initTabs(root) {
   });
 }
 
-function initRedactedText(root) {
+export function initRedactedText(root) {
   root.querySelectorAll('.article__redacted').forEach((span) => {
     span.addEventListener('click', async () => {
       const level = span.dataset.clearance;
