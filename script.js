@@ -428,11 +428,15 @@ async function initAuthState() {
     return;
   }
 
-  const { data: profile } = await supabase
+  const { data: profile, error: profileError } = await supabase
     .from('profiles')
-    .select('username, rank_tier, department, keycard_number, avatar_url')
+    .select('username, rank_tier, department, keycard_number')
     .eq('id', session.user.id)
     .single();
+  if (profileError) {
+    console.error('initAuthState: не удалось получить профиль', profileError);
+    return;
+  }
   if (!profile) return;
 
   const idLabel = formatUserId(profile);
