@@ -212,6 +212,7 @@ img.icon-btn { width: 48px; height: 48px; }
 .side-nav__link {
   display: block;
   padding: 0.3em 0;
+  font-family: var(--font-label);
   font-size: 0.9rem;
   transition: color 0.15s var(--ease), padding-left 0.15s var(--ease);
 }
