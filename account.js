@@ -68,7 +68,7 @@ async function getCurrentUserId() {
 async function fetchProfile(id) {
   const { data, error } = await supabase
     .from('profiles')
-    .select('id, username, name, surname, rank_tier, department, keycard_number, avatar_url, bio, gallery_urls, birth_date, clearance_level')
+    .select('id, username, name, surname, rank_tier, department, keycard_number, avatar_url, bio, gallery_urls, birth_date, clearance_level, is_editor')
     .eq('id', id)
     .single();
   if (error) {
@@ -83,6 +83,9 @@ function renderHeader(profile, isOwn) {
   document.querySelector('[data-field="display-name"]').textContent = displayName;
   document.querySelector('[data-field="id-label"]').textContent =
     `@${profile.username} · ${formatUserId(profile)}`;
+
+  const editorBadge = document.querySelector('[data-field="editor-badge"]');
+  editorBadge.hidden = !profile.is_editor;
 
   const rankLabel = RANK_TIER_LABELS[profile.rank_tier] || '—';
   const deptLabel = DEPARTMENT_LABELS[profile.department] || '—';
