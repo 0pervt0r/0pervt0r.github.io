@@ -1,4 +1,21 @@
-import { supabase, initRatingWidgets, initTabs, RANK_TIER_LETTER, formatUserId, logout } from './script.js';
+import { supabase, initRatingWidgets, initTabs, RANK_TIER_LETTER, RANK_TIER_LABELS, formatUserId, logout } from './script.js';
+
+const DEPARTMENT_LABELS = {
+  G: 'Гвардеец',
+  R: 'Исследователь',
+  S: 'Учёный',
+  A: 'Управленческий персонал',
+  C: 'Технический и вспомогательный персонал',
+};
+
+function formatBirthDate(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '—';
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  return `${dd}.${mm}.${d.getFullYear()}`;
+}
 
 /*
  * Ожидаемые таблицы Supabase для этой страницы (создать при необходимости):
@@ -51,7 +68,7 @@ async function getCurrentUserId() {
 async function fetchProfile(id) {
   const { data, error } = await supabase
     .from('profiles')
-    .select('id, username, name, surname, rank_tier, department, keycard_number, avatar_url, bio, gallery_urls')
+    .select('id, username, name, surname, rank_tier, department, keycard_number, avatar_url, bio, gallery_urls, birth_date, clearance_level')
     .eq('id', id)
     .single();
   if (error) {
@@ -67,11 +84,16 @@ function renderHeader(profile, isOwn) {
   document.querySelector('[data-field="id-label"]').textContent =
     `@${profile.username} · ${formatUserId(profile)}`;
 
+  const rankLabel = RANK_TIER_LABELS[profile.rank_tier] || '—';
+  const deptLabel = DEPARTMENT_LABELS[profile.department] || '—';
+  document.querySelector('[data-field="meta-department"]').textContent =
+    profile.department ? `${deptLabel} (${rankLabel})` : 'Ещё не распределён(а)';
+  document.querySelector('[data-field="meta-birthdate"]').textContent = formatBirthDate(profile.birth_date);
+  document.querySelector('[data-field="meta-clearance"]').textContent =
+    profile.clearance_level != null ? String(profile.clearance_level) : '—';
+
   const avatarImg = document.querySelector('.profile-header__avatar img');
   if (avatarImg && profile.avatar_url) avatarImg.src = profile.avatar_url;
-
-  const descEl = document.querySelector('[data-field="description"]');
-  descEl.textContent = profile.bio || 'Описание пока не заполнено.';
 
   const otherActions = document.querySelector('[data-field="actions"]');
   const ownActions = document.querySelector('[data-field="own-actions"]');
@@ -81,13 +103,57 @@ function renderHeader(profile, isOwn) {
     const logoutBtn = ownActions.querySelector('[data-action="logout"]');
     logoutBtn.hidden = false;
     logoutBtn.addEventListener('click', logout);
-    ownActions.querySelector('[data-action="edit-profile"]').addEventListener('click', () => {
-      window.location.href = 'account-edit.html';
-    });
   } else {
     otherActions.hidden = false;
     wireOtherProfileActions(profile);
   }
+
+  renderDescription(profile, isOwn);
+}
+
+function renderDescription(profile, isOwn) {
+  const descEl = document.querySelector('[data-field="description"]');
+  const editBtn = document.querySelector('[data-field="desc-edit"]');
+  const form = document.querySelector('[data-field="desc-form"]');
+  const input = document.querySelector('[data-field="desc-input"]');
+  const saveBtn = document.querySelector('[data-field="desc-save"]');
+  const cancelBtn = document.querySelector('[data-field="desc-cancel"]');
+
+  descEl.textContent = profile.bio || 'Описание пока не заполнено.';
+
+  if (!isOwn) return;
+
+  editBtn.hidden = false;
+
+  editBtn.addEventListener('click', () => {
+    input.value = profile.bio || '';
+    descEl.hidden = true;
+    editBtn.hidden = true;
+    form.hidden = false;
+    input.focus();
+  });
+
+  cancelBtn.addEventListener('click', () => {
+    form.hidden = true;
+    descEl.hidden = false;
+    editBtn.hidden = false;
+  });
+
+  saveBtn.addEventListener('click', async () => {
+    const newBio = input.value.trim();
+    saveBtn.disabled = true;
+    const { error } = await supabase.from('profiles').update({ bio: newBio }).eq('id', profile.id);
+    saveBtn.disabled = false;
+    if (error) {
+      console.error('account.js: не удалось сохранить описание', error);
+      return;
+    }
+    profile.bio = newBio;
+    descEl.textContent = newBio || 'Описание пока не заполнено.';
+    form.hidden = true;
+    descEl.hidden = false;
+    editBtn.hidden = false;
+  });
 }
 
 function wireOtherProfileActions(profile) {
