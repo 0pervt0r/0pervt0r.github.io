@@ -2,14 +2,14 @@
 
 @font-face {
   font-family: 'Stengazeta';
-  src: url('../fonts/Stengazeta-Regular_5.ttf') format('truetype');
+  src: url('fonts/Stengazeta-Regular_5.ttf') format('truetype');
   font-weight: 400;
   font-display: swap;
 }
 
 @font-face {
   font-family: 'Bayon';
-  src: url('../fonts/Bayon-Regular.ttf') format('truetype');
+  src: url('fonts/Bayon-Regular.ttf') format('truetype');
   font-weight: 400;
   font-display: swap;
 }
@@ -170,6 +170,8 @@ img.icon-btn { width: 48px; height: 48px; }
   padding-bottom: var(--gap-md);
   border-bottom: 1px solid var(--bg-alt);
 }
+a.side-nav__profile { cursor: pointer; transition: color 0.15s var(--ease); }
+a.side-nav__profile:hover { color: var(--accent); }
 .side-nav__avatar {
   width: 52px;
   height: 52px;
@@ -208,7 +210,13 @@ img.icon-btn { width: 48px; height: 48px; }
 
 .side-nav__section { padding-block: var(--gap-md); border-bottom: 1px solid var(--bg-alt); }
 .side-nav__section:last-child { border-bottom: none; }
-.side-nav__section-title { font-family: var(--font-label); font-size: 0.9rem; margin-bottom: 0.5em; opacity: 0.85; }
+.side-nav__section-title {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.6em;
+  color: var(--accent);
+}
 .side-nav__link {
   display: block;
   padding: 0.3em 0;
