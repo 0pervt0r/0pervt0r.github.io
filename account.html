@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Личный аккаунт — Urbanshade Chronicles</title>
+<title>Urbanshade Chronicles</title>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -41,13 +41,13 @@
 
 <main class="container main">
 
-  <!-- ============================= HEADER ============================= -->
   <section class="profile-header" data-profile-header>
     <div class="profile-header__avatar">
       <img src="assets/avatar_placeholder.png" alt="">
     </div>
     <div class="profile-header__main">
       <div class="profile-header__name" data-field="display-name">Имя</div>
+      <span class="profile-header__badge" data-field="editor-badge" hidden>Редактор</span>
       <div class="profile-header__id" data-field="id-label">@username · LR-N #0000000000</div>
       <dl class="profile-header__meta" data-field="meta">
         <div class="profile-header__meta-item">
@@ -94,7 +94,7 @@
     </div>
   </div>
 
-  <!-- ============================= GALLERY ============================= -->
+
   <div class="profile-gallery" data-profile-gallery hidden>
     <button type="button" class="profile-gallery__arrow profile-gallery__arrow--prev" aria-label="Предыдущее изображение">◁</button>
     <div class="profile-gallery__thumb profile-gallery__thumb--prev"><img alt=""></div>
@@ -103,7 +103,7 @@
     <button type="button" class="profile-gallery__arrow profile-gallery__arrow--next" aria-label="Следующее изображение">▷</button>
   </div>
 
-  <!-- ============================= TABS ============================= -->
+
   <div class="tabs">
     <div class="tabs__item active" data-tab="blog">Блог</div>
     <div class="tabs__item" data-tab="posts">Публикации</div>
