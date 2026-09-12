@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Заявка на трудоустройство — Urbanshade Chronicles</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<aside class="side-nav">
+  <a class="side-nav__profile" href="login.html">
+    <div class="side-nav__avatar">
+      <img src="assets/avatar_placeholder.png" alt="">
+    </div>
+    <div class="side-nav__name">Войти в аккаунт</div>
+  </a>
+  <nav class="side-nav__body">
+    <div class="side-nav__section">
+      <div class="side-nav__section-title">Навигация</div>
+      <a class="side-nav__link" href="map.html">Карта</a>
+      <a class="side-nav__link" href="account.html">Личный аккаунт</a>
+      <a class="side-nav__link" href="minigames.html">Мини-игры</a>
+      <a class="side-nav__link" href="classifications.html">Классификации</a>
+      <a class="side-nav__link" href="mail.html">Почта</a>
+    </div>
+    <div class="side-nav__section">
+      <div class="side-nav__section-title">Разделы</div>
+      <a class="side-nav__link" href="personnel.html">Персоналии</a>
+      <a class="side-nav__link" href="prisoners.html">Заключённые</a>
+      <a class="side-nav__link" href="zobjects.html">Z-объекты</a>
+      <a class="side-nav__link" href="docs.html">Документация</a>
+    </div>
+  </nav>
+  <div class="side-nav__lang">
+    <button type="button" class="active" data-lang="ru">RU</button>
+    <button type="button" data-lang="en">EN</button>
+    <button type="button" data-lang="es">ES</button>
+  </div>
+</aside>
+
+<main class="container main">
+
+  <section class="form-page">
+    <h1>Заявка на трудоустройство</h1>
+    <p class="form__note">Заполните анкету для получения доступа к закрытой сети объекта. После рассмотрения заявки вам будет предложено пройти распределение по отделу.</p>
+
+    <form class="form" id="register-form" novalidate>
+
+      <div class="form__group">
+        <label class="form__label" for="emergency_contact">Экстренный контакт</label>
+        <input class="form__input" type="email" id="emergency_contact" name="emergency_contact" placeholder="name@gmail.com" required>
+        <div class="form__hint">Только адрес в домене @gmail.com</div>
+        <div class="form__error"></div>
+      </div>
+
+      <div class="form__group">
+        <label class="form__label" for="access_code">Код доступа</label>
+        <input class="form__input" type="password" id="access_code" name="access_code" placeholder="Не короче 8 символов" required>
+        <div class="form__hint">Этот код будет использоваться для входа в аккаунт</div>
+        <div class="form__error"></div>
+      </div>
+
+      <div class="form__group">
+        <label class="form__label" for="name">Имя</label>
+        <input class="form__input" type="text" id="name" name="name" required>
+        <div class="form__error"></div>
+      </div>
+
+      <div class="form__group">
+        <label class="form__label" for="surname">Фамилия</label>
+        <input class="form__input" type="text" id="surname" name="surname" required>
+        <div class="form__hint">Указанные имя и фамилия не обязательно должны быть настоящими</div>
+        <div class="form__error"></div>
+      </div>
+
+      <div class="form__group">
+        <label class="form__label" for="username">Позывной</label>
+        <input class="form__input" type="text" id="username" name="username" placeholder="только латиница" required>
+        <div class="form__hint">Только латиница, цифры и «_», от 4 до 20 символов</div>
+        <div class="form__error"></div>
+      </div>
+
+      <div class="form__group">
+        <label class="form__label" for="birth_date">Дата рождения</label>
+        <input class="form__input" type="date" id="birth_date" name="birth_date" required>
+        <div class="form__error"></div>
+      </div>
+
+      <div class="form__group">
+        <label class="form__checkbox" for="age_confirm">
+          <input type="checkbox" id="age_confirm" name="age_confirm">
+          Медицинское освидетельствование пройдено (мне есть 18 лет)
+        </label>
+        <div class="form__error"></div>
+      </div>
+
+      <button class="btn btn-accent form__submit" type="submit">Отправить заявку</button>
+      <div class="form__status"></div>
+
+      <div class="form__switch">Уже есть аккаунт? <a href="login.html">Войти</a></div>
+    </form>
+  </section>
+
+  <section class="test-page" hidden>
+    <h1>Распределение по отделу</h1>
+    <div class="test" data-role="assignment">
+      <div class="test__progress"></div>
+      <div class="test__question"></div>
+      <div class="test__options"></div>
+    </div>
+  </section>
+
+</main>
+
+<script type="module" src="script.js"></script>
+</body>
+</html>
