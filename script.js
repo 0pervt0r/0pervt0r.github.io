@@ -44,7 +44,7 @@ function initSideNavLang(root) {
   });
 }
 
-async function castVote(targetTable, targetId, direction) {
+export async function castVote(targetTable, targetId, direction) {
   const { data: session } = await supabase.auth.getSession();
   if (!session?.session) return null;
   const userId = session.session.user.id;
@@ -56,8 +56,10 @@ async function castVote(targetTable, targetId, direction) {
   return data;
 }
 
-function initRatingWidgets(root) {
+export function initRatingWidgets(root) {
   root.querySelectorAll('.rating').forEach((widget) => {
+    if (widget.dataset.bound) return;
+    widget.dataset.bound = '1';
     const scoreEl = widget.querySelector('.rating__score');
     const upBtn = widget.querySelector('[data-vote="up"]');
     const downBtn = widget.querySelector('[data-vote="down"]');
@@ -192,7 +194,7 @@ async function verifyAccessPassword(password, articleId) {
   return !error && data;
 }
 
-function initTabs(root) {
+export function initTabs(root) {
   root.querySelectorAll('.tabs').forEach((tabs) => {
     const items = tabs.querySelectorAll('.tabs__item');
     const panels = root.querySelectorAll('.tab-panel');
@@ -227,9 +229,9 @@ function initRedactedText(root) {
 
 const RANK_TIERS = ['low', 'middle', 'high', 'elite'];
 const ACCESS_CARDS = ['basic', 'adjacent', 'operational', 'high', 'extended', 'directorial'];
-const RANK_TIER_LABELS = { low: 'Low-rank', middle: 'Middle-rank', high: 'High-rank', elite: 'Elite-rank' };
+export const RANK_TIER_LABELS = { low: 'Low-rank', middle: 'Middle-rank', high: 'High-rank', elite: 'Elite-rank' };
 const RANK_TIER_ABBR = { low: 'LR', middle: 'MR', high: 'HR', elite: 'ER' };
-const RANK_TIER_LETTER = { low: 'L', middle: 'M', high: 'H', elite: 'E' };
+export const RANK_TIER_LETTER = { low: 'L', middle: 'M', high: 'H', elite: 'E' };
 const ACCESS_CARD_LABELS = {
   basic: 'Базовый',
   adjacent: 'Смежный',
@@ -247,7 +249,7 @@ function computeClearanceLevel(rankTier, accessCard) {
 }
 
 // Формат: (буква ранга: L/M/H/E)R-(буква должности) #(10-значный номер)
-function formatUserId(profile) {
+export function formatUserId(profile) {
   const rankLetter = RANK_TIER_LETTER[profile.rank_tier] || '?';
   const dept = profile.department || '?';
   const number = profile.keycard_number || '0000000000';
@@ -407,7 +409,7 @@ function initLoginForm(form) {
   });
 }
 
-async function logout() {
+export async function logout() {
   await supabase.auth.signOut();
   window.location.href = 'index.html';
 }
@@ -416,7 +418,7 @@ async function logout() {
 // Состояние аккаунта в шапке / боковой навигации
 // ---------------------------------------------------------------------------
 
-async function initAuthState() {
+export async function initAuthState() {
   const profileLinks = document.querySelectorAll('.side-nav__profile');
   const headerAccounts = document.querySelectorAll('.site-header__account');
   if (!profileLinks.length && !headerAccounts.length) return;
