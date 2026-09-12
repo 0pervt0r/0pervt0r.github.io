@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Вход в аккаунт — Urbanshade Chronicles</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<aside class="side-nav">
+  <a class="side-nav__profile" href="login.html">
+    <div class="side-nav__avatar">
+      <img src="assets/avatar_placeholder.png" alt="">
+    </div>
+    <div class="side-nav__name">Войти в аккаунт</div>
+  </a>
+  <nav class="side-nav__body">
+    <div class="side-nav__section">
+      <div class="side-nav__section-title">Навигация</div>
+      <a class="side-nav__link" href="map.html">Карта</a>
+      <a class="side-nav__link" href="account.html">Личный аккаунт</a>
+      <a class="side-nav__link" href="minigames.html">Мини-игры</a>
+      <a class="side-nav__link" href="classifications.html">Классификации</a>
+      <a class="side-nav__link" href="mail.html">Почта</a>
+    </div>
+    <div class="side-nav__section">
+      <div class="side-nav__section-title">Разделы</div>
+      <a class="side-nav__link" href="personnel.html">Персоналии</a>
+      <a class="side-nav__link" href="prisoners.html">Заключённые</a>
+      <a class="side-nav__link" href="zobjects.html">Z-объекты</a>
+      <a class="side-nav__link" href="docs.html">Документация</a>
+    </div>
+  </nav>
+  <div class="side-nav__lang">
+    <button type="button" class="active" data-lang="ru">RU</button>
+    <button type="button" data-lang="en">EN</button>
+    <button type="button" data-lang="es">ES</button>
+  </div>
+</aside>
+
+<main class="container main">
+  <section>
+    <h1>Вход в аккаунт</h1>
+    <p class="form__note">Введите экстренный контакт и код доступа, указанные при подаче заявки на трудоустройство.</p>
+
+    <form class="form" id="login-form" novalidate>
+
+      <div class="form__group">
+        <label class="form__label" for="emergency_contact">Экстренный контакт</label>
+        <input class="form__input" type="email" id="emergency_contact" name="emergency_contact" placeholder="name@gmail.com" required>
+        <div class="form__error"></div>
+      </div>
+
+      <div class="form__group">
+        <label class="form__label" for="access_code">Код доступа</label>
+        <input class="form__input" type="password" id="access_code" name="access_code" required>
+        <div class="form__error"></div>
+      </div>
+
+      <button class="btn btn-accent form__submit" type="submit">Войти</button>
+      <div class="form__status"></div>
+
+      <div class="form__switch">Ещё нет аккаунта? <a href="register.html">Подать заявку</a></div>
+    </form>
+  </section>
+</main>
+
+<script type="module" src="script.js"></script>
+</body>
+</html>
