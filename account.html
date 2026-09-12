@@ -46,9 +46,23 @@
     <div class="profile-header__avatar">
       <img src="assets/avatar_placeholder.png" alt="">
     </div>
-    <div>
+    <div class="profile-header__main">
       <div class="profile-header__name" data-field="display-name">Имя</div>
-      <div class="profile-header__id" data-field="id-label">#R-N 0000000000</div>
+      <div class="profile-header__id" data-field="id-label">@username · LR-N #0000000000</div>
+      <dl class="profile-header__meta" data-field="meta">
+        <div class="profile-header__meta-item">
+          <dt>Должность</dt>
+          <dd data-field="meta-department">—</dd>
+        </div>
+        <div class="profile-header__meta-item">
+          <dt>Дата рождения</dt>
+          <dd data-field="meta-birthdate">—</dd>
+        </div>
+        <div class="profile-header__meta-item">
+          <dt>Уровень допуска</dt>
+          <dd data-field="meta-clearance">—</dd>
+        </div>
+      </dl>
     </div>
     <div class="profile-header__actions" data-field="actions" hidden>
       <button type="button" data-action="add-friend" title="Добавить в друзья">
@@ -62,16 +76,23 @@
       </button>
     </div>
     <div class="profile-header__actions" data-field="own-actions" hidden>
-      <button type="button" data-action="edit-profile" title="Редактировать профиль">
-        <img src="assets/edit.png" alt="Редактировать профиль">
-      </button>
       <button type="button" data-action="logout" title="Выйти из аккаунта" hidden>
         <img src="assets/logout.png" alt="Выйти из аккаунта">
       </button>
     </div>
   </section>
 
-  <p class="profile-header__desc" data-field="description">Описание пока не заполнено.</p>
+  <div class="profile-desc" data-field="desc-block">
+    <p class="profile-desc__text" data-field="description">Описание пока не заполнено.</p>
+    <button type="button" class="profile-desc__edit" data-field="desc-edit" hidden>Редактировать</button>
+    <div class="profile-desc__form" data-field="desc-form" hidden>
+      <textarea class="form__textarea" data-field="desc-input" maxlength="500" rows="4"></textarea>
+      <div class="profile-desc__form-actions">
+        <button type="button" class="btn btn-accent" data-field="desc-save">Сохранить</button>
+        <button type="button" class="btn" data-field="desc-cancel">Отмена</button>
+      </div>
+    </div>
+  </div>
 
   <!-- ============================= GALLERY ============================= -->
   <div class="profile-gallery" data-profile-gallery hidden>
@@ -91,19 +112,19 @@
 
   <div class="tab-panel active" data-tab="blog">
     <div class="list list--blog" data-field="blog-list">
-      <div class="list__empty" data-field="blog-empty" hidden>На стене пока пусто.</div>
+      <div class="list__empty" data-field="blog-empty" hidden>Тут пока ничего нет.</div>
     </div>
   </div>
 
   <div class="tab-panel" data-tab="posts">
     <div class="list" data-field="posts-list">
-      <div class="list__empty" data-field="posts-empty" hidden>Публикаций пока нет.</div>
+      <div class="list__empty" data-field="posts-empty" hidden>Тут пока ничего нет.</div>
     </div>
   </div>
 
   <div class="tab-panel" data-tab="friends">
     <div class="list" data-field="friends-list">
-      <div class="list__empty" data-field="friends-empty" hidden>В списке друзей пока никого нет.</div>
+      <div class="list__empty" data-field="friends-empty" hidden>Тут пока ничего нет.</div>
     </div>
   </div>
 
