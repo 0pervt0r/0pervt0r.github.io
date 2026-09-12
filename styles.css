@@ -1,11 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Alegreya+Sans+SC:wght@400;500;700;800&family=Space+Mono:wght@400;700&display=swap');
-
-@font-face {
-  font-family: 'Stengazeta';
-  src: url('fonts/Stengazeta-Regular_5.ttf') format('truetype');
-  font-weight: 400;
-  font-display: swap;
-}
+@import url('https://fonts.googleapis.com/css2?family=Alegreya+Sans+SC:wght@400;500;700;800&display=swap');
 
 @font-face {
   font-family: 'Bayon';
@@ -24,8 +17,8 @@
 
   --font-body: 'Alegreya Sans SC', sans-serif;
   --font-display: 'Bayon', sans-serif;
-  --font-label: 'Stengazeta', serif;
-  --font-mono: 'Space Mono', monospace;
+  --font-label: var(--font-body);
+  --font-mono: var(--font-body);
 
   --nav-w: 260px;
   --gap-sm: 0.5rem;
