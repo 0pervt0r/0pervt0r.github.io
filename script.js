@@ -229,6 +229,7 @@ const RANK_TIERS = ['low', 'middle', 'high', 'elite'];
 const ACCESS_CARDS = ['basic', 'adjacent', 'operational', 'high', 'extended', 'directorial'];
 const RANK_TIER_LABELS = { low: 'Low-rank', middle: 'Middle-rank', high: 'High-rank', elite: 'Elite-rank' };
 const RANK_TIER_ABBR = { low: 'LR', middle: 'MR', high: 'HR', elite: 'ER' };
+const RANK_TIER_LETTER = { low: 'L', middle: 'M', high: 'H', elite: 'E' };
 const ACCESS_CARD_LABELS = {
   basic: 'Базовый',
   adjacent: 'Смежный',
@@ -245,12 +246,12 @@ function computeClearanceLevel(rankTier, accessCard) {
   return rankIndex * ACCESS_CARDS.length + cardIndex + 1;
 }
 
-// Формат: (Ранг)(Должность)-0000000000 — без дефиса между рангом и отделом.
+// Формат: (буква ранга: L/M/H/E)R-(буква должности) #(10-значный номер)
 function formatUserId(profile) {
-  const rankAbbr = RANK_TIER_ABBR[profile.rank_tier] || '??';
+  const rankLetter = RANK_TIER_LETTER[profile.rank_tier] || '?';
   const dept = profile.department || '?';
   const number = profile.keycard_number || '0000000000';
-  return `${rankAbbr}${dept}-${number}`;
+  return `${rankLetter}R-${dept} #${number}`;
 }
 
 function validateRegistrationForm(form) {
@@ -430,7 +431,7 @@ async function initAuthState() {
 
   const { data: profile, error: profileError } = await supabase
     .from('profiles')
-    .select('username, rank_tier, department, keycard_number')
+    .select('username, name, surname, rank_tier, department, keycard_number')
     .eq('id', session.user.id)
     .single();
   if (profileError) {
@@ -440,7 +441,6 @@ async function initAuthState() {
   if (!profile) return;
 
   const idLabel = formatUserId(profile);
-  const rankLabel = RANK_TIER_LABELS[profile.rank_tier] || '';
 
   profileLinks.forEach((link) => {
     link.href = 'account.html';
@@ -469,13 +469,20 @@ async function initAuthState() {
     }
     nameEl.textContent = profile.username;
 
+    let dividerEl = info.querySelector('.side-nav__divider');
+    if (!dividerEl) {
+      dividerEl = document.createElement('div');
+      dividerEl.className = 'side-nav__divider';
+      info.insertBefore(dividerEl, nameEl.nextSibling);
+    }
+
     let rankEl = info.querySelector('.side-nav__rank');
     if (!rankEl) {
       rankEl = document.createElement('div');
       rankEl.className = 'side-nav__rank';
       info.appendChild(rankEl);
     }
-    rankEl.textContent = rankLabel;
+    rankEl.textContent = `${profile.name || ''} ${profile.surname || ''}`.trim();
     rankEl.hidden = false;
 
     let idEl = info.querySelector('.side-nav__id');
@@ -627,8 +634,10 @@ function initAssignmentTest(root) {
 
     async function finish() {
       const department = tallyDepartment(answers);
+      const keycardNumber = await generateUniqueKeycardNumber();
       await supabase.from('profiles').update({
         department,
+        keycard_number: keycardNumber,
         last_assignment_test: new Date().toISOString(),
       }).eq('id', userId);
 
@@ -637,7 +646,7 @@ function initAssignmentTest(root) {
           <div class="keycard-reveal__status">Тест завершён</div>
         </div>
       `;
-      renderKeycard(root, { username: profile.username, department, keycardNumber: await generateUniqueKeycardNumber() });
+      renderKeycard(root, { username: profile.username, department, keycardNumber });
     }
 
     renderQuestion();
