@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-field="page-title">Статья — Urbanshade Chronicles</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<aside class="side-nav">
+  <a class="side-nav__profile" href="login.html">
+    <div class="side-nav__avatar">
+      <img src="assets/avatar_placeholder.png" alt="">
+    </div>
+    <div class="side-nav__name">Войти в аккаунт</div>
+  </a>
+  <nav class="side-nav__body">
+    <div class="side-nav__section">
+      <div class="side-nav__section-title">Навигация</div>
+      <a class="side-nav__link" href="map.html">Карта</a>
+      <a class="side-nav__link" href="account.html">Личный аккаунт</a>
+      <a class="side-nav__link" href="minigames.html">Мини-игры</a>
+      <a class="side-nav__link" href="classifications.html">Классификации</a>
+      <a class="side-nav__link" href="mail.html">Почта</a>
+    </div>
+    <div class="side-nav__section">
+      <div class="side-nav__section-title">Разделы</div>
+      <a class="side-nav__link" href="personnel.html">Персоналии</a>
+      <a class="side-nav__link" href="prisoners.html">Заключённые</a>
+      <a class="side-nav__link" href="zobjects.html">Z-объекты</a>
+      <a class="side-nav__link" href="docs.html">Документация</a>
+    </div>
+  </nav>
+  <div class="side-nav__lang">
+    <button type="button" class="active" data-lang="ru">RU</button>
+    <button type="button" data-lang="en">EN</button>
+    <button type="button" data-lang="es">ES</button>
+  </div>
+</aside>
+
+<main class="container main">
+  <article class="article" data-article-root>
+
+    <div class="article__ratingbar" data-field="ratingbar">
+      <!-- сюда article.js вставит .rating с уже известным id статьи -->
+    </div>
+
+    <h1 data-field="title">Загрузка…</h1>
+
+    <div class="article__meta">
+      <span data-field="meta-author">—</span>
+      <span data-field="meta-date">—</span>
+      <span data-field="meta-section">—</span>
+      <span data-field="meta-clearance"></span>
+    </div>
+
+    <div class="article__body" data-article-body>
+      <p class="article__loading">Загрузка статьи…</p>
+    </div>
+
+    <!-- Запрос допуска: initAccessModal из script.js сам находит этот блок
+         по [data-article-modal] и вешает обработчики при загрузке страницы -->
+    <div class="article__access" data-article-modal data-article-id="">
+      <button type="button" class="icon-btn" data-action="ask-access" title="Запросить допуск">
+        <img src="assets/ask_for_access.png" alt="Запросить допуск">
+      </button>
+
+      <div class="modal-overlay">
+        <div class="modal">
+          <div class="modal__title">Запросить допуск</div>
+          <label class="modal__checkbox">
+            <input type="checkbox">
+            Предоставить мои персональные данные
+          </label>
+          <div class="modal__divider">или</div>
+          <input type="text" class="modal__input" placeholder="Пароль допуска">
+          <div class="modal__denied"></div>
+          <div class="modal__actions">
+            <button type="button" data-action="confirm">Подтвердить</button>
+            <button type="button" data-action="cancel">Отмена</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section class="article__comments">
+      <h3>Комментарии</h3>
+      <div class="list__empty" data-field="comments-empty">
+        Комментарии под статьями пока не подключены к базе данных —
+        это отдельная задача (нужна таблица article_comments).
+      </div>
+    </section>
+
+  </article>
+</main>
+
+<script type="module" src="script.js"></script>
+<script type="module" src="article.js"></script>
+</body>
+</html>
