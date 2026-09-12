@@ -174,9 +174,11 @@ a.side-nav__profile:hover { color: var(--accent); }
   flex-shrink: 0;
 }
 .side-nav__avatar img { width: 100%; height: 100%; object-fit: cover; }
+.side-nav__info { display: flex; flex-direction: column; gap: 0.15em; min-width: 0; }
 .side-nav__name { font-family: var(--font-label); font-size: 1.05rem; }
 .side-nav__rank { font-family: var(--font-mono); font-size: 0.75rem; opacity: 0.7; }
 .side-nav__id { font-family: var(--font-mono); font-size: 0.7rem; opacity: 0.5; }
+.side-nav__rank[hidden], .side-nav__id[hidden] { display: none; }
 
 .side-nav__body {
   position: relative;
@@ -672,6 +674,10 @@ a.side-nav__profile:hover { color: var(--accent); }
 .form__group.invalid .form__textarea { border-color: var(--danger); }
 .form__group.invalid .form__error { display: block; }
 .form__submit { margin-top: var(--gap-lg); }
+.form__status { margin-top: var(--gap-md); font-family: var(--font-mono); font-size: 0.85rem; opacity: 0.85; }
+.form__note { margin-bottom: var(--gap-lg); opacity: 0.75; font-size: 0.9rem; }
+.form__switch { margin-top: var(--gap-lg); font-size: 0.85rem; opacity: 0.7; }
+.form__switch a { color: var(--accent); }
 
 .test {
   max-width: 560px;
