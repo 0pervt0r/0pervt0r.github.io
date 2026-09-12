@@ -228,6 +228,7 @@ function initRedactedText(root) {
 const RANK_TIERS = ['low', 'middle', 'high', 'elite'];
 const ACCESS_CARDS = ['basic', 'adjacent', 'operational', 'high', 'extended', 'directorial'];
 const RANK_TIER_LABELS = { low: 'Low-rank', middle: 'Middle-rank', high: 'High-rank', elite: 'Elite-rank' };
+const RANK_TIER_ABBR = { low: 'LR', middle: 'MR', high: 'HR', elite: 'ER' };
 const ACCESS_CARD_LABELS = {
   basic: 'Базовый',
   adjacent: 'Смежный',
@@ -242,6 +243,14 @@ function computeClearanceLevel(rankTier, accessCard) {
   const cardIndex = ACCESS_CARDS.indexOf(accessCard);
   if (rankIndex === -1 || cardIndex === -1) return 0;
   return rankIndex * ACCESS_CARDS.length + cardIndex + 1;
+}
+
+// Формат: (Ранг)(Должность)-0000000000 — без дефиса между рангом и отделом.
+function formatUserId(profile) {
+  const rankAbbr = RANK_TIER_ABBR[profile.rank_tier] || '??';
+  const dept = profile.department || '?';
+  const number = profile.keycard_number || '0000000000';
+  return `${rankAbbr}${dept}-${number}`;
 }
 
 function validateRegistrationForm(form) {
@@ -304,6 +313,8 @@ function initRegistrationForm(form) {
     if (!valid) return;
 
     submitBtn.disabled = true;
+    statusEl.textContent = '';
+
     if (!(await checkUsernameAvailable(values.username))) {
       showFormErrors(form, { username: 'Позывной уже занят' });
       submitBtn.disabled = false;
@@ -342,6 +353,138 @@ function initRegistrationForm(form) {
     statusEl.textContent = 'Заявка передана в отдел кадров';
     window.dispatchEvent(new CustomEvent('registration:complete', { detail: { userId: authData.user.id } }));
   });
+}
+
+// ---------------------------------------------------------------------------
+// Вход в существующий аккаунт
+// ---------------------------------------------------------------------------
+
+function validateLoginForm(form) {
+  const errors = {};
+  const contact = form.querySelector('[name="emergency_contact"]').value.trim();
+  const code = form.querySelector('[name="access_code"]').value;
+
+  if (!contact) errors.emergency_contact = 'Укажите экстренный контакт';
+  if (!code) errors.access_code = 'Укажите код доступа';
+
+  return { valid: Object.keys(errors).length === 0, errors, values: { contact, code } };
+}
+
+function initLoginForm(form) {
+  const submitBtn = form.querySelector('.form__submit');
+  const statusEl = form.querySelector('.form__status');
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const { valid, errors, values } = validateLoginForm(form);
+    showFormErrors(form, errors);
+    if (!valid) return;
+
+    submitBtn.disabled = true;
+    statusEl.textContent = '';
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email: values.contact,
+      password: values.code,
+    });
+
+    if (error) {
+      statusEl.textContent = 'Неверный контакт или код доступа';
+      submitBtn.disabled = false;
+      return;
+    }
+
+    statusEl.textContent = 'Доступ подтверждён';
+    window.location.href = 'index.html';
+  });
+}
+
+async function logout() {
+  await supabase.auth.signOut();
+  window.location.href = 'index.html';
+}
+
+// ---------------------------------------------------------------------------
+// Состояние аккаунта в шапке / боковой навигации
+// ---------------------------------------------------------------------------
+
+async function initAuthState() {
+  const profileLinks = document.querySelectorAll('.side-nav__profile');
+  const headerAccounts = document.querySelectorAll('.site-header__account');
+  if (!profileLinks.length && !headerAccounts.length) return;
+
+  const { data: sessionData } = await supabase.auth.getSession();
+  const session = sessionData?.session;
+
+  if (!session) {
+    document.querySelectorAll('[data-action="logout"]').forEach((btn) => { btn.hidden = true; });
+    return;
+  }
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('username, rank_tier, department, keycard_number, avatar_url')
+    .eq('id', session.user.id)
+    .single();
+  if (!profile) return;
+
+  const idLabel = formatUserId(profile);
+  const rankLabel = RANK_TIER_LABELS[profile.rank_tier] || '';
+
+  profileLinks.forEach((link) => {
+    link.href = 'account.html';
+    const avatarImg = link.querySelector('.side-nav__avatar img');
+    if (avatarImg && profile.avatar_url) avatarImg.src = profile.avatar_url;
+
+    let info = link.querySelector('.side-nav__info');
+    if (!info) {
+      // старая разметка: name лежит прямо в .side-nav__profile — оборачиваем
+      const nameEl = link.querySelector('.side-nav__name');
+      info = document.createElement('div');
+      info.className = 'side-nav__info';
+      if (nameEl) {
+        link.insertBefore(info, nameEl);
+        info.appendChild(nameEl);
+      } else {
+        link.appendChild(info);
+      }
+    }
+
+    let nameEl = info.querySelector('.side-nav__name');
+    if (!nameEl) {
+      nameEl = document.createElement('div');
+      nameEl.className = 'side-nav__name';
+      info.appendChild(nameEl);
+    }
+    nameEl.textContent = profile.username;
+
+    let rankEl = info.querySelector('.side-nav__rank');
+    if (!rankEl) {
+      rankEl = document.createElement('div');
+      rankEl.className = 'side-nav__rank';
+      info.appendChild(rankEl);
+    }
+    rankEl.textContent = rankLabel;
+    rankEl.hidden = false;
+
+    let idEl = info.querySelector('.side-nav__id');
+    if (!idEl) {
+      idEl = document.createElement('div');
+      idEl.className = 'side-nav__id';
+      info.appendChild(idEl);
+    }
+    idEl.textContent = idLabel;
+    idEl.hidden = false;
+  });
+
+  headerAccounts.forEach((el) => { el.textContent = idLabel; });
+
+  document.querySelectorAll('[data-action="logout"]').forEach((btn) => {
+    btn.hidden = false;
+    btn.addEventListener('click', logout);
+  });
+
+  document.dispatchEvent(new CustomEvent('auth:ready', { detail: profile }));
 }
 
 const DEPARTMENT_QUESTIONS = [
@@ -499,7 +642,9 @@ function boot() {
   initTabs(document);
   initRedactedText(document);
   document.querySelectorAll('#register-form').forEach(initRegistrationForm);
+  document.querySelectorAll('#login-form').forEach(initLoginForm);
   document.querySelectorAll('.test[data-role="assignment"]').forEach(initAssignmentTest);
+  initAuthState();
 
   window.addEventListener('registration:complete', () => {
     document.querySelector('.form-page')?.setAttribute('hidden', '');
