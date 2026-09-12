@@ -8,20 +8,16 @@
 </head>
 <body>
 
-<header class="site-header">
-  <a class="site-header__account" href="login.html">Войти в аккаунт</a>
-</header>
-
 <aside class="side-nav">
-  <div class="side-nav__profile">
+  <!-- Гостевое состояние: вся область профиля — ссылка на вход.
+       После авторизации script.js должен заменить содержимое .side-nav__profile
+       на аватар + <div class="side-nav__name">Username</div> + <div class="side-nav__id">ID: ...</div> -->
+  <a class="side-nav__profile" href="login.html">
     <div class="side-nav__avatar">
       <img src="assets/avatar_placeholder.png" alt="">
     </div>
-    <div>
-      <div class="side-nav__name">Гость</div>
-      <div class="side-nav__id">ID: LG-#3819502647</div>
-    </div>
-  </div>
+    <div class="side-nav__name">Войти в аккаунт</div>
+  </a>
   <nav class="side-nav__body">
     <div class="side-nav__section">
       <div class="side-nav__section-title">Навигация</div>
