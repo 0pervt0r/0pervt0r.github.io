@@ -1,15 +1,3 @@
-// supabase/functions/save-article/index.ts
-//
-// Эта функция — единственное место, где "живёт" GitHub-токен.
-// Она получает от сайта JSON статьи, проверяет, что пользователь — редактор,
-// и коммитит файл articles/{slug}.json в GitHub-репозиторий от имени бота.
-//
-// Секреты (задаются один раз командой `supabase secrets set`, см. SETUP.md):
-//   GITHUB_TOKEN   — personal access token с правом Contents: Read & write
-//   GITHUB_OWNER   — владелец репозитория, например "0pervt0r"
-//   GITHUB_REPO    — имя репозитория, например "0pervt0r.github.io"
-//   GITHUB_BRANCH  — ветка, обычно "main"
-//   SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY — подставляются Supabase автоматически
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
@@ -96,6 +84,27 @@ async function commitFile(filePath: string, contentText: string, message: string
   return res.json();
 }
 
+async function commitFileBase64(filePath: string, base64Content: string, message: string) {
+  const sha = await getExistingSha(filePath);
+  const res = await githubRequest(
+    `/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${filePath}`,
+    {
+      method: 'PUT',
+      body: JSON.stringify({
+        message,
+        content: base64Content,
+        branch: GITHUB_BRANCH,
+        ...(sha ? { sha } : {}),
+      }),
+    },
+  );
+  if (!res.ok) {
+    const errBody = await res.text();
+    throw new Error(`GitHub PUT ${filePath}: ${res.status} ${errBody}`);
+  }
+  return res.json();
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: CORS_HEADERS });
@@ -104,7 +113,7 @@ Deno.serve(async (req) => {
     return jsonResponse({ error: 'method_not_allowed' }, 405);
   }
 
-  // --- 1. Проверяем, кто вызывает функцию ---
+
   const authHeader = req.headers.get('Authorization') ?? '';
   const jwt = authHeader.replace(/^Bearer\s+/i, '');
   if (!jwt) return jsonResponse({ error: 'no_auth' }, 401);
@@ -125,7 +134,7 @@ Deno.serve(async (req) => {
     return jsonResponse({ error: 'not_an_editor' }, 403);
   }
 
-  // --- 2. Разбираем тело запроса ---
+
   let payload: {
     slug?: string;
     title: string;
@@ -142,7 +151,7 @@ Deno.serve(async (req) => {
       weightKg?: number | null;
       birthDate?: string | null;
       crimes?: string | null;
-      avatarUrl?: string | null;
+      avatarFile?: { name: string; dataBase64: string } | null;
       status?: 'active' | 'missing';
     };
   };
@@ -166,7 +175,7 @@ Deno.serve(async (req) => {
     2,
   );
 
-  // --- 3. Коммитим в GitHub ---
+
   try {
     await commitFile(filePath, fileContent, `Статья: ${payload.title}`);
   } catch (err) {
@@ -174,9 +183,7 @@ Deno.serve(async (req) => {
     return jsonResponse({ error: 'github_failed', detail: String(err) }, 502);
   }
 
-  // --- 4. Обновляем метаданные в Supabase ---
-  // section добавляем в объект только если он реально передан с фронта —
-  // иначе при апдейте существующей статьи он бы затирался на null.
+
   const articleRow: Record<string, unknown> = {
     slug,
     title: payload.title,
@@ -199,23 +206,38 @@ Deno.serve(async (req) => {
     return jsonResponse({ error: 'db_failed', detail: upsertError.message }, 500);
   }
 
-  // --- 5. Структурные поля персоналии/заключённого (если это они) ---
+
   if (payload.personnel) {
     const p = payload.personnel;
+
+    let avatarPath: string | undefined;
+    if (p.avatarFile?.dataBase64) {
+      const ext = (p.avatarFile.name.split('.').pop() || 'png').toLowerCase().replace(/[^a-z0-9]/g, '') || 'png';
+      avatarPath = `assets/personnel/${slug}.${ext}`;
+      try {
+        await commitFileBase64(avatarPath, p.avatarFile.dataBase64, `Аватар: ${payload.title}`);
+      } catch (err) {
+        console.error(err);
+        return jsonResponse({ error: 'github_avatar_failed', detail: String(err) }, 502);
+      }
+    }
+
+    const personnelRow: Record<string, unknown> = {
+      article_id: articleRowResult.id,
+      department: p.department ?? null,
+      rank_tier: p.rankTier ?? 'low',
+      gender: p.gender ?? null,
+      height_cm: p.heightCm ?? null,
+      weight_kg: p.weightKg ?? null,
+      birth_date: p.birthDate ?? null,
+      crimes: p.crimes ?? null,
+      status: p.status ?? 'active',
+    };
+    if (avatarPath) personnelRow.avatar_url = avatarPath;
+
     const { error: personnelError } = await supabaseAdmin
       .from('personnel_details')
-      .upsert({
-        article_id: articleRowResult.id,
-        department: p.department ?? null,
-        rank_tier: p.rankTier ?? 'low',
-        gender: p.gender ?? null,
-        height_cm: p.heightCm ?? null,
-        weight_kg: p.weightKg ?? null,
-        birth_date: p.birthDate ?? null,
-        crimes: p.crimes ?? null,
-        avatar_url: p.avatarUrl ?? null,
-        status: p.status ?? 'active',
-      }, { onConflict: 'article_id' });
+      .upsert(personnelRow, { onConflict: 'article_id' });
 
     if (personnelError) {
       console.error(personnelError);
