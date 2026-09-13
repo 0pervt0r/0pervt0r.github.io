@@ -438,8 +438,6 @@ export async function initAuthState() {
 
   profileLinks.forEach((link) => {
     link.href = 'account.html';
-    const avatarImg = link.querySelector('.side-nav__avatar img');
-    if (avatarImg && profile.avatar_url) avatarImg.src = profile.avatar_url;
 
     let info = link.querySelector('.side-nav__info');
     if (!info) {
