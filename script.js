@@ -248,7 +248,7 @@ function computeClearanceLevel(rankTier, accessCard) {
   return rankIndex * ACCESS_CARDS.length + cardIndex + 1;
 }
 
-// Формат: (буква ранга: L/M/H/E)R-(буква должности) #(10-значный номер)
+
 export function formatUserId(profile) {
   const rankLetter = RANK_TIER_LETTER[profile.rank_tier] || '?';
   const dept = profile.department || '?';
@@ -355,19 +355,14 @@ function initRegistrationForm(form) {
 
     statusEl.textContent = 'Заявка передана в отдел кадров';
     if (authData.session) {
-      // Сессия появляется сразу только если подтверждение почты отключено
-      // (Authentication → Providers → Email → Confirm email). Если оно
-      // включено, session будет null до перехода по ссылке из письма —
-      // тогда шапка останется в состоянии "Войти в аккаунт", и это ожидаемо.
+
       await initAuthState();
     }
     window.dispatchEvent(new CustomEvent('registration:complete', { detail: { userId: authData.user.id } }));
   });
 }
 
-// ---------------------------------------------------------------------------
-// Вход в существующий аккаунт
-// ---------------------------------------------------------------------------
+
 
 function validateLoginForm(form) {
   const errors = {};
@@ -414,9 +409,6 @@ export async function logout() {
   window.location.href = 'index.html';
 }
 
-// ---------------------------------------------------------------------------
-// Состояние аккаунта в шапке / боковой навигации
-// ---------------------------------------------------------------------------
 
 export async function initAuthState() {
   const profileLinks = document.querySelectorAll('.side-nav__profile');
@@ -433,7 +425,7 @@ export async function initAuthState() {
 
   const { data: profile, error: profileError } = await supabase
     .from('profiles')
-    .select('username, name, surname, rank_tier, department, keycard_number')
+    .select('username, name, surname, rank_tier, department, keycard_number, is_editor')
     .eq('id', session.user.id)
     .single();
   if (profileError) {
@@ -451,7 +443,7 @@ export async function initAuthState() {
 
     let info = link.querySelector('.side-nav__info');
     if (!info) {
-      // старая разметка: name лежит прямо в .side-nav__profile — оборачиваем
+
       const nameEl = link.querySelector('.side-nav__name');
       info = document.createElement('div');
       info.className = 'side-nav__info';
@@ -498,6 +490,20 @@ export async function initAuthState() {
   });
 
   headerAccounts.forEach((el) => { el.textContent = idLabel; });
+
+    if (profile.is_editor) {
+    document.querySelectorAll('.side-nav__body').forEach((navBody) => {
+      if (navBody.querySelector('[data-editor-link]')) return; // уже добавлено
+      const firstSection = navBody.querySelector('.side-nav__section');
+      if (!firstSection) return;
+      const link = document.createElement('a');
+      link.className = 'side-nav__link';
+      link.href = 'create-article.html';
+      link.textContent = 'Создать материал';
+      link.setAttribute('data-editor-link', '');
+      firstSection.appendChild(link);
+    });
+  }
 
   document.querySelectorAll('[data-action="logout"]').forEach((btn) => {
     btn.hidden = false;
