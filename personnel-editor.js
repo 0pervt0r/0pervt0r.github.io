@@ -1,9 +1,4 @@
-// personnel-editor.js
-//
-// Редактор для персоналий и заключённых. Отличается от обычного
-// article-editor.js только набором структурных полей сверху (отдел,
-// ранг, рост/вес и т.д.) — сами блоки текста/картинок переиспользуются
-// оттуда же, чтобы не дублировать логику.
+
 
 import { supabase } from './script.js';
 import {
@@ -87,8 +82,11 @@ export function mountPersonnelEditor(root, { slug: initialSlug = '', kind = 'per
       </div>` : ''}
 
       <div class="form__group">
-        <label class="form__label">Ссылка на аватар/фото</label>
-        <input type="text" class="form__input editor__avatar">
+        <label class="form__label">Фото / аватар (файл будет сохранён в репозитории)</label>
+        <input type="file" class="editor__avatar-file" accept="image/*">
+        <div class="editor__avatar-preview" style="margin-top: var(--gap-sm); width: 96px; height: 96px; background: var(--bg-alt); overflow: hidden;">
+          <img class="editor__avatar-preview-img" style="width:100%; height:100%; object-fit:cover; display:none;">
+        </div>
       </div>
 
       <div class="form__group">
@@ -125,7 +123,20 @@ export function mountPersonnelEditor(root, { slug: initialSlug = '', kind = 'per
   const weightInput = root.querySelector('.editor__weight');
   const birthdateInput = root.querySelector('.editor__birthdate');
   const crimesInput = root.querySelector('.editor__crimes');
-  const avatarInput = root.querySelector('.editor__avatar');
+  const avatarFileInput = root.querySelector('.editor__avatar-file');
+  const avatarPreviewImg = root.querySelector('.editor__avatar-preview-img');
+  let existingAvatarUrl = null;
+
+  avatarFileInput.addEventListener('change', () => {
+    const file = avatarFileInput.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      avatarPreviewImg.src = reader.result;
+      avatarPreviewImg.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  });
   const statusSelect = root.querySelector('.editor__status');
   const clearanceInput = root.querySelector('.editor__clearance');
   const blocksRoot = root.querySelector('.editor__blocks');
@@ -152,6 +163,19 @@ export function mountPersonnelEditor(root, { slug: initialSlug = '', kind = 'per
     redraw();
   });
 
+  function readFileAsBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+
+        const base64 = String(reader.result).split(',')[1] || '';
+        resolve(base64);
+      };
+      reader.onerror = () => reject(reader.error);
+      reader.readAsDataURL(file);
+    });
+  }
+
   root.querySelector('.editor__save').addEventListener('click', async () => {
     statusEl.textContent = 'Сохранение…';
     const { data: sessionData } = await supabase.auth.getSession();
@@ -159,6 +183,11 @@ export function mountPersonnelEditor(root, { slug: initialSlug = '', kind = 'per
       statusEl.textContent = 'Нужно войти в аккаунт.';
       return;
     }
+
+    const selectedFile = avatarFileInput.files[0];
+    const avatarFile = selectedFile
+      ? { name: selectedFile.name, dataBase64: await readFileAsBase64(selectedFile) }
+      : null;
 
     const { data, error } = await supabase.functions.invoke('save-article', {
       body: {
@@ -176,7 +205,7 @@ export function mountPersonnelEditor(root, { slug: initialSlug = '', kind = 'per
           weightKg: weightInput.value ? Number(weightInput.value) : null,
           birthDate: birthdateInput.value || null,
           crimes: isPrisoner ? (crimesInput.value.trim() || null) : null,
-          avatarUrl: avatarInput.value.trim() || null,
+          avatarFile,
           status: statusSelect.value,
         },
       },
@@ -190,7 +219,7 @@ export function mountPersonnelEditor(root, { slug: initialSlug = '', kind = 'per
     statusEl.textContent = 'Сохранено.';
   });
 
-  // Подгрузка существующей записи (текст — из GitHub, структурные поля — из Supabase)
+
   if (initialSlug) {
     fetch(`articles/${initialSlug}.json`, { cache: 'no-store' })
       .then((res) => (res.ok ? res.json() : null))
@@ -220,7 +249,11 @@ export function mountPersonnelEditor(root, { slug: initialSlug = '', kind = 'per
         weightInput.value = p.weight_kg ?? '';
         birthdateInput.value = p.birth_date || '';
         if (crimesInput) crimesInput.value = p.crimes || '';
-        avatarInput.value = p.avatar_url || '';
+        if (p.avatar_url) {
+          existingAvatarUrl = p.avatar_url;
+          avatarPreviewImg.src = p.avatar_url;
+          avatarPreviewImg.style.display = 'block';
+        }
         statusSelect.value = p.status || 'active';
       });
   }
