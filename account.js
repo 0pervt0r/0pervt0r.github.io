@@ -17,27 +17,7 @@ function formatBirthDate(iso) {
   return `${dd}.${mm}.${d.getFullYear()}`;
 }
 
-/*
- * Ожидаемые таблицы Supabase для этой страницы (создать при необходимости):
- *
- * profiles
- *   ...существующие поля (username, name, surname, rank_tier, department,
- *   keycard_number, avatar_url, clearance_level, birth_date)
- *   + bio            text        — описание в шапке профиля
- *   + gallery_urls   jsonb       — массив ссылок на изображения профиля
- *
- * blog_posts
- *   id, author_id (-> profiles.id), content, created_at, score (int, default 0)
- * blog_posts_votes
- *   target_id (-> blog_posts.id), user_id (-> profiles.id), value (int: -1/0/1)
- *   unique (target_id, user_id)
- *
- * articles
- *   id, author_id (-> profiles.id), title, description, slug, created_at
- *
- * friendships
- *   id, user_id, friend_id, status ('pending' | 'accepted'), created_at
- */
+
 
 const params = new URLSearchParams(window.location.search);
 const viewedId = params.get('id');
@@ -68,7 +48,7 @@ async function getCurrentUserId() {
 async function fetchProfile(id) {
   const { data, error } = await supabase
     .from('profiles')
-    .select('id, username, name, surname, rank_tier, department, keycard_number, avatar_url, bio, gallery_urls, birth_date, clearance_level, is_editor')
+    .select('id, username, name, surname, rank_tier, department, keycard_number, bio, gallery_urls, birth_date, clearance_level, is_editor')
     .eq('id', id)
     .single();
   if (error) {
@@ -94,9 +74,6 @@ function renderHeader(profile, isOwn) {
   document.querySelector('[data-field="meta-birthdate"]').textContent = formatBirthDate(profile.birth_date);
   document.querySelector('[data-field="meta-clearance"]').textContent =
     profile.clearance_level != null ? String(profile.clearance_level) : '—';
-
-  const avatarImg = document.querySelector('.profile-header__avatar img');
-  if (avatarImg && profile.avatar_url) avatarImg.src = profile.avatar_url;
 
   const otherActions = document.querySelector('[data-field="actions"]');
   const ownActions = document.querySelector('[data-field="own-actions"]');
@@ -290,7 +267,7 @@ async function renderFriendsTab(profile) {
 
   const { data: rows, error } = await supabase
     .from('friendships')
-    .select('user_id, friend_id, profiles_friend:profiles!friendships_friend_id_fkey(id, username, name, surname, avatar_url), profiles_user:profiles!friendships_user_id_fkey(id, username, name, surname, avatar_url)')
+    .select('user_id, friend_id, profiles_friend:profiles!friendships_friend_id_fkey(id, username, name, surname), profiles_user:profiles!friendships_user_id_fkey(id, username, name, surname)')
     .eq('status', 'accepted')
     .or(`user_id.eq.${profile.id},friend_id.eq.${profile.id}`);
 
@@ -309,7 +286,7 @@ async function renderFriendsTab(profile) {
     el.className = 'friend-row';
     el.innerHTML = `
       <a class="friend-row__avatar" href="account.html?id=${friend.id}">
-        <img src="${friend.avatar_url || 'assets/avatar_placeholder.png'}" alt="">
+        <img src="${friend.avatar_url || 'avatar_placeholder.png'}" alt="">
       </a>
       <div>
         <a class="friend-row__name" href="account.html?id=${friend.id}">${escapeHtml(displayName)}</a>
