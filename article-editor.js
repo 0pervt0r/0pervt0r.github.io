@@ -15,17 +15,17 @@
 import { supabase } from './script.js';
 
 let blockCounter = 0;
-function nextId() { return `b${++blockCounter}`; }
+export function nextId() { return `b${++blockCounter}`; }
 
-function emptyTextBlock() {
+export function emptyTextBlock() {
   return { id: nextId(), type: 'text', align: 'left', highlight: false, footnote: '', redacted: null, content: '' };
 }
 
-function emptyImageBlock() {
+export function emptyImageBlock() {
   return { id: nextId(), type: 'image', position: 'center', src: '', caption: '' };
 }
 
-function renderTextBlockEditor(block, onChange, onRemove) {
+export function renderTextBlockEditor(block, onChange, onRemove) {
   const wrap = document.createElement('div');
   wrap.className = 'editor-block';
   wrap.innerHTML = `
@@ -73,7 +73,7 @@ function renderTextBlockEditor(block, onChange, onRemove) {
   return wrap;
 }
 
-function renderImageBlockEditor(block, onChange, onRemove) {
+export function renderImageBlockEditor(block, onChange, onRemove) {
   const wrap = document.createElement('div');
   wrap.className = 'editor-block';
   wrap.innerHTML = `

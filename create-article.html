@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Создать материал — Urbanshade Chronicles</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<aside class="side-nav">
+  <a class="side-nav__profile" href="login.html">
+    <div class="side-nav__avatar">
+      <img src="assets/avatar_placeholder.png" alt="">
+    </div>
+    <div class="side-nav__name">Войти в аккаунт</div>
+  </a>
+  <nav class="side-nav__body">
+    <div class="side-nav__section">
+      <div class="side-nav__section-title">Навигация</div>
+      <a class="side-nav__link" href="map.html">Карта</a>
+      <a class="side-nav__link" href="account.html">Личный аккаунт</a>
+      <a class="side-nav__link" href="minigames.html">Мини-игры</a>
+      <a class="side-nav__link" href="classifications.html">Классификации</a>
+      <a class="side-nav__link" href="mail.html">Почта</a>
+    </div>
+    <div class="side-nav__section">
+      <div class="side-nav__section-title">Разделы</div>
+      <a class="side-nav__link" href="personnel.html">Персоналии</a>
+      <a class="side-nav__link" href="prisoners.html">Заключённые</a>
+      <a class="side-nav__link" href="zobjects.html">Z-объекты</a>
+      <a class="side-nav__link" href="docs.html">Документация</a>
+    </div>
+  </nav>
+  <div class="side-nav__lang">
+    <button type="button" class="active" data-lang="ru">RU</button>
+    <button type="button" data-lang="en">EN</button>
+    <button type="button" data-lang="es">ES</button>
+  </div>
+</aside>
+
+<main class="container main">
+  <div data-field="denied" hidden>
+    <h1>Доступ ограничен</h1>
+    <p>Создание материалов доступно только редакторам сайта.</p>
+  </div>
+
+  <div data-field="picker" hidden>
+    <h1>Что будем писать?</h1>
+    <p>Выбери шаблон материала — дальше откроется редактор с нужными полями.</p>
+
+    <nav class="section-links" style="margin-top: var(--gap-lg);">
+      <a class="section-links__item" href="write-article.html?section=docs&kind=plain">
+        <img src="docs_icon.png" alt="">
+        <span class="divider-v"></span>
+        <span>Документ</span>
+      </a>
+      <a class="section-links__item" href="write-article.html?section=zobjects&kind=plain">
+        <img src="zobjects_icon.png" alt="">
+        <span class="divider-v"></span>
+        <span>Z-объект</span>
+      </a>
+      <a class="section-links__item" href="write-article.html?section=fauna&kind=plain">
+        <img src="zobjects_icon.png" alt="">
+        <span class="divider-v"></span>
+        <span>Фауна Лет-Ванд</span>
+      </a>
+      <a class="section-links__item" href="write-article.html?section=stories&kind=plain">
+        <img src="docs_icon.png" alt="">
+        <span class="divider-v"></span>
+        <span>Рассказ</span>
+      </a>
+      <a class="section-links__item" href="write-article.html?section=personnel&kind=personnel">
+        <img src="workers_icon.png" alt="">
+        <span class="divider-v"></span>
+        <span>Персоналия</span>
+      </a>
+      <a class="section-links__item" href="write-article.html?section=prisoners&kind=prisoners">
+        <img src="prisoners_icons.png" alt="">
+        <span class="divider-v"></span>
+        <span>Заключённый</span>
+      </a>
+    </nav>
+  </div>
+</main>
+
+<script type="module" src="script.js"></script>
+<script type="module">
+  import { supabase } from './script.js';
+
+  async function checkEditorAccess() {
+    const { data: sessionData } = await supabase.auth.getSession();
+    const denied = document.querySelector('[data-field="denied"]');
+    const picker = document.querySelector('[data-field="picker"]');
+
+    if (!sessionData?.session) {
+      denied.hidden = false;
+      return;
+    }
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('is_editor')
+      .eq('id', sessionData.session.user.id)
+      .single();
+
+    if (profile?.is_editor) {
+      picker.hidden = false;
+    } else {
+      denied.hidden = false;
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', checkEditorAccess);
+</script>
+</body>
+</html>

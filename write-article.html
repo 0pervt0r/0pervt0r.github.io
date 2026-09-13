@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Редактор — Urbanshade Chronicles</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<aside class="side-nav">
+  <a class="side-nav__profile" href="login.html">
+    <div class="side-nav__avatar">
+      <img src="assets/avatar_placeholder.png" alt="">
+    </div>
+    <div class="side-nav__name">Войти в аккаунт</div>
+  </a>
+  <nav class="side-nav__body">
+    <div class="side-nav__section">
+      <div class="side-nav__section-title">Навигация</div>
+      <a class="side-nav__link" href="map.html">Карта</a>
+      <a class="side-nav__link" href="account.html">Личный аккаунт</a>
+      <a class="side-nav__link" href="minigames.html">Мини-игры</a>
+      <a class="side-nav__link" href="classifications.html">Классификации</a>
+      <a class="side-nav__link" href="mail.html">Почта</a>
+    </div>
+    <div class="side-nav__section">
+      <div class="side-nav__section-title">Разделы</div>
+      <a class="side-nav__link" href="personnel.html">Персоналии</a>
+      <a class="side-nav__link" href="prisoners.html">Заключённые</a>
+      <a class="side-nav__link" href="zobjects.html">Z-объекты</a>
+      <a class="side-nav__link" href="docs.html">Документация</a>
+    </div>
+  </nav>
+  <div class="side-nav__lang">
+    <button type="button" class="active" data-lang="ru">RU</button>
+    <button type="button" data-lang="en">EN</button>
+    <button type="button" data-lang="es">ES</button>
+  </div>
+</aside>
+
+<main class="container main">
+  <div data-field="denied" hidden>
+    <h1>Доступ ограничен</h1>
+    <p>Редактирование материалов доступно только редакторам сайта.</p>
+  </div>
+  <div id="editor-root" data-field="editor-root" hidden></div>
+</main>
+
+<script type="module" src="script.js"></script>
+<script type="module">
+  import { supabase } from './script.js';
+  import { mountArticleEditor } from './article-editor.js';
+  import { mountPersonnelEditor } from './personnel-editor.js';
+
+  const PLAIN_KINDS = new Set(['plain']);
+  const PERSONNEL_KINDS = new Set(['personnel', 'prisoners']);
+
+  async function initEditorPage() {
+    const params = new URLSearchParams(window.location.search);
+    const section = params.get('section') || 'docs';
+    const kind = params.get('kind') || 'plain';
+    const slug = params.get('slug') || '';
+
+    const denied = document.querySelector('[data-field="denied"]');
+    const editorRoot = document.querySelector('[data-field="editor-root"]');
+
+    const { data: sessionData } = await supabase.auth.getSession();
+    if (!sessionData?.session) { denied.hidden = false; return; }
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('is_editor')
+      .eq('id', sessionData.session.user.id)
+      .single();
+
+    if (!profile?.is_editor) { denied.hidden = false; return; }
+
+    editorRoot.hidden = false;
+
+    if (PERSONNEL_KINDS.has(kind)) {
+      mountPersonnelEditor(editorRoot, { slug, kind });
+    } else if (PLAIN_KINDS.has(kind)) {
+      mountArticleEditor(editorRoot, { slug });
+      // Раздел (section) для обычных статей задаётся полем "Раздел" внутри
+      // самого редактора — предзаполним его значением из ссылки, чтобы
+      // не приходилось вводить руками при переходе с create-article.html.
+      const sectionInput = editorRoot.querySelector('.editor__section');
+      if (sectionInput && !sectionInput.value) sectionInput.value = section;
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', initEditorPage);
+</script>
+</body>
+</html>
