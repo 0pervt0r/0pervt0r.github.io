@@ -110,9 +110,9 @@ function initComments(root) {
     <div class="account-preview__username"></div>
     <div class="account-preview__desc"></div>
     <div class="account-preview__actions">
-      <button data-action="friend"><img src="assets/add_friend.png" alt=""></button>
-      <button data-action="view"><img src="assets/account_see.png" alt=""></button>
-      <button data-action="block"><img src="assets/block.png" alt=""></button>
+      <button data-action="friend"><img src="add_friend.png" alt=""></button>
+      <button data-action="view"><img src="account_see.png" alt=""></button>
+      <button data-action="block"><img src="block.png" alt=""></button>
     </div>
   `;
   document.body.appendChild(preview);
@@ -571,7 +571,7 @@ function renderKeycard(root, { username, department, keycardNumber }) {
     card.className = 'keycard';
     card.innerHTML = `
       <div class="keycard__top">
-        <img class="keycard__icon" src="assets/keycard_background.png" alt="">
+        <img class="keycard__icon" src="keycard_background.png" alt="">
         <div>
           <div class="keycard__username">${username}</div>
           <div class="keycard__rank">LR-${department}</div>
